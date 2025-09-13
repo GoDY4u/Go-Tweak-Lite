@@ -2,14 +2,6 @@
 Write-Host "🚀 Go-Tweak Lite Installer" -ForegroundColor Magenta
 Write-Host "==========================================" -ForegroundColor Cyan
 
-# Check execution policy and bypass if needed
-$currentPolicy = Get-ExecutionPolicy
-if ($currentPolicy -eq "Restricted") {
-    Write-Host "⚠️  Execution policy is Restricted" -ForegroundColor Yellow
-    Write-Host "🔓 Temporarily bypassing execution policy..." -ForegroundColor Cyan
-    Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force
-}
-
 # Check if running as administrator
 $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 if (-not $isAdmin) {
@@ -60,10 +52,6 @@ try {
     Write-Host "✅ Installation complete!" -ForegroundColor Green
     Write-Host "📍 Location: $installPath" -ForegroundColor Cyan
     
-    # Set execution policy for the main script
-    Write-Host "🔓 Setting execution policy for Go-Tweak..." -ForegroundColor Cyan
-    Set-ExecutionPolicy -ExecutionPolicy RemoteSigned -Scope Process -Force
-    
     # AUTO-RUN after installation
     Write-Host "🎯 Auto-starting Go-Tweak..." -ForegroundColor Yellow
     Start-Sleep -Seconds 2
@@ -71,7 +59,7 @@ try {
     & "$installPath\Go-Tweak.ps1"
     
 } catch {
-    Write-Host "❌ Error: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "❌ Download failed: $($_.Exception.Message)" -ForegroundColor Red
     Write-Host "📋 Please download manually from:" -ForegroundColor Yellow
     Write-Host "   https://github.com/GoDY4u/Go-Tweak-Lite" -ForegroundColor Cyan
     pause
