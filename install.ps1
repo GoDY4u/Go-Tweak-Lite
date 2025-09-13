@@ -1,4 +1,4 @@
-# install.ps1 - Go-Tweak Lite Installer
+# install.ps1 - Go-Tweak Lite Installer (FIXED VERSION)
 Write-Host "🚀 Go-Tweak Lite Installer" -ForegroundColor Magenta
 Write-Host "==========================================" -ForegroundColor Cyan
 
@@ -24,9 +24,6 @@ if (Test-Path $installPath) {
     New-Item -Path $installPath -ItemType Directory -Force | Out-Null
 }
 
-# Change to installation directory
-Set-Location $installPath
-
 # Download repository
 Write-Host "📥 Downloading Go-Tweak Lite..." -ForegroundColor Cyan
 $repoUrl = "https://github.com/GoDY4u/Go-Tweak-Lite/archive/main.zip"
@@ -40,26 +37,37 @@ try {
     Write-Host "📦 Extracting files..." -ForegroundColor Cyan
     Expand-Archive -Path $zipFile -DestinationPath $installPath -Force
     
-    # Move files to main folder (organized)
+    # FIX: Move files from the subfolder to main folder
     Write-Host "🗂️  Organizing files..." -ForegroundColor Cyan
-    $tempFolder = Join-Path $installPath "Go-Tweak-Lite-main"
-    if (Test-Path $tempFolder) {
-        Move-Item -Path "$tempFolder\*" -Destination $installPath -Force
-        Remove-Item -Path $tempFolder -Recurse -Force
+    $subFolder = Get-ChildItem -Path $installPath -Directory | Where-Object { $_.Name -like "Go-Tweak-Lite*" } | Select-Object -First 1
+    
+    if ($subFolder) {
+        Write-Host "📁 Moving files from: $($subFolder.Name)" -ForegroundColor Cyan
+        Move-Item -Path "$($subFolder.FullName)\*" -Destination $installPath -Force
+        Remove-Item -Path $subFolder.FullName -Recurse -Force
     }
+    
     Remove-Item -Path $zipFile -Force
     
     Write-Host "✅ Installation complete!" -ForegroundColor Green
     Write-Host "📍 Location: $installPath" -ForegroundColor Cyan
     
+    # Verify structure
+    Write-Host "📋 Verifying structure..." -ForegroundColor Cyan
+    if (Test-Path "$installPath\content\scripts") {
+        Write-Host "✅ Scripts folder found!" -ForegroundColor Green
+    } else {
+        Write-Host "❌ Scripts folder missing!" -ForegroundColor Red
+    }
+    
     # AUTO-RUN after installation
     Write-Host "🎯 Auto-starting Go-Tweak..." -ForegroundColor Yellow
     Start-Sleep -Seconds 2
-    Clear-Host
+    Set-Location $installPath
     & "$installPath\Go-Tweak.ps1"
     
 } catch {
-    Write-Host "❌ Download failed: $($_.Exception.Message)" -ForegroundColor Red
+    Write-Host "❌ Error: $($_.Exception.Message)" -ForegroundColor Red
     Write-Host "📋 Please download manually from:" -ForegroundColor Yellow
     Write-Host "   https://github.com/GoDY4u/Go-Tweak-Lite" -ForegroundColor Cyan
     pause
