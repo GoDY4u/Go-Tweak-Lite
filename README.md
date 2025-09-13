@@ -4,7 +4,6 @@
 ![Windows](https://img.shields.io/badge/Windows-10|11-0078D6.svg)
 ![License](https://img.shields.io/badge/License-MIT-green.svg)
 ![Version](https://img.shields.io/badge/Version-Lite%20Edition-lightgrey.svg)
-![Platform](https://img.shields.io/badge/Platform-Windows-x64-red.svg)
 ![Maintenance](https://img.shields.io/badge/Maintenance-Actively%20Developed-brightgreen.svg)
 
 **Go-Tweak Lite** is a powerful PowerShell-based optimization tool designed specifically for gamers and power users. This lightweight console application delivers serious performance boosts without the bloat of graphical interfaces.
