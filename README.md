@@ -40,3 +40,14 @@
 ## ✨ **Features**
 
 ### 🎮 **Gaming Optimizations**
+
+Step 2: Run as Administrator (REQUIRED)
+
+# Method 1: Right-click -> "Run as Administrator"
+.\Go-Tweak.ps1
+
+# Method 2: PowerShell command (recommended)
+powershell.exe -ExecutionPolicy Bypass -File "Go-Tweak.ps1"
+
+# Method 3: Quiet mode (no console output)
+.\Go-Tweak.ps1 -Quiet
