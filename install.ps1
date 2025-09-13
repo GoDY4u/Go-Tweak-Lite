@@ -1,74 +1,72 @@
-# install.ps1 - Go-Tweak Lite Installer (FIXED VERSION)
+# install.ps1 - SIMPLE Installer that WORKS
 Write-Host "🚀 Go-Tweak Lite Installer" -ForegroundColor Magenta
 Write-Host "==========================================" -ForegroundColor Cyan
 
-# Check if running as administrator
+# Check admin
 $isAdmin = ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 if (-not $isAdmin) {
-    Write-Host "❌ Please run as Administrator!" -ForegroundColor Red
+    Write-Host "❌ Run as Administrator!" -ForegroundColor Red
     Write-Host "   Right-click -> Run as Administrator" -ForegroundColor Yellow
     pause
     exit 1
 }
 
-# Create folder on Desktop
-$desktopPath = [Environment]::GetFolderPath("Desktop")
-$installPath = Join-Path $desktopPath "Go-Tweak-Lite"
-
-Write-Host "📁 Creating folder on Desktop: Go-Tweak-Lite" -ForegroundColor Cyan
-
-if (Test-Path $installPath) {
-    Write-Host "⚠️  Folder already exists. Cleaning..." -ForegroundColor Yellow
-    Remove-Item -Path "$installPath\*" -Recurse -Force
-} else {
-    New-Item -Path $installPath -ItemType Directory -Force | Out-Null
+# Create folder
+$installPath = "$env:USERPROFILE\Desktop\Go-Tweak-Lite"
+if (Test-Path $installPath) { 
+    Remove-Item -Path "$installPath\*" -Recurse -Force 
+} else { 
+    New-Item -Path $installPath -ItemType Directory -Force | Out-Null 
 }
 
-# Download repository
-Write-Host "📥 Downloading Go-Tweak Lite..." -ForegroundColor Cyan
-$repoUrl = "https://github.com/GoDY4u/Go-Tweak-Lite/archive/main.zip"
-$zipFile = Join-Path $installPath "Go-Tweak-Lite.zip"
+# Download EACH FILE individually
+Write-Host "📥 Downloading files..." -ForegroundColor Cyan
 
-try {
-    # Download zip
-    Invoke-RestMethod -Uri $repoUrl -OutFile $zipFile
-    
-    # Extract files
-    Write-Host "📦 Extracting files..." -ForegroundColor Cyan
-    Expand-Archive -Path $zipFile -DestinationPath $installPath -Force
-    
-    # FIX: Move files from the subfolder to main folder
-    Write-Host "🗂️  Organizing files..." -ForegroundColor Cyan
-    $subFolder = Get-ChildItem -Path $installPath -Directory | Where-Object { $_.Name -like "Go-Tweak-Lite*" } | Select-Object -First 1
-    
-    if ($subFolder) {
-        Write-Host "📁 Moving files from: $($subFolder.Name)" -ForegroundColor Cyan
-        Move-Item -Path "$($subFolder.FullName)\*" -Destination $installPath -Force
-        Remove-Item -Path $subFolder.FullName -Recurse -Force
+# Create folder structure
+New-Item -Path "$installPath\content\scripts\internet" -ItemType Directory -Force | Out-Null
+New-Item -Path "$installPath\content\scripts\globaloptimization" -ItemType Directory -Force | Out-Null
+New-Item -Path "$installPath\content\scripts\ram" -ItemType Directory -Force | Out-Null
+
+# Download main script
+Invoke-WebRequest -Uri "https://raw.githubusercontent.com/GoDY4u/Go-Tweak-Lite/main/Go-Tweak.ps1" -OutFile "$installPath\Go-Tweak.ps1" -UseBasicParsing
+
+# Download script files
+$files = @(
+    "content/scripts/internet/active-internetscript.bat",
+    "content/scripts/internet/desactive-internetscript.bat",
+    "content/scripts/globaloptimization/active-globaloptimization.reg", 
+    "content/scripts/globaloptimization/desactive-globaloptimization.reg",
+    "content/scripts/ram/4GB RAM.reg",
+    "content/scripts/ram/6GB RAM.reg",
+    "content/scripts/ram/8GB RAM.reg",
+    "content/scripts/ram/12GB RAM.reg",
+    "content/scripts/ram/16GB RAM.reg",
+    "content/scripts/ram/24GB RAM.reg",
+    "content/scripts/ram/32GB RAM.reg",
+    "content/scripts/ram/64GB RAM.reg",
+    "content/scripts/ram/Restablecer valores predeterminados.reg",
+    "content/scripts/wincleaner.bat",
+    "content/scripts/gpedit-installer.bat"
+)
+
+foreach ($file in $files) {
+    try {
+        $fileName = Split-Path $file -Leaf
+        $folderPath = Split-Path $file -Parent
+        $fullPath = Join-Path $installPath $folderPath
+        
+        Invoke-WebRequest -Uri "https://raw.githubusercontent.com/GoDY4u/Go-Tweak-Lite/main/$file" -OutFile "$fullPath\$fileName" -UseBasicParsing
+        Write-Host "✅ $fileName" -ForegroundColor Green
+    } catch {
+        Write-Host "⚠️  Missing: $file" -ForegroundColor Yellow
     }
-    
-    Remove-Item -Path $zipFile -Force
-    
-    Write-Host "✅ Installation complete!" -ForegroundColor Green
-    Write-Host "📍 Location: $installPath" -ForegroundColor Cyan
-    
-    # Verify structure
-    Write-Host "📋 Verifying structure..." -ForegroundColor Cyan
-    if (Test-Path "$installPath\content\scripts") {
-        Write-Host "✅ Scripts folder found!" -ForegroundColor Green
-    } else {
-        Write-Host "❌ Scripts folder missing!" -ForegroundColor Red
-    }
-    
-    # AUTO-RUN after installation
-    Write-Host "🎯 Auto-starting Go-Tweak..." -ForegroundColor Yellow
-    Start-Sleep -Seconds 2
-    Set-Location $installPath
-    & "$installPath\Go-Tweak.ps1"
-    
-} catch {
-    Write-Host "❌ Error: $($_.Exception.Message)" -ForegroundColor Red
-    Write-Host "📋 Please download manually from:" -ForegroundColor Yellow
-    Write-Host "   https://github.com/GoDY4u/Go-Tweak-Lite" -ForegroundColor Cyan
-    pause
 }
+
+Write-Host "✅ ALL files downloaded!" -ForegroundColor Green
+Write-Host "📍 Location: $installPath" -ForegroundColor Cyan
+
+# Auto-run
+Write-Host "🎯 Starting Go-Tweak..." -ForegroundColor Yellow
+Start-Sleep -Seconds 2
+Set-Location $installPath
+.\Go-Tweak.ps1
