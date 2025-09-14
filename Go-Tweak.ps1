@@ -1,4 +1,4 @@
-﻿# Go-Tweak.ps1 - Windows Optimization Tool
+# Go-Tweak.ps1 - Windows Optimization Tool
 # Requires administrator execution
 
 param(
@@ -14,6 +14,7 @@ $script:ScriptsPath = Join-Path $ContentPath "scripts"
 $script:RAMPath = Join-Path $ScriptsPath "ram"
 $script:InternetPath = Join-Path $ScriptsPath "internet"
 $script:GlobalOptimizationPath = Join-Path $ScriptsPath "globaloptimization"
+$script:OtherTweaksPath = Join-Path $ScriptsPath "othertweaks"
 
 # Check execution policy
 if ((Get-ExecutionPolicy) -eq "Restricted") {
@@ -36,7 +37,7 @@ function Initialize-ProjectStructure {
     }
     
     # Check if essential project folders exist
-    $essentialFolders = @($ScriptsPath, $RAMPath, $InternetPath, $GlobalOptimizationPath)
+    $essentialFolders = @($ScriptsPath, $RAMPath, $InternetPath, $GlobalOptimizationPath, $OtherTweaksPath)
     foreach ($folder in $essentialFolders) {
         if (-not (Test-Path $folder)) {
             Write-Host "WARNING: Folder not found: $folder" -ForegroundColor Yellow
@@ -69,37 +70,27 @@ function Test-Admin {
     return $currentUser.IsInRole([Security.Principal.WindowsBuiltInRole]::Administrator)
 }
 
-# Function to create restore point
+# Function to create restore point (VERSIÓN SIMPLE)
 function Create-RestorePoint {
-    Write-Log "Creating system restore point..."
+    Write-Log "Opening System Restore creation tool..."
     
     try {
-        # Check if restore service is enabled
-        $restoreService = Get-Service -Name srservice -ErrorAction SilentlyContinue
-        if ($restoreService.Status -ne "Running") {
-            Write-Log "System restore service is not running" "WARNING"
-            return $false
-        }
+        # Abrir directamente la herramienta de crear punto de restauración
+        Start-Process "systempropertiesprotection.exe"
+        Write-Log "System Protection settings opened successfully" "SUCCESS"
         
-        # Create restore point
-        $restorePoint = Checkpoint-Computer -Description "Go-Tweak Optimization - $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')" -RestorePointType MODIFY_SETTINGS
+        Write-Host "✅ Herramienta de puntos de restauración abierta" -ForegroundColor Green
+        Write-Host "📋 Sigue estos pasos:" -ForegroundColor Cyan
+        Write-Host "   1. Haz clic en 'Crear...'" -ForegroundColor White
+        Write-Host "   2. Usa el nombre: 'Go-Tweak $(Get-Date -Format 'yyyy-MM-dd HH:mm')'" -ForegroundColor Yellow
+        Write-Host "   3. Sigue las instrucciones" -ForegroundColor White
+        Write-Host "   4. Cierra la ventana cuando termines" -ForegroundColor White
         
-        if ($restorePoint) {
-            Write-Log "Restore point created successfully" "SUCCESS"
-            return $true
-        } else {
-            # Try with wmic for older systems
-            $wmicResult = wmic.exe /Namespace:\\root\default Path SystemRestore Call CreateRestorePoint "Go-Tweak Optimization $(Get-Date -Format 'yyyy-MM-dd HH:mm:ss')", 100, 7
-            if ($wmicResult -like "*ReturnValue = 0*") {
-                Write-Log "Restore point created successfully (via WMIC)" "SUCCESS"
-                return $true
-            } else {
-                Write-Log "Could not create restore point" "WARNING"
-                return $false
-            }
-        }
+        return $true
     } catch {
-        Write-Log "Error creating restore point: $($_.Exception.Message)" "ERROR"
+        Write-Log "Error opening System Protection: $($_.Exception.Message)" "ERROR"
+        Write-Host "❌ No se pudo abrir la herramienta de restauración" -ForegroundColor Red
+        Write-Host "💡 Abre manualmente: Panel de Control → Sistema → Protección del sistema" -ForegroundColor Yellow
         return $false
     }
 }
@@ -419,6 +410,68 @@ function Open-NetworkConnections {
     }
 }
 
+# Function to apply other tweaks
+function Invoke-OtherTweaks {
+    Write-Log "Applying other system tweaks..."
+    
+    $otherTweaksScript = Join-Path $OtherTweaksPath "other-tweaks.ps1"
+    
+    if (Test-Path $otherTweaksScript) {
+        try {
+            Write-Log "Executing other tweaks script..."
+            
+            # Cambiar temporalmente la política de ejecución
+            $originalPolicy = Get-ExecutionPolicy
+            Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force -ErrorAction SilentlyContinue
+            
+            & $otherTweaksScript
+            
+            # Restaurar la política original
+            Set-ExecutionPolicy -ExecutionPolicy $originalPolicy -Scope Process -Force -ErrorAction SilentlyContinue
+            
+            Write-Log "Other tweaks applied successfully" "SUCCESS"
+            return $true
+        } catch {
+            Write-Log "Error applying other tweaks: $($_.Exception.Message)" "ERROR"
+            return $false
+        }
+    } else {
+        Write-Log "Other tweaks script not found: $otherTweaksScript" "ERROR"
+        return $false
+    }
+}
+
+# Function to revert tweaks
+function Invoke-RevertTweaks {
+    Write-Log "Reverting system tweaks..."
+    
+    $revertScript = Join-Path $OtherTweaksPath "revert-tweaks.ps1"
+    
+    if (Test-Path $revertScript) {
+        try {
+            Write-Log "Executing revert tweaks script..."
+            
+            # Cambiar temporalmente la política de ejecución
+            $originalPolicy = Get-ExecutionPolicy
+            Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force -ErrorAction SilentlyContinue
+            
+            & $revertScript
+            
+            # Restaurar la política original
+            Set-ExecutionPolicy -ExecutionPolicy $originalPolicy -Scope Process -Force -ErrorAction SilentlyContinue
+            
+            Write-Log "Tweaks reverted successfully" "SUCCESS"
+            return $true
+        } catch {
+            Write-Log "Error reverting tweaks: $($_.Exception.Message)" "ERROR"
+            return $false
+        }
+    } else {
+        Write-Log "Revert script not found: $revertScript" "ERROR"
+        return $false
+    }
+}
+
 # Show options menu
 function Show-Menu {
     Clear-Host
@@ -430,17 +483,18 @@ function Show-Menu {
     Write-Host "1. Windows Cleanup" -ForegroundColor Yellow
     Write-Host "2. RAM Optimization" -ForegroundColor Yellow
     Write-Host "3. Optimize FPS" -ForegroundColor Yellow
-    Write-Host "4. Optimize Internet" -ForegroundColor Yellow
-    Write-Host "5. Install GPEdit (Windows Home)" -ForegroundColor Yellow
-    Write-Host "6. Power Plan: Maximum Performance" -ForegroundColor Yellow
-    Write-Host "7. Install Visual C++ & DirectX" -ForegroundColor Yellow
-    Write-Host "8. Keyboard Properties" -ForegroundColor Cyan
-    Write-Host "9. Mouse Properties" -ForegroundColor Cyan
-    Write-Host "10. Performance Options" -ForegroundColor Cyan
-    Write-Host "11. Device Manager" -ForegroundColor Cyan
-    Write-Host "12. Network Connections" -ForegroundColor Cyan
-    Write-Host "13. Disable Optimizations" -ForegroundColor Magenta
-    Write-Host "14. Exit" -ForegroundColor Red
+    Write-Host "4. Apply Other Tweaks" -ForegroundColor Yellow
+    Write-Host "5. Optimize Internet" -ForegroundColor Yellow
+    Write-Host "6. Install GPEdit (Windows Home)" -ForegroundColor Yellow
+    Write-Host "7. Power Plan: Maximum Performance" -ForegroundColor Yellow
+    Write-Host "8. Install Visual C++ & DirectX" -ForegroundColor Yellow
+    Write-Host "9. Keyboard Properties" -ForegroundColor Cyan
+    Write-Host "10. Mouse Properties" -ForegroundColor Cyan
+    Write-Host "11. Performance Options" -ForegroundColor Cyan
+    Write-Host "12. Device Manager" -ForegroundColor Cyan
+    Write-Host "13. Network Connections" -ForegroundColor Cyan
+    Write-Host "14. Disable Optimizations" -ForegroundColor Red
+    Write-Host "15. Exit" -ForegroundColor Red
     Write-Host ""
 }
 
@@ -453,7 +507,8 @@ function Show-DisableMenu {
     Write-Host ""
     Write-Host "1. Disable FPS Optimization" -ForegroundColor Yellow
     Write-Host "2. Disable Internet Optimization" -ForegroundColor Yellow
-    Write-Host "3. Return to main menu" -ForegroundColor Green
+    Write-Host "3. Revert Other Tweaks" -ForegroundColor Yellow
+    Write-Host "4. Return to main menu" -ForegroundColor Green
     Write-Host ""
 }
 
@@ -479,17 +534,12 @@ function Main {
         # Interactive console mode
         do {
             Show-Menu
-            $choice = Read-Host "Select an option (0-14)"
+            $choice = Read-Host "Select an option (0-15)"
             
             switch ($choice) {
                 "0" { 
-                    Write-Log "Creating restore point..."
+                    Write-Log "Opening restore point creation tool..."
                     $result = Create-RestorePoint
-                    if ($result) {
-                        Write-Host "✅ Restore point created successfully" -ForegroundColor Green
-                    } else {
-                        Write-Host "⚠️  Could not create restore point (may be disabled)" -ForegroundColor Yellow
-                    }
                     Read-Host "Press Enter to continue..."
                 }
                 "1" { 
@@ -621,6 +671,16 @@ function Main {
                     Read-Host "Press Enter to continue..."
                 }
                 "4" { 
+                    Write-Log "Applying other system tweaks..."
+                    $result = Invoke-OtherTweaks
+                    if ($result) {
+                        Write-Host "✅ Other tweaks applied successfully" -ForegroundColor Green
+                    } else {
+                        Write-Host "❌ Error applying other tweaks" -ForegroundColor Red
+                    }
+                    Read-Host "Press Enter to continue..."
+                }
+                "5" { 
                     Write-Log "Applying internet optimization..."
                     $result = Invoke-OptimizationScript -ScriptCategory "internet" -ScriptName "internetscript.bat" -Enable $true -FriendlyName "Internet Optimization"
                     if ($result) {
@@ -630,7 +690,7 @@ function Main {
                     }
                     Read-Host "Press Enter to continue..."
                 }
-                "5" { 
+                "6" { 
                     Write-Log "Installing GPEdit..."
                     $result = Install-GPEdit
                     if ($result) {
@@ -640,7 +700,7 @@ function Main {
                     }
                     Read-Host "Press Enter to continue..."
                 }
-                "6" { 
+                "7" { 
                     Write-Log "Configuring maximum performance power plan..."
                     $result = Set-MaxPerformancePowerPlan
                     if ($result) {
@@ -650,7 +710,7 @@ function Main {
                     }
                     Read-Host "Press Enter to continue..."
                 }
-                "7" { 
+                "8" { 
                     Write-Log "Installing components..."
                     $result = Install-VisualsAndDirectX
                     if ($result) {
@@ -661,7 +721,7 @@ function Main {
                     }
                     Read-Host "Press Enter to continue..."
                 }
-                "8" { 
+                "9" { 
                     Write-Log "Opening keyboard properties..."
                     $result = Open-KeyboardProperties
                     if ($result) {
@@ -671,7 +731,7 @@ function Main {
                     }
                     Read-Host "Press Enter to continue..."
                 }
-                "9" { 
+                "10" { 
                     Write-Log "Opening mouse properties..."
                     $result = Open-MouseProperties
                     if ($result) {
@@ -681,7 +741,7 @@ function Main {
                     }
                     Read-Host "Press Enter to continue..."
                 }
-                "10" { 
+                "11" { 
                     Write-Log "Opening performance options..."
                     $result = Open-PerformanceOptions
                     if ($result) {
@@ -691,7 +751,7 @@ function Main {
                     }
                     Read-Host "Press Enter to continue..."
                 }
-                "11" { 
+                "12" { 
                     Write-Log "Opening Device Manager..."
                     $result = Open-DeviceManager
                     if ($result) {
@@ -701,7 +761,7 @@ function Main {
                     }
                     Read-Host "Press Enter to continue..."
                 }
-                "12" { 
+                "13" { 
                     Write-Log "Opening network connections..."
                     $result = Open-NetworkConnections
                     if ($result) {
@@ -711,11 +771,11 @@ function Main {
                     }
                     Read-Host "Press Enter to continue..."
                 }
-                "13" { 
+                "14" { 
                     # Submenu to disable optimizations
                     do {
                         Show-DisableMenu
-                        $disableChoice = Read-Host "Select an option (1-3)"
+                        $disableChoice = Read-Host "Select an option (1-4)"
                         
                         switch ($disableChoice) {
                             "1" { 
@@ -739,6 +799,16 @@ function Main {
                                 Read-Host "Press Enter to continue..."
                             }
                             "3" { 
+                                Write-Log "Reverting other tweaks..."
+                                $result = Invoke-RevertTweaks
+                                if ($result) {
+                                    Write-Host "✅ Other tweaks reverted successfully" -ForegroundColor Green
+                                } else {
+                                    Write-Host "❌ Error reverting other tweaks" -ForegroundColor Red
+                                }
+                                Read-Host "Press Enter to continue..."
+                            }
+                            "4" { 
                                 # Return to main menu
                                 break
                             }
@@ -747,9 +817,9 @@ function Main {
                                 Start-Sleep -Seconds 1
                             }
                         }
-                    } while ($disableChoice -ne "3")
+                    } while ($disableChoice -ne "4")
                 }
-                "14" { 
+                "15" { 
                     Write-Log "Exiting Go-Tweak" "SUCCESS"
                     Write-Host "Goodbye! 👋" -ForegroundColor Green
                     exit 0
