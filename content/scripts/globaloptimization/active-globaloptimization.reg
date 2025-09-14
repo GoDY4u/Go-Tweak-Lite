@@ -433,11 +433,11 @@ Windows Registry Editor Version 5.00
   6c,00,65,00,25,00,5c,00,41,00,70,00,70,00,44,00,61,00,74,00,61,00,5c,00,\
   52,00,6f,00,61,00,6d,00,69,00,6e,00,67,00,00,00
 "Cache"=hex(2):25,00,75,00,73,00,65,00,72,00,70,00,72,00,6f,00,66,00,69,00,\
-  6c,00,65,00,25,00,5c,00,41,00,70,00,70,00,44,00,61,00,74,00,61,00,5c,00,\
-  4c,00,6f,00,63,00,61,00,6d,00,69,00,6e,00,67,00,5c,00,4d,00,69,00,63,00,\
-  72,00,6f,00,73,00,6f,00,66,00,74,00,5c,00,57,00,69,00,6e,00,66,00,6f,00,\
-  77,00,73,00,5c,00,49,00,4e,00,65,00,74,00,43,00,61,00,63,00,68,00,65,00,\
-  00,00
+  6c,00,65,00,25,00,5c,00,41,00,70,00,44,00,61,00,74,00,61,00,5c,00,\
+  4c,00,6f,00,63,00,61,00,6c,00,6d,00,69,00,6e,00,67,00,5c,00,4d,00,69,00,\
+  63,00,72,00,6f,00,73,00,6f,00,66,00,74,00,5c,00,57,00,69,00,6e,00,66,00,\
+  6f,00,77,00,73,00,5c,00,49,00,4e,00,65,00,74,00,43,00,61,00,63,00,68,00,\
+  65,00,00,00
 "{374DE290-123F-4565-9164-39C4925E467B}"=hex(2):25,00,75,00,73,00,65,00,72,\
   00,70,00,72,00,6f,00,66,00,69,00,6c,00,65,00,25,00,5c,00,44,00,6f,00,77,\
   00,6e,00,6c,00,6f,00,61,00,64,00,73,00,00,00
@@ -481,3 +481,92 @@ Windows Registry Editor Version 5.00
 "MouseSpeed"="0"
 "MouseThreshold1"="0"
 "MouseThreshold2"="0"
+
+; ==========================================
+; >>> OPTIMIZACIONES AVANZADAS DE RENDIMIENTO <<<
+; ==========================================
+; NOTA: Estas optimizaciones pueden ser agresivas. Prueba la estabilidad del sistema después de aplicarlas.
+
+; Intenta mover interrupciones (IRQs) a CPUs de alto rendimiento (útil para sistemas con CPU de muchos núcleos)
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\PriorityControl]
+"IRQ8Priority"=dword:00000001
+
+; Configuración de afinidad para el timer del sistema (puede reducir latencia)
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\IntelpPM\Parameters]
+"ProcessorPerformanceCoreOverride"=dword:00000001
+"ProcessorPerformanceCoreOverrideMask"=dword:00000001
+
+; Optimizaciones de Red TCP/IP (RFC 1323, puertos, etc.)
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters]
+"Tcp1323Opts"=dword:00000003
+"EnableAutoTuning"=dword:00000000
+"MaxUserPort"=dword:0000fffe
+
+; Forzar la eliminación de archivos temporales al arrancar
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Temporary Files]
+"StateFlags0064"=dword:00000002
+
+; ==========================================
+; >>> SEGURIDAD / VBS (AGRESIVO - LEE LA ADVERTENCIA) <<<
+; ==========================================
+; ADVERTENCIA: Deshabilitar VBS puede mejorar el rendimiento pero reduce la seguridad.
+; Algunos juegos y aplicaciones (e.g., Valorant) REQUIEREN VBS habilitado.
+; Si juegas Valorant o usas software con requisitos de seguridad estrictos, OMITE esta sección.
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\DeviceGuard]
+"EnableVirtualizationBasedSecurity"=dword:00000000
+"RequirePlatformSecurityFeatures"=dword:00000000
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa]
+"LsaCfgFlags"=dword:00000000
+
+; ==========================================
+; >>> SERVICIOS ADICIONALES (Deshabilitar) <<<
+; ==========================================
+; ADVERTENCIA: Deshabilitar Windows Update te obliga a actualizar manualmente.
+; Si quieres actualizaciones automáticas, OMITE la línea de "wuauserv".
+
+; Servicio de transferencia inteligente en segundo plano (BITS)
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Bits]
+"Start"=dword:00000004
+
+; Servicio de Protocolo de transferencia de hipertexto (HTTPSSL)
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\HTTPSSL]
+"Start"=dword:00000004
+
+; Servicio de Windows Update (¡CUIDADO! Esto desactiva las actualizaciones automáticas)
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\wuauserv]
+"Start"=dword:00000004
+
+; ==========================================
+; >>> HYPER-V (SEGURO PARA VMWARE/VIRTUALBOX) <<<
+; ==========================================
+; Deshabilita el inicio automático de servicios de Hyper-V para liberar recursos,
+; pero permite que VMware/VirtualBox los inicien cuando los necesiten.
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\HvHost]
+"Start"=dword:00000004
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\vmickvpexchange]
+"Start"=dword:00000004
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\vmicguestinterface]
+"Start"=dword:00000004
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\vmicshutdown]
+"Start"=dword:00000004
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\vmicheartbeat]
+"Start"=dword:00000004
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\vmictimesync]
+"Start"=dword:00000004
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\vmicvmsession]
+"Start"=dword:00000004
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\vmicrdv]
+"Start"=dword:00000004
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\vmicexchange]
+"Start"=dword:00000004
