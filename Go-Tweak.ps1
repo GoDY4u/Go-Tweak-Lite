@@ -831,6 +831,5 @@ function Main {
         } while ($true)
     }
 }
-
-# Script entry point
 Main
+
