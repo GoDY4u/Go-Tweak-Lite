@@ -1,18 +1,58 @@
 Windows Registry Editor Version 5.00
 
 ; ==========================================
-; >>> REVERTIR CONFIGURACIONES DE TELEMETRÍA <<<
+; >>> SCRIPT REVERSIBLE - RESTAURAR CONFIGURACIÓN POR DEFECTO <<<
+; ==========================================
+; ADVERTENCIA: Este script intenta revertir los cambios del script de optimización.
+; Algunos valores se restablecen a los predeterminados generales de Windows, que pueden no ser
+; exactamente los mismos que tenías antes. Se recomienda reiniciar después de aplicarlo.
+
+; ==========================================
+; >>> OPTIMIZACIONES DE GPU Y ENERGÍA <<<
 ; ==========================================
 
+; Optimización HDCP/GPU (RMHdcpKeyglobZero) - Valor por defecto normalmente es 0 o no existe.
+[-HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\0000\RMHdcpKeyglobZero]
+
+; Opciones de Energía (Power Settings) - Restaurar atributos por defecto (Normalmente 1 para visible)
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\943c8cb6-6f93-4227-ad87-e9a3feec08d1]
+"Attributes"=-
+
+; Eliminar configuraciones de esquemas de energía personalizados
+[-HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\2a737441-1930-4402-8d77-b2bebba308a3\d4e98f31-5ffe-4ce1-be31-1b38b384c009\DefaultPowerSchemeValues\381b4222-f694-41f0-9685-ff5bb260df2e]
+[-HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\2a737441-1930-4402-8d77-b2bebba308a3\d4e98f31-5ffe-4ce1-be31-1b38b384c009\DefaultPowerSchemeValues\8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c]
+[-HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\3b04d4fd-1cc7-4f23-ab1c-d1337819c4bb\DefaultPowerSchemeValues\381b4222-f694-41f0-9685-ff5bb260df2e]
+[-HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\3b04d4fd-1cc7-4f23-ab1c-d1337819c4bb\DefaultPowerSchemeValues\8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c]
+[-HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\7b224883-b3cc-4d79-819f-8374152cbe7c\DefaultPowerSchemeValues\8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c]
+
+; Configuración General de Energía - Restaurar valores por defecto
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Power]
+"HiberbootEnabled"=-
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power]
+"HibernateEnabled"=-
+"HibernateEnabledDefault"=-
+"PowerThrottlingOff"=-
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power\PowerThrottling]
+"PowerThrottlingOff"=-
+
+; ==========================================
+; >>> TELEMETRÍA, PRIVACIDAD Y RECOPILACIÓN DE DATOS <<<
+; ==========================================
+
+; Eliminar políticas de telemetría (Windows restaurará los valores por defecto al eliminar la clave)
 [-HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\System]
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection]
 [-HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\DataCollection]
 [-HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Policies\DataCollection]
 
-[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection]
-"AllowTelemetry"=-
-
+; Restablecer configuraciones de privacidad del usuario (por defecto suelen ser 1 o no existen)
 [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Privacy]
 "TailoredExperiencesWithDiagnosticDataEnabled"=-
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Diagnostics\DiagTrack\EventTranscriptKey]
+"EnableEventTranscript"=-
 
 [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Siuf\Rules]
 "NumberOfSIUFInPeriod"=-
@@ -23,6 +63,9 @@ Windows Registry Editor Version 5.00
 
 [HKEY_CURRENT_USER\Control Panel\International\User Profile]
 "HttpAcceptLanguageOptOut"=-
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+"Start_TrackProgs"=-
 
 [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Speech_OneCore\Settings\OnlineSpeechPrivacy]
 "HasAccepted"=-
@@ -37,14 +80,24 @@ Windows Registry Editor Version 5.00
 [HKEY_CURRENT_USER\SOFTWARE\Microsoft\InputPersonalization\TrainedDataStore]
 "HarvestContacts"=-
 
-[-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\userNotificationListener]
-[-HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location]
-[-HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\appDiagnostics]
-[-HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\userAccountInformation]
+; Consent Stores - Restaurar a "Allow" por defecto
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\userNotificationListener]
+"Value"=-
 
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location]
+"Value"=-
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\appDiagnostics]
+"Value"=-
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\userAccountInformation]
+"Value"=-
+
+; Configuración de Contenido en la Nube - Eliminar políticas
 [-HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Windows\CloudContent]
 [-HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\CloudContent]
 
+; Content Delivery Manager - Restaurar valores por defecto (usualmente 1 para habilitado)
 [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager]
 "ContentDeliveryAllowed"=-
 "OemPreInstalledAppsEnabled"=-
@@ -57,93 +110,103 @@ Windows Registry Editor Version 5.00
 "SystemPaneSuggestionsEnabled"=-
 "RemediationRequired"=-
 
+; Location Tracking - Restaurar valores por defecto
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Sensor\Overrides\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}]
+"SensorPermissionState"=-
+[HKEY_LOCAL_MACHINE\SYSTEM\Maps]
+"AutoUpdateEnabled"=-
+
+; Setting Sync - Restaurar sincronización por defecto
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync]
+"SyncPolicy"=-
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Personalization]
+"Enabled"=-
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\BrowserSettings]
+"Enabled"=-
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Credentials]
+"Enabled"=-
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Accessibility]
+"Enabled"=-
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Windows]
+"Enabled"=-
+
 ; ==========================================
-; >>> REVERTIR CONFIGURACIONES DE ENERGÍA <<<
+; >>> RENDIMIENTO DEL SISTEMA Y APLICACIONES <<<
 ; ==========================================
 
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power]
-"HibernateEnabled"=-
-"HibernateEnabledDefault"=-
-"PowerThrottlingOff"=-
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power\PowerThrottling]
-"PowerThrottlingOff"=-
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Power]
-"HiberbootEnabled"=-
-
-; ==========================================
-; >>> REVERTIR CONFIGURACIONES DE RENDIMIENTO <<<
-; ==========================================
-
+; Prioridad de Aplicaciones - Valor por defecto suele ser 2 (Windows decide) o 26 para fondo/services
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\PriorityControl]
 "Win32PrioritySeparation"=-
 
+; Polling de Teclado y Ratón - Restaurar valores por defecto (normalmente 2 iteraciones, prioridad 13)
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\kbdclass\Parameters]
 "PollingIterations"=-
 "PollingPriority"=-
-
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\mouclass\Parameters]
 "PollingIterations"=-
 "PollingPriority"=-
 
+; Game Mode - Restaurar por defecto (normalmente 1)
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Input\Settings]
 "EnableGameMode"=-
 "InputTimerFrequency"=-
 
+; SystemCache - Valores por defecto
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management]
 "LargeSystemCache"=-
 "FeatureSettingsOverride"=-
 "FeatureSettingsOverrideMask"=-
 
+; Tiempos de Espera y Cierre - Valores por defecto de Windows
 [HKEY_CURRENT_USER\Control Panel\Desktop]
 "AutoEndTasks"=-
 "HungAppTimeout"=-
 "WaitToKillAppTimeout"=-
 "LowLevelHooksTimeout"=-
 "MenuShowDelay"=-
-"DragFullWindows"=-
-
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control]
 "WaitToKillServiceTimeout"=-
 
-[HKEY_CURRENT_USER\Control Panel\Desktop\WindowMetrics]
-"MinAnimate"=-
-
-[HKEY_CURRENT_USER\Control Panel\Keyboard]
-"KeyboardDelay"=-
-
-[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
-"ListviewAlphaSelect"=-
-"ListviewShadow"=-
-"TaskbarAnimations"=-
-"ShowTaskViewButton"=-
-
-[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects]
-"VisualFXSetting"=-
-
-[HKEY_CURRENT_USER\Software\Microsoft\Windows\DWM]
-"EnableAeroPeek"=-
-
-[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Search]
-"SearchboxTaskbarMode"=-
-
+; MMCSS - Prioridad Multimedia - Valores por defecto
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile]
 "NetworkThrottlingIndex"=-
 "SystemResponsiveness"=-
 "NoLazyMode"=-
 "AlwaysOn"=-
+; Eliminar perfil personalizado para Juegos
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games]
+
+; Configuraciones Visuales - Restaurar efectos por defecto
+[HKEY_CURRENT_USER\Control Panel\Desktop]
+"DragFullWindows"=-
+"MenuShowDelay"=-
+[HKEY_CURRENT_USER\Control Panel\Desktop\WindowMetrics]
+"MinAnimate"=-
+[HKEY_CURRENT_USER\Control Panel\Keyboard]
+"KeyboardDelay"=-
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+"ListviewAlphaSelect"=-
+"ListviewShadow"=-
+"TaskbarAnimations"=-
+"ShowTaskViewButton"=-
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects]
+"VisualFXSetting"=-
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\DWM]
+"EnableAeroPeek"=-
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Search]
+"SearchboxTaskbarMode"=-
 
 ; ==========================================
-; >>> REVERTIR CONFIGURACIONES DE JUEGOS <<<
+; >>> JUEGOS (DVR / FSO) <<<
 ; ==========================================
 
+; Eliminar políticas de GameDVR (Windows usará su configuración por defecto, normalmente habilitado)
 [-HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\GameDVR]
 [-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PolicyManager\default\ApplicationManagement\AllowGameDVR]
 
+; Restaurar configuración de usuario para GameDVR y FSO
 [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR]
 "AppCaptureEnabled"=-
-
 [HKEY_CURRENT_USER\System\GameConfigStore]
 "GameDVR_Enabled"=-
 "GameDVR_FSEBehavior"=-
@@ -152,158 +215,209 @@ Windows Registry Editor Version 5.00
 "GameDVR_DXGIHonorFSEWindowsCompatible"=-
 
 ; ==========================================
-; >>> REVERTIR CONFIGURACIONES DE SERVICIOS <<<
+; >>> SERVICIOS (Rehabilitar) <<<
 ; ==========================================
+; NOTA: Restablecer el "Start" a 3 (Manual) o 2 (Automático) para que Windows los gestione.
 
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\MapsBroker]
 "Start"=-
-
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\DiagTrack]
 "Start"=-
-
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\dmwappushservice]
 "Start"=-
-
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\diagsvc]
 "Start"=-
-
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\DPS]
 "Start"=-
-
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\diagnosticshub.standardcollector.service]
 "Start"=-
-
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WdiServiceHost]
 "Start"=-
-
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WdiSystemHost]
 "Start"=-
-
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WbioSrvc]
 "Start"=-
-
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\FontCache]
 "Start"=-
-
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\FontCache3.0.0.0]
 "Start"=-
-
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\GraphicsPerfSvc]
 "Start"=-
-
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\stisvc]
 "Start"=-
-
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WerSvc]
 "Start"=-
-
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Wecsvc]
 "Start"=-
-
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Spooler]
 "Start"=-
-
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\PrintNotify]
 "Start"=-
-
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Fax]
 "Start"=-
-
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc]
 "Start"=-
-
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Service\Configuration]
 "Status"=-
 
 ; ==========================================
-; >>> REVERTIR CONFIGURACIONES DE RED <<<
+; >>> CONFIGURACIÓN DE RED <<<
 ; ==========================================
 
+; Eliminar políticas de Wi-Fi Sense
 [-HKEY_LOCAL_MACHINE\Software\Microsoft\PolicyManager\default\WiFi\AllowWiFiHotSpotReporting]
 [-HKEY_LOCAL_MACHINE\Software\Microsoft\PolicyManager\default\WiFi\AllowAutoConnectToWiFiSenseHotspots]
 
+; Restaurar configuración IPv6 por defecto (Habilitado)
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters]
 "DisabledComponents"=-
 
 ; ==========================================
-; >>> REVERTIR APLICACIONES DE TERCEROS <<<
+; >>> APLICACIONES DE TERCEROS <<<
 ; ==========================================
 
+; Eliminar políticas de Brave (Se reinstalarán con versión por defecto si se vuelve a instalar)
 [-HKEY_LOCAL_MACHINE\SOFTWARE\Policies\BraveSoftware\Brave]
+; Eliminar políticas de Edge
 [-HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\EdgeUpdate]
 [-HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Edge]
 
+; Restaurar configuración de instalación de drivers
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\DriverSearching]
 "SearchOrderConfig"=-
-
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Device Installer]
 "DisableCoInstallers"=-
 
 ; ==========================================
-; >>> REVERTIR CONFIGURACIÓN DE ESCRITORIO <<<
+; >>> CONFIGURACIÓN DE ESCRITORIO Y USUARIO <<<
 ; ==========================================
 
-[-HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSettings]
+; End Task en la Barra - Restaurar por defecto (0)
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSettings]
+"TaskbarEndTask"=-
 
+; Storage Sense - Restaurar por defecto (0 o 1 dependiendo de versión)
 [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\StorageSense\Parameters\StoragePolicy]
 "01"=-
 
+; Eliminar políticas de Copilot y Recall
 [-HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsCopilot]
 [-HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\WindowsCopilot]
-
-[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
-"ShowCopilotButton"=-
-
-[-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Shell\Copilot]
-[-HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsCopilot]
-[-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Shell\Copilot\BingChat]
-
 [-HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsAI]
 
+; Restaurar configuración de usuario de Copilot
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+"ShowCopilotButton"=-
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Shell\Copilot]
+"IsCopilotAvailable"=-
+"CopilotDisabledReason"=-
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsCopilot]
+"AllowCopilotRuntime"=-
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Shell\Copilot\BingChat]
+"IsUserEligible"=-
+
+; WPBT - Restaurar por defecto (0 o no existe)
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager]
+"DisableWpbtExecution"=-
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\CI\Policy]
 "VerifiedAndReputablePolicyState"=-
 
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager]
-"DisableWpbtExecution"=-
-
+; OneDrive - Restaurar Shell Folders por defecto (Elimina las entradas personalizadas)
 [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders]
 "AppData"=-
 "Cache"=-
 "{374DE290-123F-4565-9164-39C4925E467B}"=-
 
+; Menú clásico clic derecho - Eliminar la extensión
 [-HKEY_CURRENT_USER\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}]
 
+; Apps en segundo plano - Restaurar por defecto (0 para deshabilitado, 1 para habilitado)
 [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications]
 "GlobalUserDisabled"=-
-
 [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Search]
 "BackgroundAppGlobalToggle"=-
 
+; Tema claro - Restaurar tema por defecto de Windows
 [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize]
 "AppsUseLightTheme"=-
 "SystemUsesLightTheme"=-
 "EnableTransparency"=-
 
+; Ocultar archivos y extensiones - Restaurar configuración por defecto (Ocultos=2, Extensiones=1)
 [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
 "Hidden"=-
 "HideFileExt"=-
 
+; Mantenimiento automático - Habilitar (0)
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\Maintenance]
 "MaintenanceDisabled"=-
 
+; Configuración de Ratón - Restaurar valores por defecto
 [HKEY_CURRENT_USER\Control Panel\Mouse]
 "MouseSpeed"=-
 "MouseThreshold1"=-
 "MouseThreshold2"=-
-
 [HKEY_USERS\.DEFAULT\Control Panel\Mouse]
 "MouseSpeed"=-
 "MouseThreshold1"=-
 "MouseThreshold2"=-
 
 ; ==========================================
-; >>> REVERTIR OPTIMIZACIÓN GPU <<<
+; >>> OPTIMIZACIONES AVANZADAS (Revertir) <<<
 ; ==========================================
 
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\0000]
-"RMHdcpKeyglobZero"=-
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\PriorityControl]
+"IRQ8Priority"=-
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\IntelpPM\Parameters]
+"ProcessorPerformanceCoreOverride"=-
+"ProcessorPerformanceCoreOverrideMask"=-
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters]
+"Tcp1323Opts"=-
+"EnableAutoTuning"=-
+"MaxUserPort"=-
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\VolumeCaches\Temporary Files]
+
+; ==========================================
+; >>> SEGURIDAD / VBS (Revertir) <<<
+; ==========================================
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\DeviceGuard]
+"EnableVirtualizationBasedSecurity"=-
+"RequirePlatformSecurityFeatures"=-
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Lsa]
+"LsaCfgFlags"=-
+
+; ==========================================
+; >>> SERVICIOS ADICIONALES (Revertir) <<<
+; ==========================================
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Bits]
+"Start"=-
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\HTTPSSL]
+"Start"=-
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\wuauserv]
+"Start"=-
+
+; ==========================================
+; >>> HYPER-V (Revertir - Seguro para VMWare/VirtualBox) <<<
+; ==========================================
+; Restablecer a inicio Manual (3) o Automático (2) para que Hyper-V no arranque pero esté disponible.
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\HvHost]
+"Start"=-
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\vmickvpexchange]
+"Start"=-
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\vmicguestinterface]
+"Start"=-
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\vmicshutdown]
+"Start"=-
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\vmicheartbeat]
+"Start"=-
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\vmictimesync]
+"Start"=-
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\vmicvmsession]
+"Start"=-
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\vmicrdv]
+"Start"=-
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\vmicexchange]
+"Start"=-
