@@ -3,9 +3,9 @@
 Write-Host "=== APLICANDO TWEAKS COMPLEMENTARIOS ===" -ForegroundColor Cyan
 
 # 2. WPFTweaksHiber - Disable Hibernation COMPLETO
-Write-Host "Deshabilitando Hibernación..." -ForegroundColor Yellow
+Write-Host "Deshabilitando Hibernacion..." -ForegroundColor Yellow
 powercfg.exe /hibernate off
-Write-Host "Hibernación deshabilitada y archivo hiberfil.sys eliminado." -ForegroundColor Green
+Write-Host "Hibernacion deshabilitada y archivo hiberfil.sys eliminado." -ForegroundColor Green
 
 # 24. WPFTweaksDisableLMS1 - Disable Intel LMS (vPro) - LO MÁS AGresivo
 Write-Host "Deshabilitando Intel LMS (vPro)..." -ForegroundColor Yellow
@@ -22,7 +22,7 @@ if (Test-Path $OneDrivePath) {
     Start-Process -FilePath $OneDrivePath -ArgumentList "/uninstall" -Wait -NoNewWindow
     Write-Host "OneDrive desinstalado." -ForegroundColor Green
 } else {
-    Write-Host "OneDriveSetup.exe no encontrado. OneDrive podría no estar instalado." -ForegroundColor Red
+    Write-Host "OneDriveSetup.exe no encontrado. OneDrive podria no estar instalado." -ForegroundColor Red
 }
 
 # 29. WPFTweaksDebloatAdobe - CCStopper (Adobe)
@@ -70,4 +70,5 @@ Write-Host "IPv6 deshabilitado en todos los adaptadores." -ForegroundColor Green
 
 Write-Host "`n=== TODOS LOS TWEAKS COMPLEMENTARIOS APLICADOS ===" -ForegroundColor Green
 Write-Host "Por favor, ejecuta el archivo .reg para completar la configuración." -ForegroundColor Cyan
+
 Write-Host "Algunos cambios requieren reinicio para surtir efecto completo." -ForegroundColor Yellow
