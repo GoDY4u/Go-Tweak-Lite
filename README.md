@@ -62,5 +62,5 @@
 Run this command in **PowerShell (Administrator)** to install directly:  
 ```powershell
 powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/GoDY4u/Go-Tweak-Lite/main/install.ps1 | iex"
-
+```
 Default instalation Directory: \Desktop\Go-Tweak-Lite\...
