@@ -1,4 +1,4 @@
-# install.ps1 - INSTALLER SIMPLIFICADO
+# install.ps1 - INSTALLER DEFINITIVO CON MS-APPS
 Write-Host "🚀 Go-Tweak Lite Installer" -ForegroundColor Magenta
 Write-Host "==========================================" -ForegroundColor Cyan
 
@@ -73,15 +73,66 @@ try {
         New-Item -Path $otherTweaksPath -ItemType Directory -Force | Out-Null
     }
     
-    # DESCARGAR ARCHIVO PRINCIPAL CORREGIDO DESDE GITHUB
-    Write-Host "📥 Downloading corrected Go-Tweak.ps1..." -ForegroundColor Cyan
-    try {
-        $correctedScriptUrl = "https://raw.githubusercontent.com/GoDY4u/Go-Tweak-Lite/main/Go-Tweak.ps1"
-        $mainScriptPath = Join-Path $installPath "Go-Tweak.ps1"
-        Invoke-WebRequest -Uri $correctedScriptUrl -OutFile $mainScriptPath -UseBasicParsing
-        Write-Host "✅ Corrected script downloaded" -ForegroundColor Green
-    } catch {
-        Write-Host "⚠️  Could not download corrected script" -ForegroundColor Yellow
+    # CREATE MS-APPS FOLDER IF IT DOESN'T EXIST
+    $msAppsPath = Join-Path $installPath "content\scripts\ms-apps"
+    if (-not (Test-Path $msAppsPath)) {
+        Write-Host "📁 Creating ms-apps folder..." -ForegroundColor Cyan
+        New-Item -Path $msAppsPath -ItemType Directory -Force | Out-Null
+    }
+    
+    # DOWNLOAD OTHER TWEAKS FILES
+    Write-Host "📥 Downloading other tweaks files..." -ForegroundColor Cyan
+    $otherTweaksFiles = @(
+        "other-tweaks.ps1",
+        "revert-tweaks.ps1"
+    )
+    
+    foreach ($file in $otherTweaksFiles) {
+        try {
+            $fileUrl = "https://raw.githubusercontent.com/GoDY4u/Go-Tweak-Lite/main/content/scripts/othertweaks/$file"
+            $filePath = Join-Path $otherTweaksPath $file
+            Invoke-WebRequest -Uri $fileUrl -OutFile $filePath -UseBasicParsing
+            Write-Host "✅ $file" -ForegroundColor Green
+        } catch {
+            Write-Host "⚠️  Missing: $file" -ForegroundColor Yellow
+        }
+    }
+    
+    # DOWNLOAD MS-APPS FILES
+    Write-Host "📥 Downloading MS Apps files..." -ForegroundColor Cyan
+    $msAppsFiles = @(
+        "remove-ms-apps.ps1",
+        "restore-ms-apps.ps1"
+    )
+    
+    foreach ($file in $msAppsFiles) {
+        try {
+            $fileUrl = "https://raw.githubusercontent.com/GoDY4u/Go-Tweak-Lite/main/content/scripts/ms-apps/$file"
+            $filePath = Join-Path $msAppsPath $file
+            Invoke-WebRequest -Uri $fileUrl -OutFile $filePath -UseBasicParsing
+            Write-Host "✅ $file" -ForegroundColor Green
+        } catch {
+            Write-Host "⚠️  Missing: $file" -ForegroundColor Yellow
+        }
+    }
+    
+    # CORREGIR ERRORES EN EL ARCHIVO PRINCIPAL
+    Write-Host "🔧 Fixing errors in Go-Tweak.ps1..." -ForegroundColor Cyan
+    $mainScriptPath = Join-Path $installPath "Go-Tweak.ps1"
+    
+    if (Test-Path $mainScriptPath) {
+        # Leer el contenido del archivo
+        $content = Get-Content -Path $mainScriptPath -Raw
+        
+        # CORREGIR ERROR 1: Expresión regular mal formada
+        $content = $content -replace '\(\{\[a-fA-F0-9\\-\]\+\}\)', '(\{[a-fA-F0-9\-]+\})'
+        
+        # CORREGIR ERROR 2: Caracteres corruptos
+        $content = $content -replace 'âŒ', '❌'
+        
+        # Guardar el archivo corregido
+        Set-Content -Path $mainScriptPath -Value $content -Force
+        Write-Host "✅ Script errors fixed" -ForegroundColor Green
     }
     
     Write-Host "✅ Installation complete!" -ForegroundColor Green
@@ -89,8 +140,11 @@ try {
     
     # Verify final structure
     Write-Host "📋 Final structure:" -ForegroundColor Cyan
-    Get-ChildItem -Path $installPath | ForEach-Object {
-        Write-Host "   $($_.Name)" -ForegroundColor White
+    Get-ChildItem -Path $installPath -Recurse -Directory | ForEach-Object {
+        Write-Host "   📁 $($_.FullName.Replace($installPath, ''))" -ForegroundColor White
+    }
+    Get-ChildItem -Path $installPath -Recurse -File | ForEach-Object {
+        Write-Host "   📄 $($_.FullName.Replace($installPath, ''))" -ForegroundColor Gray
     }
     
     # AUTO-RUN
