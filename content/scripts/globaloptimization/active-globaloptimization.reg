@@ -1,0 +1,483 @@
+Windows Registry Editor Version 5.00
+
+; ==========================================
+; >>> OPTIMIZACIONES DE GPU Y ENERGÍA <<<
+; ==========================================
+
+; Optimización HDCP/GPU (RMHdcpKeyglobZero)
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\0000]
+"RMHdcpKeyglobZero"=dword:00000001
+
+; Opciones de Energía (Power Settings)
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\943c8cb6-6f93-4227-ad87-e9a3feec08d1]
+"Attributes"=dword:00000002
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\2a737441-1930-4402-8d77-b2bebba308a3\d4e98f31-5ffe-4ce1-be31-1b38b384c009\DefaultPowerSchemeValues\381b4222-f694-41f0-9685-ff5bb260df2e]
+"ACSettingIndex"=dword:00000000
+"DCSettingIndex"=dword:00000000
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\2a737441-1930-4402-8d77-b2bebba308a3\d4e98f31-5ffe-4ce1-be31-1b38b384c009\DefaultPowerSchemeValues\8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c]
+"ACSettingIndex"=dword:00000000
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\3b04d4fd-1cc7-4f23-ab1c-d1337819c4bb\DefaultPowerSchemeValues\381b4222-f694-41f0-9685-ff5bb260df2e]
+"ACSettingIndex"=dword:00000000
+"DCSettingIndex"=dword:00000000
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\3b04d4fd-1cc7-4f23-ab1c-d1337819c4bb\DefaultPowerSchemeValues\8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c]
+"ACSettingIndex"=dword:00000000
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\7b224883-b3cc-4d79-819f-8374152cbe7c\DefaultPowerSchemeValues\8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c]
+"ACSettingIndex"=dword:00000064
+
+; Configuración General de Energía
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Power]
+"HiberbootEnabled"=dword:00000000
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power]
+"HibernateEnabled"=dword:00000000
+"HibernateEnabledDefault"=dword:00000000
+"PowerThrottlingOff"=dword:00000001
+"HibernateEnabled"=dword:00000000
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power\PowerThrottling]
+"PowerThrottlingOff"=dword:00000001
+
+; ==========================================
+; >>> TELEMETRÍA, PRIVACIDAD Y RECOPILACIÓN DE DATOS <<<
+; ==========================================
+
+; 1. WPFTweaksAH - Disable Activity History
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\System]
+"EnableActivityFeed"=dword:00000000
+"PublishUserActivities"=dword:00000000
+"UploadUserActivities"=dword:00000000
+
+; 10. WPFTweaksTele - Disable Telemetry (Configuración Principal)
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection]
+"AllowTelemetry"=dword:00000000
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\DataCollection]
+"AllowTelemetry"=dword:00000000
+"AllowDeviceNameInTelemetry"=dword:00000000
+"DoNotShowFeedbackNotifications"=dword:00000001
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Policies\DataCollection]
+"AllowTelemetry"=dword:00000000
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Privacy]
+"TailoredExperiencesWithDiagnosticDataEnabled"=dword:00000000
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Diagnostics\DiagTrack\EventTranscriptKey]
+"EnableEventTranscript"=dword:00000000
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Siuf\Rules]
+"NumberOfSIUFInPeriod"=dword:00000000
+"PeriodInNanoSeconds"=-
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo]
+"Enabled"=dword:00000000
+
+[HKEY_CURRENT_USER\Control Panel\International\User Profile]
+"HttpAcceptLanguageOptOut"=dword:00000001
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+"Start_TrackProgs"=dword:00000000
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Speech_OneCore\Settings\OnlineSpeechPrivacy]
+"HasAccepted"=dword:00000000
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Personalization\Settings]
+"AcceptedPrivacyPolicy"=dword:00000000
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\InputPersonalization]
+"RestrictImplicitInkCollection"=dword:00000001
+"RestrictImplicitTextCollection"=dword:00000001
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\InputPersonalization\TrainedDataStore]
+"HarvestContacts"=dword:00000000
+
+; Consent Stores
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\userNotificationListener]
+"Value"="Deny"
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location]
+"Value"="Deny"
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\appDiagnostics]
+"Value"="Deny"
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\userAccountInformation]
+"Value"="Deny"
+
+; Configuración de Contenido en la Nube y Experiencias
+[HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Windows\CloudContent]
+"ConfigureWindowsSpotlight"=dword:00000002
+"IncludeEnterpriseSpotlight"=dword:00000000
+"DisableWindowsSpotlightFeatures"=dword:00000001
+"DisableWindowsSpotlightWindowsWelcomeExperience"=dword:00000001
+"DisableWindowsSpotlightOnActionCenter"=dword:00000001
+"DisableWindowsSpotlightOnSettings"=dword:00000001
+"DisableThirdPartySuggestions"=dword:00000001
+"DisableTailoredExperiencesWithDiagnosticData"=dword:00000001
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\CloudContent]
+"DisableThirdPartySuggestions"=dword:00000001
+"DisableWindowsConsumerFeatures"=dword:00000001
+
+; 9. WPFTweaksConsumerFeatures - Disable ConsumerFeatures
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\CloudContent]
+"DisableWindowsConsumerFeatures"=dword:00000001
+
+; Content Delivery Manager
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager]
+"ContentDeliveryAllowed"=dword:00000000
+"OemPreInstalledAppsEnabled"=dword:00000000
+"PreInstalledAppsEnabled"=dword:00000000
+"PreInstalledAppsEverEnabled"=dword:00000000
+"SilentInstalledAppsEnabled"=dword:00000000
+"SoftLandingEnabled"=dword:00000000
+"SubscribedContentEnabled"=dword:00000000
+"FeatureManagementEnabled"=dword:00000000
+"SystemPaneSuggestionsEnabled"=dword:00000000
+"RemediationRequired"=dword:00000000
+
+; 5. WPFTweaksLoc - Disable Location Tracking
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Sensor\Overrides\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}]
+"SensorPermissionState"=dword:00000000
+[HKEY_LOCAL_MACHINE\SYSTEM\Maps]
+"AutoUpdateEnabled"=dword:00000000
+
+; Setting Sync
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync]
+"SyncPolicy"=dword:00000005
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Personalization]
+"Enabled"=dword:00000000
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\BrowserSettings]
+"Enabled"=dword:00000000
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Credentials]
+"Enabled"=dword:00000000
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Accessibility]
+"Enabled"=dword:00000000
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Windows]
+"Enabled"=dword:00000000
+
+; ==========================================
+; >>> RENDIMIENTO DEL SISTEMA Y APLICACIONES <<<
+; ==========================================
+
+; Prioridad de Aplicaciones en Primer Plano
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\PriorityControl]
+"Win32PrioritySeparation"=dword:00000026
+
+; Optimización de Polling de Teclado y Ratón
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\kbdclass\Parameters]
+"PollingIterations"=dword:00000001
+"PollingPriority"=dword:00000008
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\mouclass\Parameters]
+"PollingIterations"=dword:00000001
+"PollingPriority"=dword:00000008
+
+; Game Mode y Timing de Entrada
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Input\Settings]
+"EnableGameMode"=dword:00000001
+"InputTimerFrequency"=dword:00000001
+
+; SystemCache
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management]
+"LargeSystemCache"=dword:00000000
+"FeatureSettingsOverride"=dword:00000003
+"FeatureSettingsOverrideMask"=dword:00000003
+
+; Tiempos de Espera y Cierre
+[HKEY_CURRENT_USER\Control Panel\Desktop]
+"AutoEndTasks"="1"
+"HungAppTimeout"="1000"
+"WaitToKillAppTimeout"="2000"
+"LowLevelHooksTimeout"="1000"
+"MenuShowDelay"="0"
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control]
+"WaitToKillServiceTimeout"="2000"
+
+; MMCSS - Prioridad Multimedia
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile]
+"NetworkThrottlingIndex"=dword:ffffffff
+"SystemResponsiveness"=dword:00000000
+"NoLazyMode"=dword:00000001
+"AlwaysOn"=dword:00000001
+
+; Perfil para Juegos en MMCSS
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games]
+"Affinity"=dword:00000000
+"Background Only"="False"
+"Clock Rate"=dword:00002710
+"GPU Priority"=dword:00000008
+"Priority"=dword:00000006
+"Scheduling Category"="High"
+"SFIO Priority"="High"
+
+; 15. WPFTweaksDisplay - Set Display for Performance
+[HKEY_CURRENT_USER\Control Panel\Desktop]
+"DragFullWindows"="0"
+"MenuShowDelay"="200"
+[HKEY_CURRENT_USER\Control Panel\Desktop\WindowMetrics]
+"MinAnimate"="0"
+[HKEY_CURRENT_USER\Control Panel\Keyboard]
+"KeyboardDelay"=dword:00000000
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+"ListviewAlphaSelect"=dword:00000000
+"ListviewShadow"=dword:00000000
+"TaskbarAnimations"=dword:00000000
+"ShowTaskViewButton"=dword:00000000
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects]
+"VisualFXSetting"=dword:00000003
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\DWM]
+"EnableAeroPeek"=dword:00000000
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Search]
+"SearchboxTaskbarMode"=dword:00000000
+
+; ==========================================
+; >>> JUEGOS (DVR / FSO) <<<
+; ==========================================
+
+; 34. WPFTweaksDVR - Disable GameDVR
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\GameDVR]
+"AllowGameDVR"=dword:00000000
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PolicyManager\default\ApplicationManagement\AllowGameDVR]
+"value"=dword:00000000
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR]
+"AppCaptureEnabled"=dword:00000000
+
+[HKEY_CURRENT_USER\System\GameConfigStore]
+"GameDVR_Enabled"=dword:00000000
+"GameDVR_FSEBehavior"=dword:00000002
+"GameDVR_HonorUserFSEBehaviorMode"=dword:00000001
+"GameDVR_EFSEFeatureFlags"=dword:00000000
+
+; 39. WPFTweaksDisableFSO - Disable Fullscreen Optimizations
+[HKEY_CURRENT_USER\System\GameConfigStore]
+"GameDVR_DXGIHonorFSEWindowsCompatible"=dword:00000001
+
+; ==========================================
+; >>> SERVICIOS (Deshabilitar) <<<
+; ==========================================
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\MapsBroker]
+"Start"=dword:00000004
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\DiagTrack]
+"Start"=dword:00000004
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\dmwappushservice]
+"Start"=dword:00000004
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\diagsvc]
+"Start"=dword:00000004
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\DPS]
+"Start"=dword:00000004
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\diagnosticshub.standardcollector.service]
+"Start"=dword:00000004
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WdiServiceHost]
+"Start"=dword:00000004
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WdiSystemHost]
+"Start"=dword:00000004
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WbioSrvc]
+"Start"=dword:00000004
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\FontCache]
+"Start"=dword:00000004
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\FontCache3.0.0.0]
+"Start"=dword:00000004
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\GraphicsPerfSvc]
+"Start"=dword:00000004
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\stisvc]
+"Start"=dword:00000004
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WerSvc]
+"Start"=dword:00000004
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Wecsvc]
+"Start"=dword:00000004
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Spooler]
+"Start"=dword:00000004
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\PrintNotify]
+"Start"=dword:00000004
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Fax]
+"Start"=dword:00000004
+
+; 5. WPFTweaksLoc - Deshabilitar Servicio de Ubicación
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc]
+"Start"=dword:00000004
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Service\Configuration]
+"Status"=dword:00000000
+
+; ==========================================
+; >>> CONFIGURACIÓN DE RED <<<
+; ==========================================
+
+; 11. WPFTweaksWifi - Disable Wi-Fi Sense
+[HKEY_LOCAL_MACHINE\Software\Microsoft\PolicyManager\default\WiFi\AllowWiFiHotSpotReporting]
+"Value"=dword:00000000
+[HKEY_LOCAL_MACHINE\Software\Microsoft\PolicyManager\default\WiFi\AllowAutoConnectToWiFiSenseHotspots]
+"Value"=dword:00000000
+
+; 35. WPFTweaksIPv46 - Prefer IPv4 over IPv6
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters]
+"DisabledComponents"=dword:00000020
+
+; 36. WPFTweaksTeredo - Disable Teredo
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters]
+"DisabledComponents"=dword:00000001
+
+; 37. WPFTweaksDisableipsix - Disable IPv6
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters]
+"DisabledComponents"=dword:000000ff
+
+; ==========================================
+; >>> APLICACIONES DE TERCEROS <<<
+; ==========================================
+
+; 7. WPFTweaksBraveDebloat - Debloat Brave
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\BraveSoftware\Brave]
+"BraveRewardsDisabled"=dword:00000001
+"BraveWalletDisabled"=dword:00000001
+"BraveVPNDisabled"=dword:00000001
+"BraveAIChatEnabled"=dword:00000000
+
+; 8. WPFTweaksEdgeDebloat - Debloat Edge
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\EdgeUpdate]
+"CreateDesktopShortcutDefault"=dword:00000000
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Edge]
+"PersonalizationReportingEnabled"=dword:00000000
+"ShowRecommendationsEnabled"=dword:00000000
+"HideFirstRunExperience"=dword:00000001
+"UserFeedbackAllowed"=dword:00000000
+"ConfigureDoNotTrack"=dword:00000001
+"AlternateErrorPagesEnabled"=dword:00000000
+"EdgeCollectionsEnabled"=dword:00000000
+"EdgeShoppingAssistantEnabled"=dword:00000000
+"MicrosoftEdgeInsiderPromotionEnabled"=dword:00000000
+"ShowMicrosoftRewards"=dword:00000000
+"WebWidgetAllowed"=dword:00000000
+"DiagnosticData"=dword:00000000
+"EdgeAssetDeliveryServiceEnabled"=dword:00000000
+"CryptoWalletEnabled"=dword:00000000
+"WalletDonationEnabled"=dword:00000000
+
+; 27. WPFTweaksRazerBlock - Block Razer Software Installs
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\DriverSearching]
+"SearchOrderConfig"=dword:00000000
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Device Installer]
+"DisableCoInstallers"=dword:00000001
+
+; ==========================================
+; >>> CONFIGURACIÓN DE ESCRITORIO Y USUARIO <<<
+; ==========================================
+
+; 18. WPFTweaksEndTaskOnTaskbar - Enable End Task With Right Click
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSettings]
+"TaskbarEndTask"=dword:00000001
+
+; 21. WPFTweaksStorage - Disable Storage Sense
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\StorageSense\Parameters\StoragePolicy]
+"01"=dword:00000000
+
+; 22. WPFTweaksRemoveCopilot - Disable Microsoft Copilot
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsCopilot]
+"TurnOffWindowsCopilot"=dword:00000001
+[HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\WindowsCopilot]
+"TurnOffWindowsCopilot"=dword:00000001
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+"ShowCopilotButton"=dword:00000000
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Shell\Copilot]
+"IsCopilotAvailable"=dword:00000000
+"CopilotDisabledReason"="IsEnabledForGeographicRegionFailed"
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsCopilot]
+"AllowCopilotRuntime"=dword:00000000
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Shell\Copilot\BingChat]
+"IsUserEligible"=dword:00000000
+
+; 23. WPFTweaksRecallOff - Disable Recall
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsAI]
+"DisableAIDataAnalysis"=dword:00000001
+"AllowRecallEnablement"=dword:00000000
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\CI\Policy]
+"VerifiedAndReputablePolicyState"=dword:00000000
+
+; 25. WPFTweaksDisableWpbtExecution - Disable Windows Platform Binary Table (WPBT)
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager]
+"DisableWpbtExecution"=dword:00000001
+
+; 26. WPFTweaksRemoveOnedrive - Registry part for Shell Folders
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders]
+"AppData"=hex(2):25,00,75,00,73,00,65,00,72,00,70,00,72,00,6f,00,66,00,69,00,\
+  6c,00,65,00,25,00,5c,00,41,00,70,00,70,00,44,00,61,00,74,00,61,00,5c,00,\
+  52,00,6f,00,61,00,6d,00,69,00,6e,00,67,00,00,00
+"Cache"=hex(2):25,00,75,00,73,00,65,00,72,00,70,00,72,00,6f,00,66,00,69,00,\
+  6c,00,65,00,25,00,5c,00,41,00,70,00,70,00,44,00,61,00,74,00,61,00,5c,00,\
+  4c,00,6f,00,63,00,61,00,6d,00,69,00,6e,00,67,00,5c,00,4d,00,69,00,63,00,\
+  72,00,6f,00,73,00,6f,00,66,00,74,00,5c,00,57,00,69,00,6e,00,66,00,6f,00,\
+  77,00,73,00,5c,00,49,00,4e,00,65,00,74,00,43,00,61,00,63,00,68,00,65,00,\
+  00,00
+"{374DE290-123F-4565-9164-39C4925E467B}"=hex(2):25,00,75,00,73,00,65,00,72,\
+  00,70,00,72,00,6f,00,66,00,69,00,6c,00,65,00,25,00,5c,00,44,00,6f,00,77,\
+  00,6e,00,6c,00,6f,00,61,00,64,00,73,00,00,00
+
+; 31. WPFTweaksRightClickMenu - Set Classic Right-Click Menu
+[HKEY_CURRENT_USER\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32]
+@=""
+
+; 38. WPFTweaksDisableBGapps - Disable Background Apps
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications]
+"GlobalUserDisabled"=dword:00000001
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Search]
+"BackgroundAppGlobalToggle"=dword:00000000
+
+; 40. WPFToggleDarkMode - Dark Theme for Windows
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize]
+"AppsUseLightTheme"=dword:00000000
+"SystemUsesLightTheme"=dword:00000000
+"EnableTransparency"=dword:00000000
+
+; 53. WPFToggleHiddenFiles - Show Hidden Files
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+"Hidden"=dword:00000001
+
+; 54. WPFToggleShowExt - Show File Extensions
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+"HideFileExt"=dword:00000000
+
+; Disable Auto Maintenance
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\Maintenance]
+"MaintenanceDisabled"=dword:00000001
+
+; Mouse Settings
+[HKEY_CURRENT_USER\Control Panel\Mouse]
+"MouseSpeed"="0"
+"MouseThreshold1"="0"
+"MouseThreshold2"="0"
+
+[HKEY_USERS\.DEFAULT\Control Panel\Mouse]
+"MouseSpeed"="0"
+"MouseThreshold1"="0"
+"MouseThreshold2"="0"
