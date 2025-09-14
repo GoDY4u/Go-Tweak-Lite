@@ -91,6 +91,25 @@ try {
         }
     }
     
+    # CORREGIR ERRORES EN EL ARCHIVO PRINCIPAL
+    Write-Host "🔧 Fixing errors in Go-Tweak.ps1..." -ForegroundColor Cyan
+    $mainScriptPath = Join-Path $installPath "Go-Tweak.ps1"
+    
+    if (Test-Path $mainScriptPath) {
+        # Leer el contenido del archivo
+        $content = Get-Content -Path $mainScriptPath -Raw
+        
+        # CORREGIR ERROR 1: Expresión regular mal formada (línea ~254)
+        $content = $content -replace '\(\{\[a-fA-F0-9\\-\]\+\}\)', '(\{[a-fA-F0-9\-]+\})'
+        
+        # CORREGIR ERROR 2: Caracteres corruptos en Write-Host (línea ~828)
+        $content = $content -replace 'Write-Host "âŒ Invalid option. Try again."', 'Write-Host "❌ Invalid option. Try again."'
+        
+        # Guardar el archivo corregido
+        Set-Content -Path $mainScriptPath -Value $content -Force
+        Write-Host "✅ Script errors fixed" -ForegroundColor Green
+    }
+    
     Write-Host "✅ Installation complete!" -ForegroundColor Green
     Write-Host "📍 Location: $installPath" -ForegroundColor Cyan
     
@@ -103,7 +122,14 @@ try {
     # AUTO-RUN
     Write-Host "🎯 Starting Go-Tweak..." -ForegroundColor Yellow
     Start-Sleep -Seconds 2
-    .\Go-Tweak.ps1
+    
+    # Ejecutar el script principal
+    if (Test-Path $mainScriptPath) {
+        .\$mainScriptPath
+    } else {
+        Write-Host "❌ Main script not found: Go-Tweak.ps1" -ForegroundColor Red
+        Write-Host "📋 Check the installation folder" -ForegroundColor Yellow
+    }
     
 } catch {
     Write-Host "❌ Error: $($_.Exception.Message)" -ForegroundColor Red
