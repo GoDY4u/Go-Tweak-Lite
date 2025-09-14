@@ -1,4 +1,4 @@
-# install.ps1 - INSTALLER DEFINITIVO
+# install.ps1 - INSTALLER DEFINITIVO CON OTHER TWEAKS
 Write-Host "🚀 Go-Tweak Lite Installer" -ForegroundColor Magenta
 Write-Host "==========================================" -ForegroundColor Cyan
 
@@ -64,6 +64,31 @@ try {
             Move-Item -Path $_.FullName -Destination $installPath -Force
         }
         Remove-Item -Path $nestedFolder -Recurse -Force
+    }
+    
+    # CREATE OTHER TWEAKS FOLDER IF IT DOESN'T EXIST
+    $otherTweaksPath = Join-Path $installPath "content\scripts\othertweaks"
+    if (-not (Test-Path $otherTweaksPath)) {
+        Write-Host "📁 Creating othertweaks folder..." -ForegroundColor Cyan
+        New-Item -Path $otherTweaksPath -ItemType Directory -Force | Out-Null
+    }
+    
+    # DOWNLOAD OTHER TWEAKS FILES
+    Write-Host "📥 Downloading other tweaks files..." -ForegroundColor Cyan
+    $otherTweaksFiles = @(
+        "other-tweaks.ps1",
+        "revert-tweaks.ps1"
+    )
+    
+    foreach ($file in $otherTweaksFiles) {
+        try {
+            $fileUrl = "https://raw.githubusercontent.com/GoDY4u/Go-Tweak-Lite/main/content/scripts/othertweaks/$file"
+            $filePath = Join-Path $otherTweaksPath $file
+            Invoke-WebRequest -Uri $fileUrl -OutFile $filePath -UseBasicParsing
+            Write-Host "✅ $file" -ForegroundColor Green
+        } catch {
+            Write-Host "⚠️  Missing: $file" -ForegroundColor Yellow
+        }
     }
     
     Write-Host "✅ Installation complete!" -ForegroundColor Green
