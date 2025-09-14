@@ -141,3 +141,4 @@ try {
     Write-Host "📋 Download manually from GitHub" -ForegroundColor Yellow
     pause
 }
+
