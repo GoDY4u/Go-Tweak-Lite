@@ -1,4 +1,4 @@
-﻿# Go-Tweak.ps1 - Windows Optimization Tool
+# Go-Tweak.ps1 - Windows Optimization Tool
 # Requires administrator execution
 
 param(
@@ -15,6 +15,7 @@ $script:RAMPath = Join-Path $ScriptsPath "ram"
 $script:InternetPath = Join-Path $ScriptsPath "internet"
 $script:GlobalOptimizationPath = Join-Path $ScriptsPath "globaloptimization"
 $script:OtherTweaksPath = Join-Path $ScriptsPath "othertweaks"
+$script:MSAppsPath = Join-Path $ScriptsPath "ms-apps"  # ← Añade esta línea
 
 # Check execution policy
 if ((Get-ExecutionPolicy) -eq "Restricted") {
@@ -37,7 +38,7 @@ function Initialize-ProjectStructure {
     }
     
     # Check if essential project folders exist
-    $essentialFolders = @($ScriptsPath, $RAMPath, $InternetPath, $GlobalOptimizationPath, $OtherTweaksPath)
+    $essentialFolders = @($ScriptsPath, $RAMPath, $InternetPath, $GlobalOptimizationPath, $OtherTweaksPath, $MSAppsPath)
     foreach ($folder in $essentialFolders) {
         if (-not (Test-Path $folder)) {
             Write-Host "WARNING: Folder not found: $folder" -ForegroundColor Yellow
@@ -471,6 +472,71 @@ function Invoke-RevertTweaks {
     }
 }
 
+# Function to remove Microsoft Apps
+function Remove-MSApps {
+    Write-Log "Removing Microsoft Apps..."
+    
+    $removeScript = Join-Path $MSAppsPath "remove-ms-apps.ps1"
+    
+    if (Test-Path $removeScript) {
+        try {
+            Write-Log "Executing Microsoft Apps removal script..."
+            
+            # Cambiar temporalmente la política de ejecución
+            $originalPolicy = Get-ExecutionPolicy
+            Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force -ErrorAction SilentlyContinue
+            
+            & $removeScript
+            
+            # Restaurar la política original
+            Set-ExecutionPolicy -ExecutionPolicy $originalPolicy -Scope Process -Force -ErrorAction SilentlyContinue
+            
+            Write-Log "Microsoft Apps removed successfully" "SUCCESS"
+            return $true
+        } catch {
+            Write-Log "Error removing Microsoft Apps: $($_.Exception.Message)" "ERROR"
+            return $false
+        }
+    } else {
+        Write-Log "Remove MS Apps script not found: $removeScript" "ERROR"
+        return $false
+    }
+}
+
+# Function to restore Microsoft Apps
+function Restore-MSApps {
+    Write-Log "Restoring Microsoft Apps..."
+    
+    $restoreScript = Join-Path $MSAppsPath "restore-ms-apps.ps1"
+    
+    if (Test-Path $restoreScript) {
+        try {
+            Write-Log "Executing Microsoft Apps restoration script..."
+            
+            # Cambiar temporalmente la política de ejecución
+            $originalPolicy = Get-ExecutionPolicy
+            Set-ExecutionPolicy -ExecutionPolicy Bypass -Scope Process -Force -ErrorAction SilentlyContinue
+            
+            & $restoreScript
+            
+            # Restaurar la política original
+            Set-ExecutionPolicy -ExecutionPolicy $originalPolicy -Scope Process -Force -ErrorAction SilentlyContinue
+            
+            Write-Log "Microsoft Apps restored successfully" "SUCCESS"
+            return $true
+        } catch {
+            Write-Log "Error restoring Microsoft Apps: $($_.Exception.Message)" "ERROR"
+            return $false
+        }
+    } else {
+        Write-Log "Restore MS Apps script not found: $restoreScript" "ERROR"
+        return $false
+    }
+}
+
+
+
+
 # Show options menu
 function Show-Menu {
     Clear-Host
@@ -482,18 +548,19 @@ function Show-Menu {
     Write-Host "1. Windows Cleanup" -ForegroundColor Yellow
     Write-Host "2. RAM Optimization" -ForegroundColor Yellow
     Write-Host "3. Optimize FPS" -ForegroundColor Yellow
-    Write-Host "4. Apply Other Tweaks" -ForegroundColor Yellow
-    Write-Host "5. Optimize Internet" -ForegroundColor Yellow
-    Write-Host "6. Install GPEdit (Windows Home)" -ForegroundColor Yellow
-    Write-Host "7. Power Plan: Maximum Performance" -ForegroundColor Yellow
-    Write-Host "8. Install Visual C++ & DirectX" -ForegroundColor Yellow
-    Write-Host "9. Keyboard Properties" -ForegroundColor Cyan
-    Write-Host "10. Mouse Properties" -ForegroundColor Cyan
-    Write-Host "11. Performance Options" -ForegroundColor Cyan
-    Write-Host "12. Device Manager" -ForegroundColor Cyan
-    Write-Host "13. Network Connections" -ForegroundColor Cyan
-    Write-Host "14. Disable Optimizations" -ForegroundColor Red
-    Write-Host "15. Exit" -ForegroundColor Red
+    Write-Host "4. Remove Microsoft Apps" -ForegroundColor Yellow
+    Write-Host "5. Apply Other Tweaks" -ForegroundColor Yellow
+    Write-Host "6. Optimize Internet" -ForegroundColor Yellow
+    Write-Host "7. Install GPEdit (Windows Home)" -ForegroundColor Yellow
+    Write-Host "8. Power Plan: Maximum Performance" -ForegroundColor Yellow
+    Write-Host "9. Install Visual C++ & DirectX" -ForegroundColor Yellow
+    Write-Host "10. Keyboard Properties" -ForegroundColor Cyan
+    Write-Host "11. Mouse Properties" -ForegroundColor Cyan
+    Write-Host "12. Performance Options" -ForegroundColor Cyan
+    Write-Host "13. Device Manager" -ForegroundColor Cyan
+    Write-Host "14. Network Connections" -ForegroundColor Cyan
+    Write-Host "15. Disable Optimizations" -ForegroundColor Red
+    Write-Host "16. Exit" -ForegroundColor Red
     Write-Host ""
 }
 
@@ -507,7 +574,8 @@ function Show-DisableMenu {
     Write-Host "1. Disable FPS Optimization" -ForegroundColor Yellow
     Write-Host "2. Disable Internet Optimization" -ForegroundColor Yellow
     Write-Host "3. Revert Other Tweaks" -ForegroundColor Yellow
-    Write-Host "4. Return to main menu" -ForegroundColor Green
+    Write-Host "4. Restore Microsoft Apps" -ForegroundColor Yellow
+    Write-Host "5. Return to main menu" -ForegroundColor Green
     Write-Host ""
 }
 
@@ -670,6 +738,16 @@ function Main {
                     Read-Host "Press Enter to continue..."
                 }
                 "4" { 
+                    Write-Log "Removing Microsoft Apps..."
+                    $result = Remove-MSApps
+                    if ($result) {
+                        Write-Host "✅ Microsoft Apps removed successfully" -ForegroundColor Green
+                    } else {
+                        Write-Host "❌ Error removing Microsoft Apps" -ForegroundColor Red
+                    }
+                    Read-Host "Press Enter to continue..."
+                }
+                "5" { 
                     Write-Log "Applying other system tweaks..."
                     $result = Invoke-OtherTweaks
                     if ($result) {
@@ -679,7 +757,7 @@ function Main {
                     }
                     Read-Host "Press Enter to continue..."
                 }
-                "5" { 
+                "6" { 
                     Write-Log "Applying internet optimization..."
                     $result = Invoke-OptimizationScript -ScriptCategory "internet" -ScriptName "internetscript.bat" -Enable $true -FriendlyName "Internet Optimization"
                     if ($result) {
@@ -689,7 +767,7 @@ function Main {
                     }
                     Read-Host "Press Enter to continue..."
                 }
-                "6" { 
+                "7" { 
                     Write-Log "Installing GPEdit..."
                     $result = Install-GPEdit
                     if ($result) {
@@ -699,7 +777,7 @@ function Main {
                     }
                     Read-Host "Press Enter to continue..."
                 }
-                "7" { 
+                "8" { 
                     Write-Log "Configuring maximum performance power plan..."
                     $result = Set-MaxPerformancePowerPlan
                     if ($result) {
@@ -709,7 +787,7 @@ function Main {
                     }
                     Read-Host "Press Enter to continue..."
                 }
-                "8" { 
+                "9" { 
                     Write-Log "Installing components..."
                     $result = Install-VisualsAndDirectX
                     if ($result) {
@@ -720,7 +798,7 @@ function Main {
                     }
                     Read-Host "Press Enter to continue..."
                 }
-                "9" { 
+                "10" { 
                     Write-Log "Opening keyboard properties..."
                     $result = Open-KeyboardProperties
                     if ($result) {
@@ -730,7 +808,7 @@ function Main {
                     }
                     Read-Host "Press Enter to continue..."
                 }
-                "10" { 
+                "11" { 
                     Write-Log "Opening mouse properties..."
                     $result = Open-MouseProperties
                     if ($result) {
@@ -740,7 +818,7 @@ function Main {
                     }
                     Read-Host "Press Enter to continue..."
                 }
-                "11" { 
+                "12" { 
                     Write-Log "Opening performance options..."
                     $result = Open-PerformanceOptions
                     if ($result) {
@@ -750,7 +828,7 @@ function Main {
                     }
                     Read-Host "Press Enter to continue..."
                 }
-                "12" { 
+                "13" { 
                     Write-Log "Opening Device Manager..."
                     $result = Open-DeviceManager
                     if ($result) {
@@ -760,7 +838,7 @@ function Main {
                     }
                     Read-Host "Press Enter to continue..."
                 }
-                "13" { 
+                "14" { 
                     Write-Log "Opening network connections..."
                     $result = Open-NetworkConnections
                     if ($result) {
@@ -770,7 +848,7 @@ function Main {
                     }
                     Read-Host "Press Enter to continue..."
                 }
-                "14" { 
+                "15" { 
                     # Submenu to disable optimizations
                     do {
                         Show-DisableMenu
@@ -808,6 +886,16 @@ function Main {
                                 Read-Host "Press Enter to continue..."
                             }
                             "4" { 
+                                Write-Log "Restoring Microsoft Apps..."
+                                $result = Restore-MSApps
+                                if ($result) {
+                                    Write-Host "✅ Microsoft Apps restored successfully" -ForegroundColor Green
+                                } else {
+                                    Write-Host "❌ Error restoring Microsoft Apps" -ForegroundColor Red
+                                }
+                                Read-Host "Press Enter to continue..."
+                            }
+                            "5" { 
                                 # Return to main menu
                                 break
                             }
@@ -816,9 +904,9 @@ function Main {
                                 Start-Sleep -Seconds 1
                             }
                         }
-                    } while ($disableChoice -ne "4")
+                    } while ($disableChoice -ne "5")
                 }
-                "15" { 
+                "16" { 
                     Write-Log "Exiting Go-Tweak" "SUCCESS"
                     Write-Host "Goodbye! 👋" -ForegroundColor Green
                     exit 0
