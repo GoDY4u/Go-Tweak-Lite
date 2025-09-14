@@ -18,15 +18,12 @@
 
 **Go-Tweak Lite** is a powerful PowerShell-based optimization tool designed specifically for gamers and power users. This lightweight console application delivers serious performance boosts without the bloat of graphical interfaces.
 
----
 
 ## ⚡ **Performance Features**
 - **🎯 FPS Boost** - Gaming-optimized registry tweaks  
 - **🚀 Reduced Input Lag** - Smoother gameplay experience  
 - **📶 Network Optimization** - Lower ping and reduced packet loss  
-- **💨 Faster Load Times** - Optimized memory management  
-
----
+- **💨 Faster Load Times** - Optimized memory management
 
 ## 🖥️ **System Optimization**
 - **RAM Optimization** (4GB-64GB profiles)  
@@ -34,7 +31,6 @@
 - **Storage Optimization**  
 - **Power Management**  
 
----
 
 ## 🎯 **THIS IS THE LITE VERSION**
 *(For gamers who prefer performance over prettiness!)*
@@ -45,7 +41,6 @@
 - **🖥️ Fullscreen Friendly** - Doesn't alt-tab your games  
 - **⚡ Background Operation** - Optimize while gaming  
 
----
 
 ## 🔸 **Full Version Coming Soon**
 ![Status](https://img.shields.io/badge/Full%20Version-Coming%20Soon-orange.svg)
@@ -54,7 +49,6 @@
 - **🎚️ Profile System** - Game-specific optimizations  
 - **🌙 Theme Support** - Dark/light customization  
 
----
 
 ## 📦 **Installation**
 
