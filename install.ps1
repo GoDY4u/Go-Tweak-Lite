@@ -44,7 +44,7 @@ try {
         $mainExtractedFolder = $extractedFolders[0].FullName
         
         # Move ALL contents from the extracted folder to the main install path
-        Write-Host "📁 Moving files from: $($extractedFolders[0).Name)" -ForegroundColor Cyan
+        Write-Host "📁 Moving files from: $($extractedFolders[0].Name)" -ForegroundColor Cyan
         Get-ChildItem -Path $mainExtractedFolder | ForEach-Object {
             Move-Item -Path $_.FullName -Destination $installPath -Force
         }
@@ -119,14 +119,12 @@ try {
         Write-Host "   $($_.Name)" -ForegroundColor White
     }
     
-    # AUTO-RUN - CORREGIDO: Sin el punto y barra invertida extra
+    # AUTO-RUN - CORREGIDO
     Write-Host "🎯 Starting Go-Tweak..." -ForegroundColor Yellow
     Start-Sleep -Seconds 2
     
     # Ejecutar el script principal - FORMA CORRECTA
     if (Test-Path $mainScriptPath) {
-        # Cambiar al directorio de instalación primero
-        Set-Location $installPath
         # Ejecutar el script
         PowerShell -ExecutionPolicy Bypass -File "Go-Tweak.ps1"
     } else {
