@@ -1,34 +1,153 @@
 Windows Registry Editor Version 5.00
 
+; ==========================================
+; >>> OPTIMIZACIONES DE GPU Y ENERGÍA <<<
+; ==========================================
+
+; Optimización HDCP/GPU (RMHdcpKeyglobZero)
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Class\{4d36e968-e325-11ce-bfc1-08002be10318}\0000]
 "RMHdcpKeyglobZero"=dword:00000001
 
+; Opciones de Energía (Power Settings)
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\943c8cb6-6f93-4227-ad87-e9a3feec08d1]
 "Attributes"=dword:00000002
 
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\2a737441-1930-4402-8d77-b2bebba308a3\d4e98f31-5ffe-4ce1-be31-1b38b384c009\DefaultPowerSchemeValues\381b4222-f694-41f0-9685-ff5bb260df2e]
-"ACSettingIndex"=dword:0
-"DCSettingIndex"=dword:0
+"ACSettingIndex"=dword:00000000
+"DCSettingIndex"=dword:00000000
 
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\2a737441-1930-4402-8d77-b2bebba308a3\d4e98f31-5ffe-4ce1-be31-1b38b384c009\DefaultPowerSchemeValues\8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c]
-"ACSettingIndex"=dword:0
+"ACSettingIndex"=dword:00000000
 
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\3b04d4fd-1cc7-4f23-ab1c-d1337819c4bb\DefaultPowerSchemeValues\381b4222-f694-41f0-9685-ff5bb260df2e]
-"ACSettingIndex"=dword:0
-"DCSettingIndex"=dword:0
+"ACSettingIndex"=dword:00000000
+"DCSettingIndex"=dword:00000000
 
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\3b04d4fd-1cc7-4f23-ab1c-d1337819c4bb\DefaultPowerSchemeValues\8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c]
-"ACSettingIndex"=dword:0
+"ACSettingIndex"=dword:00000000
 
-[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\DriverSearching]
-"SearchOrderConfig"=dword:00000001
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\7b224883-b3cc-4d79-819f-8374152cbe7c\DefaultPowerSchemeValues\8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c]
+"ACSettingIndex"=dword:00000064
 
+; Configuración General de Energía
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Power]
 "HiberbootEnabled"=dword:00000000
 
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power]
+"HibernateEnabled"=dword:00000000
 "HibernateEnabledDefault"=dword:00000000
+"PowerThrottlingOff"=dword:00000001
+"HibernateEnabled"=dword:00000000
 
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power\PowerThrottling]
+"PowerThrottlingOff"=dword:00000001
+
+; ==========================================
+; >>> TELEMETRÍA, PRIVACIDAD Y RECOPILACIÓN DE DATOS <<<
+; ==========================================
+
+; 1. WPFTweaksAH - Disable Activity History
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\System]
+"EnableActivityFeed"=dword:00000000
+"PublishUserActivities"=dword:00000000
+"UploadUserActivities"=dword:00000000
+
+; 10. WPFTweaksTele - Disable Telemetry (Configuración Principal)
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection]
+"AllowTelemetry"=dword:00000000
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\DataCollection]
+"AllowTelemetry"=dword:00000000
+"AllowDeviceNameInTelemetry"=dword:00000000
+"DoNotShowFeedbackNotifications"=dword:00000001
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Policies\DataCollection]
+"AllowTelemetry"=dword:00000000
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Privacy]
+"TailoredExperiencesWithDiagnosticDataEnabled"=dword:00000000
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Diagnostics\DiagTrack\EventTranscriptKey]
+"EnableEventTranscript"=dword:00000000
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Siuf\Rules]
+"NumberOfSIUFInPeriod"=dword:00000000
+"PeriodInNanoSeconds"=-
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo]
+"Enabled"=dword:00000000
+
+[HKEY_CURRENT_USER\Control Panel\International\User Profile]
+"HttpAcceptLanguageOptOut"=dword:00000001
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+"Start_TrackProgs"=dword:00000000
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Speech_OneCore\Settings\OnlineSpeechPrivacy]
+"HasAccepted"=dword:00000000
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Personalization\Settings]
+"AcceptedPrivacyPolicy"=dword:00000000
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\InputPersonalization]
+"RestrictImplicitInkCollection"=dword:00000001
+"RestrictImplicitTextCollection"=dword:00000001
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\InputPersonalization\TrainedDataStore]
+"HarvestContacts"=dword:00000000
+
+; Consent Stores
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\userNotificationListener]
+"Value"="Deny"
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location]
+"Value"="Deny"
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\appDiagnostics]
+"Value"="Deny"
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\userAccountInformation]
+"Value"="Deny"
+
+; Configuración de Contenido en la Nube y Experiencias
+[HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Windows\CloudContent]
+"ConfigureWindowsSpotlight"=dword:00000002
+"IncludeEnterpriseSpotlight"=dword:00000000
+"DisableWindowsSpotlightFeatures"=dword:00000001
+"DisableWindowsSpotlightWindowsWelcomeExperience"=dword:00000001
+"DisableWindowsSpotlightOnActionCenter"=dword:00000001
+"DisableWindowsSpotlightOnSettings"=dword:00000001
+"DisableThirdPartySuggestions"=dword:00000001
+"DisableTailoredExperiencesWithDiagnosticData"=dword:00000001
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\CloudContent]
+"DisableThirdPartySuggestions"=dword:00000001
+"DisableWindowsConsumerFeatures"=dword:00000001
+
+; 9. WPFTweaksConsumerFeatures - Disable ConsumerFeatures
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\CloudContent]
+"DisableWindowsConsumerFeatures"=dword:00000001
+
+; Content Delivery Manager
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager]
+"ContentDeliveryAllowed"=dword:00000000
+"OemPreInstalledAppsEnabled"=dword:00000000
+"PreInstalledAppsEnabled"=dword:00000000
+"PreInstalledAppsEverEnabled"=dword:00000000
+"SilentInstalledAppsEnabled"=dword:00000000
+"SoftLandingEnabled"=dword:00000000
+"SubscribedContentEnabled"=dword:00000000
+"FeatureManagementEnabled"=dword:00000000
+"SystemPaneSuggestionsEnabled"=dword:00000000
+"RemediationRequired"=dword:00000000
+
+; 5. WPFTweaksLoc - Disable Location Tracking
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Sensor\Overrides\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}]
+"SensorPermissionState"=dword:00000000
+[HKEY_LOCAL_MACHINE\SYSTEM\Maps]
+"AutoUpdateEnabled"=dword:00000000
+
+; Setting Sync
 [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync]
 "SyncPolicy"=dword:00000005
 
@@ -47,772 +166,35 @@ Windows Registry Editor Version 5.00
 [HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\SettingSync\Groups\Windows]
 "Enabled"=dword:00000000
 
-[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Diagnostics\DiagTrack]
-"ShowedToastAtLevel"=dword:00000001
+; ==========================================
+; >>> RENDIMIENTO DEL SISTEMA Y APLICACIONES <<<
+; ==========================================
 
-[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection]
-"AllowTelemetry"=dword:00000000
-
-[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\DataCollection]
-"AllowTelemetry"=dword:00000000
-"AllowDeviceNameInTelemetry"=dword:00000000
-
-[HKEY_LOCAL_MACHINE\SOFTWARE\Wow6432Node\Microsoft\Windows\CurrentVersion\Policies\DataCollection]
-"AllowTelemetry"=dword:00000000
-
-[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Privacy]
-"TailoredExperiencesWithDiagnosticDataEnabled"=dword:00000000
-
-[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Diagnostics\DiagTrack\EventTranscriptKey]
-"EnableEventTranscript"=dword:00000000
-
-[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Siuf\Rules]
-"NumberOfSIUFInPeriod"=dword:00000000
-"PeriodInNanoSeconds"=- 
- 
-[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo]
-"Enabled"=dword:00000000
-
-[HKEY_CURRENT_USER\Control Panel\International\User Profile]
-"HttpAcceptLanguageOptOut"=dword:00000001
-
-[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
-"Start_TrackProgs"=dword:00000000 
- 
-[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Speech_OneCore\Settings\OnlineSpeechPrivacy]
-"HasAccepted"=dword:00000000 
- 
-[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Personalization\Settings]
-"AcceptedPrivacyPolicy"=dword:00000000 
- 
-[HKEY_CURRENT_USER\SOFTWARE\Microsoft\InputPersonalization]
-"RestrictImplicitInkCollection"=dword:00000001
-"RestrictImplicitTextCollection"=dword:00000001 
- 
-[HKEY_CURRENT_USER\SOFTWARE\Microsoft\InputPersonalization\TrainedDataStore]
-"HarvestContacts"=dword:00000000 
- 
-[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\System]
-"PublishUserActivities"=dword:00000000
-"UploadUserActivities"=dword:00000000 
- 
-[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\userNotificationListener]
-"Value"="Deny"
-
-[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location]
-"Value"="Deny"
-
-[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\appDiagnostics]
-"Value"="Deny"
-
-[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\userAccountInformation]
-"Value"="Deny" 
-
-[HKEY_CURRENT_USER\SOFTWARE\Policies\Microsoft\Windows\CloudContent]
-"ConfigureWindowsSpotlight"=dword:00000002
-"IncludeEnterpriseSpotlight"=dword:00000000
-"DisableWindowsSpotlightFeatures"=dword:00000001
-"DisableWindowsSpotlightWindowsWelcomeExperience"=dword:00000001
-"DisableWindowsSpotlightOnActionCenter"=dword:00000001
-"DisableWindowsSpotlightOnSettings"=dword:00000001
-"DisableThirdPartySuggestions"=dword:00000001
-"DisableTailoredExperiencesWithDiagnosticData"=dword:00000001 
-
-[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\CloudContent]
-"DisableThirdPartySuggestions"=dword:00000001
-"DisableWindowsConsumerFeatures"=dword:00000001
-
-[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager]
-"ContentDeliveryAllowed"=dword:00000000
-"OemPreInstalledAppsEnabled"=dword:00000000
-"PreInstalledAppsEnabled"=dword:00000000
-"PreInstalledAppsEverEnabled"=dword:00000000
-"SilentInstalledAppsEnabled"=dword:00000000
-"SoftLandingEnabled"=dword:00000000
-"SubscribedContentEnabled"=dword:00000000
-"FeatureManagementEnabled"=dword:00000000
-"SystemPaneSuggestionsEnabled"=dword:00000000
-"RemediationRequired"=dword:00000000
-
-; Improve foreground application priority
+; Prioridad de Aplicaciones en Primer Plano
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\PriorityControl]
 "Win32PrioritySeparation"=dword:00000026
 
-; Optimize keyboard polling
+; Optimización de Polling de Teclado y Ratón
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\kbdclass\Parameters]
 "PollingIterations"=dword:00000001
 "PollingPriority"=dword:00000008
 
-; Optimize mouse polling
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\mouclass\Parameters]
 "PollingIterations"=dword:00000001
 "PollingPriority"=dword:00000008
 
-; Enable Game Mode and improve input timing
+; Game Mode y Timing de Entrada
 [HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Input\Settings]
 "EnableGameMode"=dword:00000001
 "InputTimerFrequency"=dword:00000001
 
-; Set LargeSystemCache to improve stability
+; SystemCache
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management]
 "LargeSystemCache"=dword:00000000
 "FeatureSettingsOverride"=dword:00000003
 "FeatureSettingsOverrideMask"=dword:00000003
 
-[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications]
-"GlobalUserDisabled"=dword:00000001
-
-[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Search]
-"BackgroundAppGlobalToggle"=dword:00000000
-
-[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize]
-"EnableTransparency"=dword:00000000
-
-[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PolicyManager\default\ApplicationManagement\AllowGameDVR]
-"value"=dword:00000000
-
-[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\GameDVR] 
-"AllowGameDVR"=dword:00000000
-
-[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR] 
-"AppCaptureEnabled"=dword:00000000
-
-; Disable Full Screen Optimizations Globally
-[HKEY_CURRENT_USER\System\GameConfigStore]
-"GameDVR_Enabled"=dword:00000000
-"GameDVR_FSEBehavior"=dword:00000002
-"GameDVR_FSEBehaviorMode"=dword:00000002
-"GameDVR_HonorUserFSEBehaviorMode"=dword:00000000
-"GameDVR_DXGIHonorFSEWindowsCompatible"=dword:00000000
-"GameDVR_EFSEFeatureFlags"=dword:00000000
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\MapsBroker]
-"Start"=dword:00000004
-
-; Disable Connected User Experiences and Telemetry
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\DiagTrack]
-"Start"=dword:00000004
-
-; Disable dmwappushservice
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\dmwappushservice]
-"Start"=dword:00000004
-
-; Disable Diagnostic Execution Service
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\diagsvc]
-"Start"=dword:00000004
-
-; Disable Diagnostic Policy Service
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\DPS]
-"Start"=dword:00000004
-
-; Disable Microsoft (R) Diagnostics Hub Standard Collector Service
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\diagnosticshub.standardcollector.service]
-"Start"=dword:00000004
-
-; Disable Diagnostic Service Host
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WdiServiceHost]
-"Start"=dword:00000004
-
-; Disable Diagnostic System Host
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WdiSystemHost]
-"Start"=dword:00000004
-
-;Disable Windows Biometric Service
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WbioSrvc]
-"Start"=dword:00000004
-
-;Disable Windows Font Cache Service
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\FontCache]
-"Start"=dword:00000004
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\FontCache3.0.0.0]
-"Start"=dword:00000004
-
-;Disable Graphics performance monitor service
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\GraphicsPerfSvc]
-"Start"=dword:00000004
-
-;Disable Windows Image Acquisition (WIA)
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\stisvc]
-"Start"=dword:00000004
-
-;Disable Windows Error Reporting Service
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WerSvc]
-"Start"=dword:00000004
-
-;Disable Windows Event Collector
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Wecsvc]
-"Start"=dword:00000004
-
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Fax]
-"DisplayName"="@%systemroot%\\system32\\fxsresm.dll,-118"
-"ErrorControl"=dword:00000001
-"ImagePath"=hex(2):25,00,73,00,79,00,73,00,74,00,65,00,6d,00,72,00,6f,00,6f,00,\
-  74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,66,\
-  00,78,00,73,00,73,00,76,00,63,00,2e,00,65,00,78,00,65,00,00,00
-"Start"=dword:00000004
-"Type"=dword:00000010
-"Description"="@%systemroot%\\system32\\fxsresm.dll,-122"
-"DependOnService"=hex(7):54,00,61,00,70,00,69,00,53,00,72,00,76,00,00,00,52,00,\
-  70,00,63,00,53,00,73,00,00,00,53,00,70,00,6f,00,6f,00,6c,00,65,00,72,00,00,\
-  00,00,00
-"ObjectName"="NT AUTHORITY\\NetworkService"
-"ServiceSidType"=dword:00000001
-"RequiredPrivileges"=hex(7):53,00,65,00,41,00,73,00,73,00,69,00,67,00,6e,00,50,\
-  00,72,00,69,00,6d,00,61,00,72,00,79,00,54,00,6f,00,6b,00,65,00,6e,00,50,00,\
-  72,00,69,00,76,00,69,00,6c,00,65,00,67,00,65,00,00,00,53,00,65,00,41,00,75,\
-  00,64,00,69,00,74,00,50,00,72,00,69,00,76,00,69,00,6c,00,65,00,67,00,65,00,\
-  00,00,53,00,65,00,43,00,68,00,61,00,6e,00,67,00,65,00,4e,00,6f,00,74,00,69,\
-  00,66,00,79,00,50,00,72,00,69,00,76,00,69,00,6c,00,65,00,67,00,65,00,00,00,\
-  53,00,65,00,43,00,72,00,65,00,61,00,74,00,65,00,47,00,6c,00,6f,00,62,00,61,\
-  00,6c,00,50,00,72,00,69,00,76,00,69,00,6c,00,65,00,67,00,65,00,00,00,53,00,\
-  65,00,49,00,6d,00,70,00,65,00,72,00,73,00,6f,00,6e,00,61,00,74,00,65,00,50,\
-  00,72,00,69,00,76,00,69,00,6c,00,65,00,67,00,65,00,00,00,53,00,65,00,49,00,\
-  6e,00,63,00,72,00,65,00,61,00,73,00,65,00,51,00,75,00,6f,00,74,00,61,00,50,\
-  00,72,00,69,00,76,00,69,00,6c,00,65,00,67,00,65,00,00,00,00,00
-"FailureActions"=hex:2c,01,00,00,00,00,00,00,00,00,00,00,03,00,00,00,14,00,00,\
-  00,01,00,00,00,60,ea,00,00,01,00,00,00,60,ea,00,00,00,00,00,00,00,00,00,00
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Fax\Security]
-"Security"=hex:01,00,04,80,84,00,00,00,90,00,00,00,00,00,00,00,14,00,00,00,02,\
-  00,70,00,04,00,00,00,00,00,14,00,14,00,00,00,01,01,00,00,00,00,00,01,00,00,\
-  00,00,00,00,28,00,fd,01,02,00,01,06,00,00,00,00,00,05,50,00,00,00,4c,4f,39,\
-  7e,b9,c3,14,ef,8c,5f,c2,9d,34,5a,6a,7f,04,eb,41,0d,00,00,18,00,ff,01,0f,00,\
-  01,02,00,00,00,00,00,05,20,00,00,00,20,02,00,00,00,00,14,00,8d,01,02,00,01,\
-  01,00,00,00,00,00,05,0b,00,00,00,01,01,00,00,00,00,00,05,12,00,00,00,01,01,\
-  00,00,00,00,00,05,12,00,00,00
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc]
-"DisplayName"="@%SystemRoot%\\System32\\lfsvc.dll,-1"
-"ErrorControl"=dword:00000001
-"ImagePath"=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,\
-  74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,73,\
-  00,76,00,63,00,68,00,6f,00,73,00,74,00,2e,00,65,00,78,00,65,00,20,00,2d,00,\
-  6b,00,20,00,6e,00,65,00,74,00,73,00,76,00,63,00,73,00,00,00
-"Start"=dword:00000004
-"Type"=dword:00000020
-"Description"="@%SystemRoot%\\System32\\lfsvc.dll,-2"
-"DependOnService"=hex(7):52,00,70,00,63,00,53,00,73,00,00,00,00,00
-"ObjectName"="LocalSystem"
-"ServiceSidType"=dword:00000001
-"RequiredPrivileges"=hex(7):53,00,65,00,49,00,6d,00,70,00,65,00,72,00,73,00,6f,\
-  00,6e,00,61,00,74,00,65,00,50,00,72,00,69,00,76,00,69,00,6c,00,65,00,67,00,\
-  65,00,00,00,00,00
-"FailureActions"=hex:80,51,01,00,00,00,00,00,00,00,00,00,04,00,00,00,14,00,00,\
-  00,01,00,00,00,10,27,00,00,01,00,00,00,10,27,00,00,01,00,00,00,10,27,00,00,\
-  00,00,00,00,10,27,00,00
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components]
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\General]
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\General\Settings]
-"EnableActiveCollection"=dword:00000000
-"TestModeEnabled"=dword:00000000
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\GeofenceAppServices]
-"ClassId"="{143B03BE-F4B9-4775-979E-5392AB1B7EB2}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\GeofenceEventSubscriptions]
-"ClassId"="{2475A152-2C35-4489-BCBA-A269BD3F5BA4}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\GeofenceEventSubscriptions\Settings]
-"BackgroundThrottlingInMilliseconds"=dword:0001d4c0
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\GeofenceManager]
-"ClassId"="{F8D0708C-A86F-4CBA-A55A-F2081BD47721}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\GeofenceSettings]
-"ClassId"="{037BB880-2613-4F6E-9F84-9574CCA8DEAC}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\GeofenceStore]
-"ClassId"="{26ED43EA-45C6-4EF6-9E9B-1740366C98BF}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\GeofenceTracker]
-"ClassId"="{3BF2A5F1-C95E-4F7B-B939-582DB5F32B81}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\GeofenceTracker\Settings]
-"RegionQuota"=dword:00000100
-"TransitioningQuota"=dword:00000020
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationAcquireEmulatedTrackingCpe]
-"ClassId"="{59108A76-472B-4311-A9E0-B6FF399B8C99}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationAcquireOffloadedTrackingCpe]
-"ClassId"="{49BD2BB3-DFBE-4E01-BF21-7DE89ED09ACD}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationAcquireSingleshotCell]
-"ClassId"="{A28798CC-730B-41EB-9CA2-74F93E27B99E}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationAcquireSingleshotCell\Settings]
-"HistoricalDataLifetimeInMilliseconds"=dword:05265c00
-"HistoricalDataMaxElements"=dword:00000100
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationAcquireSingleShotCpe]
-"ClassId"="{6833568B-541D-4290-AF22-3AFB73D1447C}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationAcquireSingleshotGnss]
-"ClassId"="{A89003D7-25F1-47fd-B504-6B35E7A63A27}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationAcquireSingleShotIP]
-"ClassId"="{27FE144C-9CAD-4EA6-8232-912FE8A96873}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationAcquireSingleShotIP\Settings]
-"HistoricalDataLifetimeInMilliseconds"=dword:00dbba00
-"HistoricalDataMaxElements"=dword:00000100
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationAcquireSingleShotLegacyWinLocation]
-"ClassId"="{A961F842-FC8E-4D53-8074-4AB67E8854B4}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationAcquireSingleShotWiFi]
-"ClassId"="{C274CC5B-44A9-4093-A686-71F88079C450}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationAcquireSingleShotWiFi\Settings]
-"HistoricalDataLifetimeInMilliseconds"=dword:05265c00
-"HistoricalDataMaxElements"=dword:00000100
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationAdapterCell]
-"ClassId"="{C86D6E59-E9E6-489B-A6C3-37ED73ADBF5A}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationAdapterWiFi]
-"ClassId"="{B1840AE4-5D39-4B8E-BEDD-82F251A5FF70}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationAdapterWiFi\Settings]
-"ScanAveragingFreshnessMaxTimeInMilliseconds"=dword:00001b58
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationBackgroundBroker]
-"ClassId"="{815E42F5-B141-45C2-B844-0BDFE9C558E2}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationCellBeaconInformation]
-"ClassId"="{0A4B8F34-D725-454D-B81D-3BEBE48382DC}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationCivicAddrAdapter]
-"ClassId"="{3A582F0C-9A06-43C3-BB82-7CEEED538DF7}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationCrowdsource]
-"ClassId"="{8AE0163F-EDDD-4B0A-9C61-F7DD8B6137AE}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationCrowdsource\Settings]
-"CrowdsourceCollectionType"=dword:00000003
-"CrowdsourceLevel"=dword:00000003
-"MinTimeGapBetweenWifiScans"=dword:00004e20
-"ThrottleTimeForLowAccuracyGnssFixes"=dword:05265c00
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationDcpAdapter]
-"ClassId"="{331E9F3D-9351-4A4D-A2CA-75A16BAFF7BB}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationGnssAdapter]
-"ClassId"="{9B97D384-048C-4e24-926D-DB6F0841C9E4}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationGnssAdapter\Settings]
-"DriverPath"="\\\\.\\GnssDriver"
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationInformation]
-"ClassId"="{52968F2C-56B5-4078-9898-EA595DCA0A6E}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationMovementDetector]
-"ClassId"="{749962AB-D849-46D5-A39C-75A8307C2C86}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationPalMisc]
-"ClassId"="{F074C547-461C-4146-B35A-F1F845AF413B}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationPermissionManager]
-"ClassId"="{AE92E42B-4111-427A-8B0C-24A8D1A7D7F3}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationProviderCell]
-"ClassId"="{D1202225-F099-47FE-A965-8A78ABD6DE7D}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationProviderCell\Settings]
-"AllowedInferenceType"=dword:00000003
-"InferenceSettingRefreshTime"=dword:05265c00
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationProviderComposite]
-"ClassId"="{0B30F034-02D5-4E2B-9BB7-A9F6538F4110}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationProviderGnss]
-"ClassId"="{579648D9-94B1-418D-ACC6-AFA17860F320}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationProviderHelper]
-"ClassId"="{1DF1BDDA-A8FA-4E57-8015-8B621C4DBBE7}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationProviderIP]
-"ClassId"="{497D141A-7A42-4BB6-B017-863FD4DA36BF}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationProviderIP\Settings]
-"AllowedInferenceType"=dword:00000003
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationProviderLegacyWinLocation]
-"ClassId"="{103E1E59-66D1-4143-B772-8D846E96FEBF}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationProviderVenue]
-"ClassId"="{0A77F7E3-36D2-4D32-83A8-496A4680C706}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationProviderVenue\Settings]
-"AllowedInferenceType"=dword:00000003
-"BsmLevel1Fingerprint"=dword:00000000
-"BsmLevel2Fingerprint"=dword:00000000
-"BsmLevelToggle"=dword:00000000
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationProviderWiFi]
-"ClassId"="{18F65133-BB77-4C67-8A64-D427BE942224}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationProviderWiFi\Settings]
-"AllowedInferenceType"=dword:00000003
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationSession]
-"ClassId"="{4C1D33D1-3161-4A76-9487-2677CD589C11}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationSystemNotificationsCenter]
-"ClassId"="{E52A23D8-9409-4998-A829-34F67A74ECA5}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationUserHandles]
-"ClassId"="{BFD6E7B9-2FDE-413E-9AC9-52FC8656908C}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationVenueInformation]
-"ClassId"="{BD5EB95F-1F8A-4D34-8F1E-C90BC772E64E}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationWebServiceproxy]
-"ClassId"="{0D9D975A-C577-4B5C-93B0-D1BE4944DEDE}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\LocationWiFiBeaconInformation]
-"ClassId"="{B0DC057D-FA13-4CB3-B54D-4CC05E125781}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\PdcDb]
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\ServerTileInformation]
-"ClassId"="{AADFA891-4F4D-46E6-BF6B-E9A260931A01}"
-"ClsCtx"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\ServerTileInformation\Settings]
-"BeaconBucketCount"=dword:00000019
-"StorageSpaceLimitInKB"=dword:00005000
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Components\SUPL]
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Parameters]
-"ServiceDll"=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,\
-  00,74,00,25,00,5c,00,53,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,\
-  6c,00,66,00,73,00,76,00,63,00,2e,00,64,00,6c,00,6c,00,00,00
-"ServiceDllUnloadOnStop"=dword:00000001
-"ServiceMain"="ServiceMain"
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Security]
-"Security"=hex:01,00,04,80,18,02,00,00,24,02,00,00,00,00,00,00,14,00,00,00,02,\
-  00,04,02,0a,00,00,00,00,00,14,00,8d,01,02,00,01,01,00,00,00,00,00,05,04,00,\
-  00,00,00,00,14,00,8d,01,02,00,01,01,00,00,00,00,00,05,06,00,00,00,00,00,14,\
-  00,ff,01,0f,00,01,01,00,00,00,00,00,05,12,00,00,00,00,00,18,00,ff,01,0f,00,\
-  01,02,00,00,00,00,00,05,20,00,00,00,20,02,00,00,00,00,38,00,14,00,00,00,01,\
-  0a,00,00,00,00,00,0f,03,00,00,00,00,04,00,00,0c,70,a7,80,66,ac,cf,df,d6,87,\
-  61,2c,b6,57,3e,d7,9a,3e,e4,93,c7,8b,d6,01,0f,98,9e,cb,09,a3,42,91,00,00,14,\
-  00,14,00,00,00,01,01,00,00,00,00,00,05,04,00,00,00,00,00,34,00,14,00,00,00,\
-  01,09,00,00,00,00,00,05,20,00,00,00,0c,70,a7,80,66,ac,cf,df,d6,87,61,2c,b6,\
-  57,3e,d7,9a,3e,e4,93,c7,8b,d6,01,0f,98,9e,cb,09,a3,42,91,09,00,70,00,34,00,\
-  00,00,01,0a,00,00,00,00,00,0f,03,00,00,00,00,04,00,00,77,d9,0c,e5,d3,03,aa,\
-  0a,4e,e3,d1,1b,4d,0a,80,09,36,dc,77,fc,25,15,9e,c7,de,42,1a,74,56,45,d8,e7,\
-  61,72,74,78,f8,2e,00,00,00,57,00,49,00,4e,00,3a,00,2f,00,2f,00,49,00,53,00,\
-  4d,00,55,00,4c,00,54,00,49,00,53,00,45,00,53,00,53,00,49,00,4f,00,4e,00,53,\
-  00,4b,00,55,00,a2,09,00,4c,00,34,00,00,00,01,01,00,00,00,00,00,05,04,00,00,\
-  00,61,72,74,78,f8,2e,00,00,00,57,00,49,00,4e,00,3a,00,2f,00,2f,00,49,00,53,\
-  00,4d,00,55,00,4c,00,54,00,49,00,53,00,45,00,53,00,53,00,49,00,4f,00,4e,00,\
-  53,00,4b,00,55,00,a2,09,00,6c,00,34,00,00,00,01,09,00,00,00,00,00,05,20,00,\
-  00,00,77,d9,0c,e5,d3,03,aa,0a,4e,e3,d1,1b,4d,0a,80,09,36,dc,77,fc,25,15,9e,\
-  c7,de,42,1a,74,56,45,d8,e7,61,72,74,78,f8,2e,00,00,00,57,00,49,00,4e,00,3a,\
-  00,2f,00,2f,00,49,00,53,00,4d,00,55,00,4c,00,54,00,49,00,53,00,45,00,53,00,\
-  53,00,49,00,4f,00,4e,00,53,00,4b,00,55,00,a2,01,01,00,00,00,00,00,05,12,00,\
-  00,00,01,01,00,00,00,00,00,05,12,00,00,00
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Service]
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Service\Configuration]
-"Status"=dword:00000000
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Service\Settings]
-"Status"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Settings]
-"TestingModeOn"=dword:00000000
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Settings\LocationWebServiceProxy]
-"OrionInferenceTileUrlINT"=""
-"USE_TEST_APPID"=dword:00000000
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\TriggerInfo]
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\TriggerInfo\0]
-"Type"=dword:00000007
-"Action"=dword:00000001
-"GUID"=hex:16,28,7a,2d,5e,0c,fc,45,9c,e7,57,0e,5e,cd,e9,c9
-"Data0"=hex:75,b0,bc,a3,3e,0b,84,41
-"DataType0"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\TriggerInfo\1]
-"Type"=dword:00000006
-"Action"=dword:00000001
-"GUID"=hex:67,d1,90,bc,70,94,39,41,a9,ba,be,0b,bb,f5,b7,4d
-"Data0"=hex:44,00,30,00,39,00,42,00,44,00,45,00,42,00,35,00,2d,00,36,00,31,00,\
-  37,00,31,00,2d,00,34,00,41,00,33,00,34,00,2d,00,42,00,46,00,45,00,32,00,2d,\
-  00,30,00,36,00,46,00,41,00,38,00,32,00,36,00,35,00,32,00,35,00,36,00,38,00,\
-  3a,00,35,00,38,00,32,00,41,00,34,00,37,00,42,00,32,00,2d,00,42,00,43,00,44,\
-  00,38,00,2d,00,34,00,44,00,33,00,43,00,2d,00,38,00,41,00,43,00,42,00,2d,00,\
-  46,00,45,00,30,00,39,00,44,00,35,00,42,00,44,00,36,00,45,00,45,00,43,00,00,\
-  00
-"DataType0"=dword:00000002
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\TriggerInfo\2]
-"Type"=dword:00000001
-"Action"=dword:00000001
-"GUID"=hex:e4,e5,36,33,8a,01,69,46,84,c5,bd,05,f3,bd,36,8b
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\TriggerInfo\3]
-"Type"=dword:00000007
-"Action"=dword:00000001
-"GUID"=hex:16,28,7a,2d,5e,0c,fc,45,9c,e7,57,0e,5e,cd,e9,c9
-"Data0"=hex:75,38,bc,a3,3e,06,8a,41
-"DataType0"=dword:00000001
-
-[HKEY_CURRENT_USER\Control Panel\Mouse]
-"MouseSpeed"="0"
-"MouseThreshold1"="0"
-"MouseThreshold2"="0"
-"SmoothMouseXCurve"=hex:\
- 00,00,00,00,00,00,00,00,\
- 00,00,00,00,00,00,00,00,\
- 00,00,00,00,00,00,00,00,\
- 00,00,00,00,00,00,00,00,\
- 00,00,00,00,00,00,00,00
-"SmoothMouseYCurve"=hex:\
- 00,00,00,00,00,00,00,00,\
- 00,00,00,00,00,00,00,00,\
- 00,00,00,00,00,00,00,00,\
- 00,00,00,00,00,00,00,00,\
- 00,00,00,00,00,00,00,00
-
-[HKEY_USERS\.DEFAULT\Control Panel\Mouse]
-"MouseSpeed"="0"
-"MouseThreshold1"="0"
-"MouseThreshold2"="0"
-"SmoothMouseXCurve"=hex:\
- 00,00,00,00,00,00,00,00,\
- 00,00,00,00,00,00,00,00,\
- 00,00,00,00,00,00,00,00,\
- 00,00,00,00,00,00,00,00,\
- 00,00,00,00,00,00,00,00
-"SmoothMouseYCurve"=hex:\
- 00,00,00,00,00,00,00,00,\
- 00,00,00,00,00,00,00,00,\
- 00,00,00,00,00,00,00,00,\
- 00,00,00,00,00,00,00,00,\
- 00,00,00,00,00,00,00,00
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SCardSvr]
-"DisplayName"="@%SystemRoot%\\System32\\SCardSvr.dll,-1"
-"ErrorControl"=dword:00000001
-"Group"="SmartCardGroup"
-"ImagePath"=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,\
-  74,00,25,00,5c,00,73,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,73,\
-  00,76,00,63,00,68,00,6f,00,73,00,74,00,2e,00,65,00,78,00,65,00,20,00,2d,00,\
-  6b,00,20,00,4c,00,6f,00,63,00,61,00,6c,00,53,00,65,00,72,00,76,00,69,00,63,\
-  00,65,00,41,00,6e,00,64,00,4e,00,6f,00,49,00,6d,00,70,00,65,00,72,00,73,00,\
-  6f,00,6e,00,61,00,74,00,69,00,6f,00,6e,00,00,00
-"Start"=dword:00000004
-"Type"=dword:00000020
-"Description"="@%SystemRoot%\\System32\\SCardSvr.dll,-5"
-"DependOnService"=hex(7):77,00,75,00,64,00,66,00,73,00,76,00,63,00,00,00,00,00
-"ObjectName"="NT AUTHORITY\\LocalService"
-"ServiceSidType"=dword:00000001
-"RequiredPrivileges"=hex(7):53,00,65,00,43,00,72,00,65,00,61,00,74,00,65,00,47,\
-  00,6c,00,6f,00,62,00,61,00,6c,00,50,00,72,00,69,00,76,00,69,00,6c,00,65,00,\
-  67,00,65,00,00,00,53,00,65,00,43,00,68,00,61,00,6e,00,67,00,65,00,4e,00,6f,\
-  00,74,00,69,00,66,00,79,00,50,00,72,00,69,00,76,00,69,00,6c,00,65,00,67,00,\
-  65,00,00,00,00,00
-"FailureActions"=hex:84,03,00,00,00,00,00,00,00,00,00,00,03,00,00,00,14,00,00,\
-  00,01,00,00,00,c0,d4,01,00,01,00,00,00,e0,93,04,00,00,00,00,00,00,00,00,00
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SCardSvr\Parameters]
-"ServiceDll"=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,\
-  00,74,00,25,00,5c,00,53,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,\
-  53,00,43,00,61,00,72,00,64,00,53,00,76,00,72,00,2e,00,64,00,6c,00,6c,00,00,\
-  00
-"ServiceDllUnloadOnStop"=dword:00000001
-"ServiceMain"="CalaisMain"
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SCardSvr\Security]
-"Security"=hex:01,00,14,80,90,00,00,00,a0,00,00,00,14,00,00,00,34,00,00,00,02,\
-  00,20,00,01,00,00,00,02,c0,18,00,00,00,0c,00,01,02,00,00,00,00,00,05,20,00,\
-  00,00,20,02,00,00,02,00,5c,00,04,00,00,00,00,02,14,00,ff,01,0f,00,01,01,00,\
-  00,00,00,00,05,12,00,00,00,00,00,18,00,ff,01,02,00,01,02,00,00,00,00,00,05,\
-  20,00,00,00,20,02,00,00,00,00,14,00,8d,01,02,00,01,01,00,00,00,00,00,05,04,\
-  00,00,00,00,00,14,00,8d,01,02,00,01,01,00,00,00,00,00,05,06,00,00,00,01,02,\
-  00,00,00,00,00,05,20,00,00,00,20,02,00,00,01,02,00,00,00,00,00,05,20,00,00,\
-  00,20,02,00,00
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SCardSvr\TriggerInfo]
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SCardSvr\TriggerInfo\0]
-"Type"=dword:00000001
-"Action"=dword:00000001
-"GUID"=hex:30,52,dd,50,8a,ba,d1,11,bf,5d,00,00,f8,05,f5,30
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SCardSvr\TriggerInfo\1]
-"Type"=dword:00000001
-"Action"=dword:00000001
-"GUID"=hex:61,81,1d,12,6d,86,24,4a,ba,58,90,58,94,0c,0d,47
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SCardSvr\TriggerInfo\2]
-"Type"=dword:00000006
-"Action"=dword:00000001
-"GUID"=hex:67,d1,90,bc,70,94,39,41,a9,ba,be,0b,bb,f5,b7,4d
-"Data0"=hex:63,00,36,00,62,00,35,00,32,00,33,00,35,00,61,00,2d,00,65,00,34,00,\
-  31,00,33,00,2d,00,34,00,38,00,31,00,64,00,2d,00,39,00,61,00,63,00,38,00,2d,\
-  00,33,00,31,00,36,00,38,00,31,00,62,00,31,00,66,00,61,00,61,00,66,00,35,00,\
-  00,00
-"DataType0"=dword:00000002
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SCardSvr\TriggerInfo\3]
-"Type"=dword:00000006
-"Action"=dword:00000001
-"GUID"=hex:67,d1,90,bc,70,94,39,41,a9,ba,be,0b,bb,f5,b7,4d
-"Data0"=hex:44,00,30,00,39,00,42,00,44,00,45,00,42,00,35,00,2d,00,36,00,31,00,\
-  37,00,31,00,2d,00,34,00,41,00,33,00,34,00,2d,00,42,00,46,00,45,00,32,00,2d,\
-  00,30,00,36,00,46,00,41,00,38,00,32,00,36,00,35,00,32,00,35,00,36,00,38,00,\
-  3a,00,46,00,32,00,41,00,44,00,44,00,35,00,36,00,30,00,2d,00,45,00,42,00,38,\
-  00,35,00,2d,00,34,00,31,00,37,00,30,00,2d,00,38,00,32,00,41,00,32,00,2d,00,\
-  41,00,34,00,38,00,45,00,37,00,38,00,39,00,36,00,39,00,30,00,43,00,44,00,00,\
-  00
-"DataType0"=dword:00000002
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\TapiSrv]
-"DisplayName"="@%SystemRoot%\\system32\\tapisrv.dll,-10100"
-"ErrorControl"=dword:00000001
-"ImagePath"=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,\
-  74,00,25,00,5c,00,53,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,73,\
-  00,76,00,63,00,68,00,6f,00,73,00,74,00,2e,00,65,00,78,00,65,00,20,00,2d,00,\
-  6b,00,20,00,4e,00,65,00,74,00,77,00,6f,00,72,00,6b,00,53,00,65,00,72,00,76,\
-  00,69,00,63,00,65,00,00,00
-"Start"=dword:00000003
-"Type"=dword:00000020
-"Description"="@%SystemRoot%\\system32\\tapisrv.dll,-10101"
-"DependOnService"=hex(7):52,00,70,00,63,00,53,00,73,00,00,00,00,00
-"ObjectName"="NT AUTHORITY\\NetworkService"
-"ServiceSidType"=dword:00000001
-"RequiredPrivileges"=hex(7):53,00,65,00,41,00,75,00,64,00,69,00,74,00,50,00,72,\
-  00,69,00,76,00,69,00,6c,00,65,00,67,00,65,00,00,00,53,00,65,00,43,00,68,00,\
-  61,00,6e,00,67,00,65,00,4e,00,6f,00,74,00,69,00,66,00,79,00,50,00,72,00,69,\
-  00,76,00,69,00,6c,00,65,00,67,00,65,00,00,00,53,00,65,00,43,00,72,00,65,00,\
-  61,00,74,00,65,00,47,00,6c,00,6f,00,62,00,61,00,6c,00,50,00,72,00,69,00,76,\
-  00,69,00,6c,00,65,00,67,00,65,00,00,00,53,00,65,00,49,00,6d,00,70,00,65,00,\
-  72,00,73,00,6f,00,6e,00,61,00,74,00,65,00,50,00,72,00,69,00,76,00,69,00,6c,\
-  00,65,00,67,00,65,00,00,00,53,00,65,00,49,00,6e,00,63,00,72,00,65,00,61,00,\
-  73,00,65,00,51,00,75,00,6f,00,74,00,61,00,50,00,72,00,69,00,76,00,69,00,6c,\
-  00,65,00,67,00,65,00,00,00,53,00,65,00,41,00,73,00,73,00,69,00,67,00,6e,00,\
-  50,00,72,00,69,00,6d,00,61,00,72,00,79,00,54,00,6f,00,6b,00,65,00,6e,00,50,\
-  00,72,00,69,00,76,00,69,00,6c,00,65,00,67,00,65,00,00,00,00,00
-"FailureActions"=hex:80,51,01,00,00,00,00,00,00,00,00,00,03,00,00,00,14,00,00,\
-  00,01,00,00,00,c0,d4,01,00,01,00,00,00,e0,93,04,00,00,00,00,00,00,00,00,00
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\TapiSrv\Parameters]
-"ServiceDll"=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,\
-  00,74,00,25,00,5c,00,53,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,\
-  74,00,61,00,70,00,69,00,73,00,72,00,76,00,2e,00,64,00,6c,00,6c,00,00,00
-"ServiceDllUnloadOnStop"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\TapiSrv\Performance]
-"Close"="CloseTapiPerformanceData"
-"Collect"="CollectTapiPerformanceData"
-"Library"=hex(2):25,00,53,00,79,00,73,00,74,00,65,00,6d,00,52,00,6f,00,6f,00,\
-  74,00,25,00,5c,00,53,00,79,00,73,00,74,00,65,00,6d,00,33,00,32,00,5c,00,74,\
-  00,61,00,70,00,69,00,70,00,65,00,72,00,66,00,2e,00,64,00,6c,00,6c,00,00,00
-"ObjectList"="1150"
-"Open"="OpenTapiPerformanceData"
-"InstallType"=dword:00000001
-"PerfIniFile"="tapiperf.ini"
-"First Counter"=dword:00000778
-"Last Counter"=dword:0000078a
-"First Help"=dword:00000779
-"Last Help"=dword:0000078b
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\TapiSrv\Security]
-"Security"=hex:01,00,14,80,8c,00,00,00,98,00,00,00,14,00,00,00,30,00,00,00,02,\
-  00,1c,00,01,00,00,00,02,80,14,00,ff,01,0f,00,01,01,00,00,00,00,00,01,00,00,\
-  00,00,02,00,5c,00,04,00,00,00,00,00,14,00,fd,01,02,00,01,01,00,00,00,00,00,\
-  05,12,00,00,00,00,00,18,00,ff,01,0f,00,01,02,00,00,00,00,00,05,20,00,00,00,\
-  20,02,00,00,00,00,14,00,9d,01,02,00,01,01,00,00,00,00,00,05,04,00,00,00,00,\
-  00,14,00,9d,01,02,00,01,01,00,00,00,00,00,05,06,00,00,00,01,01,00,00,00,00,\
-  00,05,12,00,00,00,01,01,00,00,00,00,00,05,12,00,00,00
-
-; Disable Power Throttling
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power\PowerThrottling]
-"PowerThrottlingOff"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power]
-"PowerThrottlingOff"=dword:00000001
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces\{2ac945f7-8140-44ec-acbd-937c99adc640}]
-"TcpAckFrequency"=dword:00000001
-"TCPNoDelay"=dword:00000001
-"TcpDelAckTicks"=dword:00000000
-
-[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games]
-"Affinity"=dword:00000000
-"Background Only"="False"
-"Clock Rate"=dword:00002710
-"GPU Priority"=dword:00000008
-"Priority"=dword:00000006
-"Scheduling Category"="High"
-"SFIO Priority"="High"
-
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power\PowerSettings\54533251-82be-4824-96c1-47b60b740d00\7b224883-b3cc-4d79-819f-8374152cbe7c\DefaultPowerSchemeValues\8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c]
-"ACSettingIndex"=dword:64
-
-; MMCSS Tweaks
-[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile]
-"NetworkThrottlingIndex"=dword:ffffffff
-"SystemResponsiveness"=dword:00000000
-"NoLazyMode"=dword:00000001
-"AlwaysOn"=dword:00000001
-
-; Decrease processes kill time and menu show delay
+; Tiempos de Espera y Cierre
 [HKEY_CURRENT_USER\Control Panel\Desktop]
 "AutoEndTasks"="1"
 "HungAppTimeout"="1000"
@@ -823,80 +205,279 @@ Windows Registry Editor Version 5.00
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control]
 "WaitToKillServiceTimeout"="2000"
 
-; Disable Auto Maintenance
-[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\Maintenance]
-"MaintenanceDisabled"=dword:00000001
+; MMCSS - Prioridad Multimedia
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile]
+"NetworkThrottlingIndex"=dword:ffffffff
+"SystemResponsiveness"=dword:00000000
+"NoLazyMode"=dword:00000001
+"AlwaysOn"=dword:00000001
 
-; Disable Hibernation
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power]
-"HibernateEnabled"=dword:00000000
+; Perfil para Juegos en MMCSS
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Multimedia\SystemProfile\Tasks\Games]
+"Affinity"=dword:00000000
+"Background Only"="False"
+"Clock Rate"=dword:00002710
+"GPU Priority"=dword:00000008
+"Priority"=dword:00000006
+"Scheduling Category"="High"
+"SFIO Priority"="High"
 
+; 15. WPFTweaksDisplay - Set Display for Performance
+[HKEY_CURRENT_USER\Control Panel\Desktop]
+"DragFullWindows"="0"
+"MenuShowDelay"="200"
+[HKEY_CURRENT_USER\Control Panel\Desktop\WindowMetrics]
+"MinAnimate"="0"
+[HKEY_CURRENT_USER\Control Panel\Keyboard]
+"KeyboardDelay"=dword:00000000
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+"ListviewAlphaSelect"=dword:00000000
+"ListviewShadow"=dword:00000000
+"TaskbarAnimations"=dword:00000000
+"ShowTaskViewButton"=dword:00000000
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects]
+"VisualFXSetting"=dword:00000003
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\DWM]
+"EnableAeroPeek"=dword:00000000
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Search]
+"SearchboxTaskbarMode"=dword:00000000
 
-[-HKEY_CURRENT_USER\System\GameConfigStore\Children]
-[-HKEY_CURRENT_USER\System\GameConfigStore\Parents]
+; ==========================================
+; >>> JUEGOS (DVR / FSO) <<<
+; ==========================================
 
-; Disable Connected User Experiences and Telemetry
+; 34. WPFTweaksDVR - Disable GameDVR
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\GameDVR]
+"AllowGameDVR"=dword:00000000
+
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PolicyManager\default\ApplicationManagement\AllowGameDVR]
+"value"=dword:00000000
+
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR]
+"AppCaptureEnabled"=dword:00000000
+
+[HKEY_CURRENT_USER\System\GameConfigStore]
+"GameDVR_Enabled"=dword:00000000
+"GameDVR_FSEBehavior"=dword:00000002
+"GameDVR_HonorUserFSEBehaviorMode"=dword:00000001
+"GameDVR_EFSEFeatureFlags"=dword:00000000
+
+; 39. WPFTweaksDisableFSO - Disable Fullscreen Optimizations
+[HKEY_CURRENT_USER\System\GameConfigStore]
+"GameDVR_DXGIHonorFSEWindowsCompatible"=dword:00000001
+
+; ==========================================
+; >>> SERVICIOS (Deshabilitar) <<<
+; ==========================================
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\MapsBroker]
+"Start"=dword:00000004
+
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\DiagTrack]
 "Start"=dword:00000004
 
-; Disable dmwappushservice
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\dmwappushservice]
 "Start"=dword:00000004
 
-; Disable Diagnostic Execution Service
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\diagsvc]
 "Start"=dword:00000004
 
-; Disable Diagnostic Policy Service
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\DPS]
 "Start"=dword:00000004
 
-; Disable Microsoft (R) Diagnostics Hub Standard Collector Service
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\diagnosticshub.standardcollector.service]
 "Start"=dword:00000004
 
-; Disable Diagnostic Service Host
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WdiServiceHost]
 "Start"=dword:00000004
 
-; Disable Diagnostic System Host
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WdiSystemHost]
 "Start"=dword:00000004
 
-;Disable Windows Biometric Service
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WbioSrvc]
 "Start"=dword:00000004
 
-;Disable Windows Font Cache Service
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\FontCache]
 "Start"=dword:00000004
 
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\FontCache3.0.0.0]
 "Start"=dword:00000004
 
-;Disable Graphics performance monitor service
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\GraphicsPerfSvc]
 "Start"=dword:00000004
 
-;Disable Windows Image Acquisition (WIA)
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\stisvc]
 "Start"=dword:00000004
 
-;Disable Windows Error Reporting Service
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\WerSvc]
 "Start"=dword:00000004
 
-;Disable Windows Event Collector
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Wecsvc]
 "Start"=dword:00000004
 
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\MapsBroker]
-"Start"=dword:00000004
-
-;Disable Print Spooler
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Spooler]
 "Start"=dword:00000004
 
-;Disable Printer Extensions and Notifications
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\PrintNotify]
 "Start"=dword:00000004
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Fax]
+"Start"=dword:00000004
+
+; 5. WPFTweaksLoc - Deshabilitar Servicio de Ubicación
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc]
+"Start"=dword:00000004
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\lfsvc\Service\Configuration]
+"Status"=dword:00000000
+
+; ==========================================
+; >>> CONFIGURACIÓN DE RED <<<
+; ==========================================
+
+; 11. WPFTweaksWifi - Disable Wi-Fi Sense
+[HKEY_LOCAL_MACHINE\Software\Microsoft\PolicyManager\default\WiFi\AllowWiFiHotSpotReporting]
+"Value"=dword:00000000
+[HKEY_LOCAL_MACHINE\Software\Microsoft\PolicyManager\default\WiFi\AllowAutoConnectToWiFiSenseHotspots]
+"Value"=dword:00000000
+
+; 35. WPFTweaksIPv46 - Prefer IPv4 over IPv6
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters]
+"DisabledComponents"=dword:00000020
+
+; 36. WPFTweaksTeredo - Disable Teredo
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters]
+"DisabledComponents"=dword:00000001
+
+; 37. WPFTweaksDisableipsix - Disable IPv6
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters]
+"DisabledComponents"=dword:000000ff
+
+; ==========================================
+; >>> APLICACIONES DE TERCEROS <<<
+; ==========================================
+
+; 7. WPFTweaksBraveDebloat - Debloat Brave
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\BraveSoftware\Brave]
+"BraveRewardsDisabled"=dword:00000001
+"BraveWalletDisabled"=dword:00000001
+"BraveVPNDisabled"=dword:00000001
+"BraveAIChatEnabled"=dword:00000000
+
+; 8. WPFTweaksEdgeDebloat - Debloat Edge
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\EdgeUpdate]
+"CreateDesktopShortcutDefault"=dword:00000000
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Edge]
+"PersonalizationReportingEnabled"=dword:00000000
+"ShowRecommendationsEnabled"=dword:00000000
+"HideFirstRunExperience"=dword:00000001
+"UserFeedbackAllowed"=dword:00000000
+"ConfigureDoNotTrack"=dword:00000001
+"AlternateErrorPagesEnabled"=dword:00000000
+"EdgeCollectionsEnabled"=dword:00000000
+"EdgeShoppingAssistantEnabled"=dword:00000000
+"MicrosoftEdgeInsiderPromotionEnabled"=dword:00000000
+"ShowMicrosoftRewards"=dword:00000000
+"WebWidgetAllowed"=dword:00000000
+"DiagnosticData"=dword:00000000
+"EdgeAssetDeliveryServiceEnabled"=dword:00000000
+"CryptoWalletEnabled"=dword:00000000
+"WalletDonationEnabled"=dword:00000000
+
+; 27. WPFTweaksRazerBlock - Block Razer Software Installs
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\DriverSearching]
+"SearchOrderConfig"=dword:00000000
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Device Installer]
+"DisableCoInstallers"=dword:00000001
+
+; ==========================================
+; >>> CONFIGURACIÓN DE ESCRITORIO Y USUARIO <<<
+; ==========================================
+
+; 18. WPFTweaksEndTaskOnTaskbar - Enable End Task With Right Click
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSettings]
+"TaskbarEndTask"=dword:00000001
+
+; 21. WPFTweaksStorage - Disable Storage Sense
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\StorageSense\Parameters\StoragePolicy]
+"01"=dword:00000000
+
+; 22. WPFTweaksRemoveCopilot - Disable Microsoft Copilot
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsCopilot]
+"TurnOffWindowsCopilot"=dword:00000001
+[HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\WindowsCopilot]
+"TurnOffWindowsCopilot"=dword:00000001
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+"ShowCopilotButton"=dword:00000000
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Shell\Copilot]
+"IsCopilotAvailable"=dword:00000000
+"CopilotDisabledReason"="IsEnabledForGeographicRegionFailed"
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsCopilot]
+"AllowCopilotRuntime"=dword:00000000
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\Shell\Copilot\BingChat]
+"IsUserEligible"=dword:00000000
+
+; 23. WPFTweaksRecallOff - Disable Recall
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsAI]
+"DisableAIDataAnalysis"=dword:00000001
+"AllowRecallEnablement"=dword:00000000
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\CI\Policy]
+"VerifiedAndReputablePolicyState"=dword:00000000
+
+; 25. WPFTweaksDisableWpbtExecution - Disable Windows Platform Binary Table (WPBT)
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager]
+"DisableWpbtExecution"=dword:00000001
+
+; 26. WPFTweaksRemoveOnedrive - Registry part for Shell Folders
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\User Shell Folders]
+"AppData"=hex(2):25,00,75,00,73,00,65,00,72,00,70,00,72,00,6f,00,66,00,69,00,\
+  6c,00,65,00,25,00,5c,00,41,00,70,00,70,00,44,00,61,00,74,00,61,00,5c,00,\
+  52,00,6f,00,61,00,6d,00,69,00,6e,00,67,00,00,00
+"Cache"=hex(2):25,00,75,00,73,00,65,00,72,00,70,00,72,00,6f,00,66,00,69,00,\
+  6c,00,65,00,25,00,5c,00,41,00,70,00,70,00,44,00,61,00,74,00,61,00,5c,00,\
+  4c,00,6f,00,63,00,61,00,6d,00,69,00,6e,00,67,00,5c,00,4d,00,69,00,63,00,\
+  72,00,6f,00,73,00,6f,00,66,00,74,00,5c,00,57,00,69,00,6e,00,66,00,6f,00,\
+  77,00,73,00,5c,00,49,00,4e,00,65,00,74,00,43,00,61,00,63,00,68,00,65,00,\
+  00,00
+"{374DE290-123F-4565-9164-39C4925E467B}"=hex(2):25,00,75,00,73,00,65,00,72,\
+  00,70,00,72,00,6f,00,66,00,69,00,6c,00,65,00,25,00,5c,00,44,00,6f,00,77,\
+  00,6e,00,6c,00,6f,00,61,00,64,00,73,00,00,00
+
+; 31. WPFTweaksRightClickMenu - Set Classic Right-Click Menu
+[HKEY_CURRENT_USER\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}\InprocServer32]
+@=""
+
+; 38. WPFTweaksDisableBGapps - Disable Background Apps
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications]
+"GlobalUserDisabled"=dword:00000001
+
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Search]
+"BackgroundAppGlobalToggle"=dword:00000000
+
+; 40. WPFToggleDarkMode - Dark Theme for Windows
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize]
+"AppsUseLightTheme"=dword:00000000
+"SystemUsesLightTheme"=dword:00000000
+"EnableTransparency"=dword:00000000
+
+; 53. WPFToggleHiddenFiles - Show Hidden Files
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+"Hidden"=dword:00000001
+
+; 54. WPFToggleShowExt - Show File Extensions
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+"HideFileExt"=dword:00000000
+
+; Disable Auto Maintenance
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Schedule\Maintenance]
+"MaintenanceDisabled"=dword:00000001
+
+; Mouse Settings
+[HKEY_CURRENT_USER\Control Panel\Mouse]
+"MouseSpeed"="0"
+"MouseThreshold1"="0"
+"MouseThreshold2"="0"
+
+[HKEY_USERS\.DEFAULT\Control Panel\Mouse]
+"MouseSpeed"="0"
+"MouseThreshold1"="0"
+"MouseThreshold2"="0"
