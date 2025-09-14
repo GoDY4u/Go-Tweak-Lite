@@ -251,7 +251,7 @@ function Set-MaxPerformancePowerPlan {
         $powerPlans = powercfg -list
         $existingPlan = $powerPlans | Where-Object { $_ -like "*$planName*" }
         
-        # CORREGIDO: Expresión regular fix
+        # EXPRESIÓN REGULAR CORREGIDA
         if ($existingPlan -and $existingPlan -match '(\{[a-fA-F0-9\-]+\})') {
             # If exists, activate it
             $existingGuid = $matches[1]
@@ -836,4 +836,3 @@ function Main {
 
 # Script entry point
 Main
-
