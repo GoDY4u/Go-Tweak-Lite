@@ -251,10 +251,10 @@ function Set-MaxPerformancePowerPlan {
         $powerPlans = powercfg -list
         $existingPlan = $powerPlans | Where-Object { $_ -like "*$planName*" }
         
-        # EXPRESIÓN REGULAR CORREGIDA
-        if ($existingPlan -and $existingPlan -match '(\{[a-fA-F0-9\-]+\})') {
+        # EXPRESIÓN REGULAR CORREGIDA - SIMPLIFICADA
+        if ($existingPlan -and $existingPlan -match '{.*}') {
             # If exists, activate it
-            $existingGuid = $matches[1]
+            $existingGuid = $matches[0]
             powercfg -setactive $existingGuid 2>&1 | Out-Null
             Write-Log "Existing maximum performance plan activated: $existingGuid" "SUCCESS"
             return $true
@@ -283,8 +283,6 @@ function Set-MaxPerformancePowerPlan {
         powercfg -setactive $newGuid 2>&1 | Out-Null
         powercfg -setdcvalueindex $newGuid SUB_PROCESSOR PROCTHROTTLEMAX 100 2>&1 | Out-Null
         powercfg -setacvalueindex $newGuid SUB_PROCESSOR PROCTHROTTLEMAX 100 2>&1 | Out-Null
-        powercfg -setdcvalueindex $newGuid SUB_PROCESSOR PERFBOOSTMODE 2 2>&1 | Out-Null
-        powercfg -setacvalueindex $newGuid SUB_PROCESSOR PERFBOOSTMODE 2 2>&1 | Out-Null
         
         # Force update of plan list
         $powerPlans = powercfg -list
