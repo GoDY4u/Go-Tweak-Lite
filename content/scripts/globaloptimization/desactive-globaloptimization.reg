@@ -1179,3 +1179,251 @@ Windows Registry Editor Version 5.00
 
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\wudfsvc]
 "Start"=-
+
+; Revertir: Enable_Last_Active_Click
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+"LastActiveClick"=dword:00000000
+
+; Revertir: Disable_AI_Recall
+[HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\WindowsAI]
+"DisableAIDataAnalysis"=-
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsAI]
+"DisableAIDataAnalysis"=-
+"AllowRecallEnablement"=-
+"TurnOffSavingSnapshots"=-
+
+; Revertir: Disable_Animations
+[HKEY_CURRENT_USER\Control Panel\Desktop]
+"UserPreferencesMask"=-
+
+; Revertir: Disable_Bing_Cortana_In_Search
+[HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\Explorer]
+"DisableSearchBoxSuggestions"=-
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Windows Search]
+"AllowCortana"=-
+"CortanaConsent"=-
+
+; Revertir: Disable_Chat_Taskbar
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+"TaskbarMn"=-
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Policies\Explorer]
+"HideSCAMeetNow"=-
+
+; Revertir: Disable_Copilot
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+"ShowCopilotButton"=-
+[HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\WindowsCopilot]
+"TurnOffWindowsCopilot"=-
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\WindowsCopilot]
+"TurnOffWindowsCopilot"=-
+
+; Revertir: Disable_Desktop_Spotlight
+[HKEY_CURRENT_USER\Software\Policies\Microsoft\Windows\CloudContent]
+"DisableSpotlightCollectionOnDesktop"=-
+
+; Revertir: Disable_DVR
+[HKEY_CURRENT_USER\System\GameConfigStore]
+"GameDVR_Enabled"=-
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\GameDVR]
+"AllowGameDVR"=-
+
+; Revertir: Disable_Edge_Ads_And_Suggestions
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Edge]
+"NewTabPageContentEnabled"=-
+"NewTabPageHideDefaultTopSites"=-
+
+; Revertir: Disable_Edge_AI_Features
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Edge]
+"CopilotCDPPageContext"=-
+"CopilotPageContext"=-
+"HubsSidebarEnabled"=-
+"EdgeEntraCopilotPageContext"=-
+"EdgeHistoryAISearchEnabled"=-
+"ComposeInlineEnabled"=-
+"GenAILocalFoundationalModelSettings"=-
+"NewTabPageBingChatEnabled"=-
+
+; Revertir: Disable_Enhance_Pointer_Precision
+[HKEY_CURRENT_USER\Control Panel\Mouse]
+"MouseSpeed"=-
+"MouseThreshold1"=-
+"MouseThreshold2"=-
+
+; Revertir: Disable_Fast_Startup
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Power]
+"HiberbootEnabled"=-
+
+; Revertir: Disable_Give_access_to_context_menu
+; Nota: No se pueden recrear fácilmente las claves eliminadas, esto elimina los valores pero no recrea las claves originales
+
+; Revertir: Disable_Include_in_library_from_context_menu
+; Nota: No se pueden recrear fácilmente las claves eliminadas
+
+; Revertir: Disable_Lockscreen_Tips
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager]
+"SubscribedContent-338387Enabled"=-
+"RotatingLockScreenOverlayEnabled"=-
+
+; Revertir: Disable_Modern_Standby_Networking
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Power\PowerSettings\f15576e8-98b7-4186-b944-eafa664402d9]
+"ACSettingIndex"=-
+"DCSettingIndex"=-
+
+; Revertir: Disable_Notepad_AI_Features
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\WindowsNotepad]
+"DisableAIFeatures"=-
+
+; Revertir: Disable_Paint_AI_Features
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Paint]
+"DisableCocreator"=-
+"DisableGenerativeFill"=-
+"DisableImageCreator"=-
+"DisableGenerativeErase"=-
+"DisableRemoveBackground"=-
+
+; Revertir: Disable_Phone_Link_In_Start
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Start\Companions\Microsoft.YourPhone_8wekyb3d8bbwe]
+"IsEnabled"=-
+
+; Revertir: Disable_Settings_365_Ads
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\CloudContent]
+"DisableConsumerAccountStateContent"=-
+
+; Revertir: Disable_Settings_Home
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer]
+"SettingsPageVisibility"=-
+
+; Revertir: Disable_Share_from_context_menu
+; Nota: No se pueden recrear fácilmente las claves eliminadas
+
+; Revertir: Disable_Show_More_Options_Context_Menu
+[-HKEY_CURRENT_USER\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}]
+
+; Revertir: Disable_Start_Recommended
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\Explorer]
+"HideRecommendedSection"=-
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PolicyManager\current\device\Start]
+"HideRecommendedSection"=-
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PolicyManager\current\device\Education]
+"IsEducationEnvironment"=-
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+"Start_Layout"=-
+
+; Revertir: Disable_Sticky_Keys_Shortcut
+[HKEY_CURRENT_USER\Control Panel\Accessibility\StickyKeys]
+"Flags"=-
+
+; Revertir: Disable_Telemetry
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\AdvertisingInfo]
+"Enabled"=-
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Privacy]
+"TailoredExperiencesWithDiagnosticDataEnabled"=-
+[HKEY_CURRENT_USER\Software\Microsoft\Speech_OneCore\Settings\OnlineSpeechPrivacy]
+"HasAccepted"=-
+[HKEY_CURRENT_USER\Software\Microsoft\Input\TIPC]
+"Enabled"=-
+[HKEY_CURRENT_USER\Software\Microsoft\InputPersonalization]
+"RestrictImplicitInkCollection"=-
+"RestrictImplicitTextCollection"=-
+[HKEY_CURRENT_USER\Software\Microsoft\InputPersonalization\TrainedDataStore]
+"HarvestContacts"=-
+[HKEY_CURRENT_USER\Software\Microsoft\Personalization\Settings]
+"AcceptedPrivacyPolicy"=-
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection]
+"AllowTelemetry"=-
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+"Start_TrackProgs"=-
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Windows\System]
+"PublishUserActivities"=-
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Siuf\Rules]
+"NumberOfSIUFInPeriod"=-
+"PeriodInNanoSeconds"=-
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Edge]
+"PersonalizationReportingEnabled"=-
+
+; Revertir: Disable_Transparency
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Themes\Personalize]
+"EnableTransparency"=-
+
+; Revertir: Disable_Widgets_Service
+[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\PolicyManager\default\NewsAndInterests\AllowNewsAndInterests]
+"value"=-
+[HKEY_LOCAL_MACHINE\SOFTWARE\Policies\Microsoft\Dsh]
+"AllowNewsAndInterests"=-
+
+; Revertir: Disable_Windows_Suggestions
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager]
+"SubscribedContent-310093Enabled"=-
+"SubscribedContent-338388Enabled"=-
+"SystemPaneSuggestionsEnabled"=-
+"SubscribedContent-338389Enabled"=-
+"SoftLandingEnabled"=-
+"SubscribedContent-338393Enabled"=-
+"SubscribedContent-353694Enabled"=-
+"SubscribedContent-353696Enabled"=-
+"SubscribedContent-353698Enabled"=-
+"SilentInstalledAppsEnabled"=-
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+"Start_IrisRecommendations"=-
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\SystemSettings\AccountNotifications]
+"EnableAccountNotifications"=-
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\UserProfileEngagement]
+"ScoobeSystemSettingEnabled"=-
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+"ShowSyncProviderNotifications"=-
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Notifications\Settings\Windows.SystemToast.Suggested]
+"Enabled"=-
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Mobility]
+"OptedIn"=-
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+"Start_AccountNotifications"=-
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Notifications\Settings\Windows.SystemToast.BackupReminder]
+"Enabled"=-
+
+; Revertir: Enable_Dark_Mode
+[HKEY_CURRENT_USER\SOFTWARE\Microsoft\Windows\CurrentVersion\Themes\Personalize]
+"AppsUseLightTheme"=-
+"SystemUsesLightTheme"=-
+
+; Revertir: Enable_End_Task
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSettings]
+"TaskbarEndTask"=-
+
+; Revertir: Hide_3D_Objects_Folder
+; Nota: No se pueden recrear fácilmente las claves eliminadas
+
+; Revertir: Hide_duplicate_removable_drives_from_navigation_pane_of_File_Explorer
+; Nota: No se pueden recrear fácilmente las claves eliminadas
+
+; Revertir: Hide_Gallery_from_Explorer
+[HKEY_CURRENT_USER\Software\Classes\CLSID\{e88865ea-0e1c-4e20-9aa6-edcd0212c87c}]
+"System.IsPinnedToNameSpaceTree"=-
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\NavPane\ShowGallery]
+
+; Revertir: Hide_Home_from_Explorer
+[HKEY_CURRENT_USER\Software\Classes\CLSID\{f874310e-b6b7-47dc-bc84-b9e6b38f5903}]
+@=-
+"System.IsPinnedToNameSpaceTree"=-
+[-HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced\NavPane\ShowHome]
+
+; Revertir: Hide_Music_Folder
+; Nota: No se pueden recrear fácilmente las claves eliminadas
+
+; Revertir: Hide_Onedrive_Folder
+; Nota: No se pueden recrear fácilmente las claves eliminadas
+
+; Revertir: Hide_Search_Taskbar
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Search]
+"SearchboxTaskbarMode"=-
+
+; Revertir: Hide_Taskview_Taskbar
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+"ShowTaskViewButton"=-
+
+; Revertir: Show_Extensions_For_Known_File_Types
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+"HideFileExt"=-
+
+; Revertir: Show_Hidden_Folders
+[HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
+"Hidden"=-
