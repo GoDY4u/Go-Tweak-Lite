@@ -1,91 +1,96 @@
+# ==========================================
+# SCRIPT DE REVERT DE TWEAKS Y SERVICIOS
 # REQUIERE EJECUTAR COMO ADMINISTRADOR
+# ==========================================
 
-Write-Host "=== REVERTIENDO TWEAKS COMPLEMENTARIOS ===" -ForegroundColor Cyan
+Write-Host "=== REVERT DE TWEAKS Y SERVICIOS ===" -ForegroundColor Cyan
 
-# 1. Revertir Hibernación
-Write-Host "Reactivando Hibernacion..." -ForegroundColor Yellow
+# ----------------------------
+# 1. HIBERNACIÓN
+# ----------------------------
+Write-Host "Rehabilitando hibernación..." -ForegroundColor Yellow
 powercfg.exe /hibernate on
-Write-Host "Hibernacion habilitada." -ForegroundColor Green
+Write-Host "Hibernación habilitada." -ForegroundColor Green
 
-# 2. Reactivar Intel LMS (vPro)
-Write-Host "Restaurando Intel LMS (vPro)..." -ForegroundColor Yellow
-sc.exe create LMS binPath= "C:\Windows\System32\LMS.exe" start= auto DisplayName= "Intel(R) Management and Security Application Local Management Service" 2>$null
-Set-Service -Name "LMS" -StartupType Automatic -ErrorAction SilentlyContinue
-Start-Service -Name "LMS" -ErrorAction SilentlyContinue
-Write-Host "Intel LMS restaurado." -ForegroundColor Green
+# ----------------------------
+# 2. INTEL LMS
+# ----------------------------
+Write-Host "Revisar si Intel LMS necesita reinstalarse manualmente..." -ForegroundColor Yellow
+# LMS se eliminó con sc.exe delete, no se puede revertir automáticamente.
 
-# 3. Restaurar OneDrive
-Write-Host "Restaurando OneDrive..." -ForegroundColor Yellow
-$OneDrivePath = "${env:SystemRoot}\SysWOW64\OneDriveSetup.exe"
-if (Test-Path $OneDrivePath) {
-    Start-Process -FilePath $OneDrivePath -ArgumentList "/install" -Wait -NoNewWindow
-    Write-Host "OneDrive restaurado." -ForegroundColor Green
-} else {
-    Write-Host "No se encontró instalador de OneDrive en el sistema." -ForegroundColor Red
-}
+# ----------------------------
+# 3. ONEDRIVE
+# ----------------------------
+Write-Host "Revisar si OneDrive necesita reinstalarse manualmente..." -ForegroundColor Yellow
+# OneDrive se desinstaló, reinstalar desde Microsoft si se requiere.
 
-# 4. Restaurar Adobe Desktop Service
-Write-Host "Restaurando Adobe Desktop Service..." -ForegroundColor Yellow
-$CCPath = "C:\Program Files (x86)\Common Files\Adobe\Adobe Desktop Common\ADS\Adobe Desktop Service.exe.old"
-if (Test-Path $CCPath) {
-    Rename-Item -Path $CCPath -NewName "Adobe Desktop Service.exe" -Force
+# ----------------------------
+# 4. ADOBE
+# ----------------------------
+Write-Host "Revertir cambios Adobe..." -ForegroundColor Yellow
+$CCPathOld = "C:\Program Files (x86)\Common Files\Adobe\Adobe Desktop Common\ADS\Adobe Desktop Service.exe.old"
+$CCPathNew = "C:\Program Files (x86)\Common Files\Adobe\Adobe Desktop Common\ADS\Adobe Desktop Service.exe"
+if (Test-Path $CCPathOld) {
+    Rename-Item -Path $CCPathOld -NewName "Adobe Desktop Service.exe" -Force
     Write-Host "Adobe Desktop Service restaurado." -ForegroundColor Green
-} else {
-    Write-Host "No se encontró Adobe Desktop Service renombrado." -ForegroundColor Yellow
 }
 
-# 5. Quitar dominios bloqueados de Adobe en el hosts
-Write-Host "Revirtiendo bloqueo de dominios Adobe en hosts..." -ForegroundColor Yellow
-$hostsFile = "$env:SystemRoot\System32\drivers\etc\hosts"
-$adobeDomains = @(
-    "0.0.0.0 cc-api-data.adobe.io",
-    "0.0.0.0 ic.adobe.io", 
-    "0.0.0.0 p13n.adobe.io",
-    "0.0.0.0 prod.adobegenuine.com",
-    "0.0.0.0 assets.adobedtm.com",
-    "0.0.0.0 auth.services.adobe.com",
-    "0.0.0.0 licensing.adobe.io"
-)
-(Get-Content $hostsFile) | Where-Object {$_ -notin $adobeDomains} | Set-Content $hostsFile
-Write-Host "Dominios Adobe desbloqueados." -ForegroundColor Green
+Write-Host "Opcional: eliminar entradas de Adobe en hosts manualmente si es necesario." -ForegroundColor Yellow
 
-# 6. Reactivar Teredo
-Write-Host "Reactivando Teredo..." -ForegroundColor Yellow
-netsh interface teredo set state type=default
-Write-Host "Teredo reactivado." -ForegroundColor Green
+# ----------------------------
+# 5. TEMP FILES
+# ----------------------------
+Write-Host "No es necesario revertir archivos temporales." -ForegroundColor Yellow
 
-# 7. Reactivar IPv6
-Write-Host "Reactivando IPv6 en adaptadores de red..." -ForegroundColor Yellow
+# ----------------------------
+# 6. TEREDO
+# ----------------------------
+Write-Host "Rehabilitando Teredo..." -ForegroundColor Yellow
+netsh interface teredo set state default
+Write-Host "Teredo restaurado a estado por defecto." -ForegroundColor Green
+
+# ----------------------------
+# 7. IPV6
+# ----------------------------
+Write-Host "Rehabilitando IPv6 en adaptadores de red..." -ForegroundColor Yellow
 Enable-NetAdapterBinding -Name "*" -ComponentID ms_tcpip6
-Write-Host "IPv6 reactivado en todos los adaptadores." -ForegroundColor Green
+Write-Host "IPv6 habilitado en todos los adaptadores." -ForegroundColor Green
 
-# 8. Restaurar servicios deshabilitados
-Write-Host "`nRestaurando servicios deshabilitados..." -ForegroundColor Yellow
-
-$Servicios = @(
-    "Spooler","PhoneSvc","NgcSvc","WSearch","SysMain",
-    "RtkAudioService","RtkAudioUniversalService",
-    "tzautoupdate","CDPUserSvc","RemoteAccess","DiagTrack",
-    "diagnosticshub.standardcollector.service","ssh-agent",
-    "RemoteRegistry","BthHFSrv","NetTcpPortSharing",
-    "BcastDVRUserService","shpamsvc","FontCache","DusmSvc",
-    "WpcMonSvc","SCardSvr","ScDeviceEnum","CertPropSvc",
-    "Fax","PrintNotify","RmSvc","icssvc","WwanSvc",
-    "WalletService","Payments","NgcCtnrSvc","DiagSvc",
-    "lfsvc","wisvc","dmwappushservice"
+# ----------------------------
+# 8. SERVICIOS DESHABILITADOS
+# ----------------------------
+Write-Host "`nRestaurando servicios a su estado por defecto..." -ForegroundColor Yellow
+$ServiciosRestaurar = @(
+    "PhoneSvc", "ClipboardUserService_706a9", "Spooler", "PrintNotify", "Fax",
+    "WSearch", "SysMain", "RtkAudioService", "RtkAudioUniversalService",
+    "tzautoupdate", "CDPUserSvc", "RemoteAccess", "DiagTrack", 
+    "diagnosticshub.standardcollector.service", "ssh-agent", "RemoteRegistry",
+    "BthHFSrv", "NetTcpPortSharing", "BcastDVRUserService",
+    "shpamsvc", "FontCache", "DusmSvc", "WpcMonSvc", "SCardSvr", 
+    "ScDeviceEnum", "CertPropSvc", "RmSvc", "icssvc", "WwanSvc", 
+    "WalletService", "Payments", "NgcSvc", "NgcCtnrSvc", "DiagSvc",
+    "AVCTPService", "StorSvc", "BDESVC", "lfsvc", "SensorService"
 )
 
-foreach ($Servicio in $Servicios) {
+foreach ($Servicio in $ServiciosRestaurar) {
     Write-Host "Restaurando servicio: $Servicio" -ForegroundColor DarkYellow
     try {
         Set-Service -Name $Servicio -StartupType Manual -ErrorAction SilentlyContinue
         Start-Service -Name $Servicio -ErrorAction SilentlyContinue
     } catch {
-        Write-Host "No se pudo restaurar el servicio $Servicio (puede no existir en este sistema)" -ForegroundColor Red
+        Write-Host "No se pudo restaurar: $Servicio (posiblemente eliminado o no existe)" -ForegroundColor Red
     }
 }
 
-Write-Host "Servicios restaurados (modo Manual)." -ForegroundColor Green
+# ----------------------------
+# 9. SERVICIOS DE ACTUALIZACIÓN
+# ----------------------------
+Write-Host "`nConfigurando Windows Update en automático..." -ForegroundColor Yellow
+$ServiciosUpdate = @("wuauserv", "UsoSvc")
+foreach ($Servicio in $ServiciosUpdate) {
+    Set-Service -Name $Servicio -StartupType Automatic -ErrorAction SilentlyContinue
+    Start-Service -Name $Servicio -ErrorAction SilentlyContinue
+}
 
-Write-Host "`n=== TODOS LOS TWEAKS HAN SIDO REVERTIDOS ===" -ForegroundColor Green
-Write-Host "Es posible que necesites reiniciar para aplicar todos los cambios." -ForegroundColor Yellow
+Write-Host "`n=== REVERT COMPLETADO ===" -ForegroundColor Green
+Write-Host "Algunos cambios requieren reinicio para surtir efecto completo." -ForegroundColor Yellow
