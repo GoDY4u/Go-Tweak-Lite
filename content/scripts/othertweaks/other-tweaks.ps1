@@ -7,7 +7,7 @@ Write-Host "Deshabilitando Hibernacion..." -ForegroundColor Yellow
 powercfg.exe /hibernate off
 Write-Host "Hibernacion deshabilitada y archivo hiberfil.sys eliminado." -ForegroundColor Green
 
-# 24. WPFTweaksDisableLMS1 - Disable Intel LMS (vPro) - LO MÁS AGresivo
+# 24. WPFTweaksDisableLMS1 - Disable Intel LMS (vPro)
 Write-Host "Deshabilitando Intel LMS (vPro)..." -ForegroundColor Yellow
 $serviceName = "LMS"
 Stop-Service -Name $serviceName -Force -ErrorAction SilentlyContinue
@@ -63,12 +63,68 @@ Write-Host "Deshabilitando Teredo..." -ForegroundColor Yellow
 netsh interface teredo set state disabled
 Write-Host "Teredo deshabilitado." -ForegroundColor Green
 
-# 37. WPFTweaksDisableipsix - Disable IPv6 en adaptadores
+# 37. WPFTweaksDisableIPv6 - Disable IPv6 en adaptadores
 Write-Host "Deshabilitando IPv6 en adaptadores de red..." -ForegroundColor Yellow
 Disable-NetAdapterBinding -Name "*" -ComponentID ms_tcpip6
 Write-Host "IPv6 deshabilitado en todos los adaptadores." -ForegroundColor Green
 
+# NUEVA SECCIÓN: Desactivar Servicios innecesarios
+Write-Host "`nDesactivando servicios innecesarios..." -ForegroundColor Yellow
+
+$Servicios = @(
+    # Cola de impresión
+    "Spooler",
+
+    # Servicios de búsqueda y rendimiento
+    "WSearch",                  # Windows Search
+    "SysMain",                  # SysMain / Superfetch
+
+    # Realtek Audio (si no lo usas)
+    "RtkAudioService",
+    "RtkAudioUniversalService",
+
+    "tzautoupdate",             # Actualizador de zona horaria automática
+    "CDPUserSvc",               # Datos de contactos
+    "RemoteAccess",             # Enrutamiento y acceso remoto
+    "DiagTrack",                # Experiencias de usuario y telemetría
+    "diagnosticshub.standardcollector.service", # Host del servicio de diagnóstico
+    "ssh-agent",                # OpenSSH Authentication Agent
+    "RemoteRegistry",           # Registro remoto
+    "diagnosticshub.standardcollector.service", # Servicio de directivas de diagnóstico
+    "BthHFSrv",                 # Servicio de soporte técnico de Bluetooth
+    "NetTcpPortSharing",        # Servicio de uso compartido de puertos TCP
+    "BcastDVRUserService",      # GameDVR
+    "shpamsvc",                 # Shared PC Account Manager
+    "FontCache",                # Windows Presentation Foundation Font Cache
+
+    "DusmSvc",                  # Uso de datos
+    "WpcMonSvc",                # Control parental
+    "SCardSvr",                 # Tarjeta inteligente
+    "ScDeviceEnum",             # Enumeración de tarjetas inteligentes
+    "CertPropSvc",              # Propagación de certificados de tarjetas inteligentes
+    "Fax",                      # Servicio de Fax
+    "PrintNotify",              # Extensiones y notificaciones de impresora
+    "RmSvc",                    # Servicio de administración de radio
+    "icssvc",                   # Compartir red móvil
+    "WwanSvc",                  # Cobertura inalámbrica móvil
+    "WalletService",            # Servicio Wallet
+    "Payments",                 # Administración de pagos y NFC/SE
+    "NgcSvc",                   # Microsoft Passport
+    "NgcCtnrSvc",               # Contenedor de Microsoft Passport
+    "DiagSvc",                  # Servicio de ejecución de diagnóstico
+    "lfsvc",                    # Servicio de geolocalización
+    "wisvc",                    # Servicio de Windows Insider
+    "dmwappushservice"          # Servicio de enrutamiento de mensajes WAP
+)
+
+foreach ($Servicio in $Servicios) {
+    Write-Host "Desactivando servicio: $Servicio" -ForegroundColor DarkYellow
+    Stop-Service -Name $Servicio -ErrorAction SilentlyContinue
+    Set-Service -Name $Servicio -StartupType Disabled -ErrorAction SilentlyContinue
+}
+
+Write-Host "Servicios innecesarios desactivados. Reinicia el sistema para aplicar cambios." -ForegroundColor Green
+
 Write-Host "`n=== TODOS LOS TWEAKS COMPLEMENTARIOS APLICADOS ===" -ForegroundColor Green
 Write-Host "Por favor, ejecuta el archivo .reg para completar la configuración." -ForegroundColor Cyan
-
 Write-Host "Algunos cambios requieren reinicio para surtir efecto completo." -ForegroundColor Yellow
