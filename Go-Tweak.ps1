@@ -1,4 +1,4 @@
-﻿# Go-Tweak.ps1 - Windows Optimization Tool
+# Go-Tweak.ps1 - Windows Optimization Tool
 # Requires administrator execution
 
 param(
@@ -15,7 +15,7 @@ $script:RAMPath = Join-Path $ScriptsPath "ram"
 $script:InternetPath = Join-Path $ScriptsPath "internet"
 $script:GlobalOptimizationPath = Join-Path $ScriptsPath "globaloptimization"
 $script:OtherTweaksPath = Join-Path $ScriptsPath "othertweaks"
-$script:MSAppsPath = Join-Path $ScriptsPath "ms-apps"  # ← Añade esta línea
+$script:MSAppsPath = Join-Path $ScriptsPath "ms-apps"  # ? Añade esta línea
 
 # Check execution policy
 if ((Get-ExecutionPolicy) -eq "Restricted") {
@@ -80,8 +80,8 @@ function Create-RestorePoint {
         Start-Process "systempropertiesprotection.exe"
         Write-Log "System Protection settings opened successfully" "SUCCESS"
         
-        Write-Host "✅ Herramienta de puntos de restauración abierta" -ForegroundColor Green
-        Write-Host "📋 Sigue estos pasos:" -ForegroundColor Cyan
+        Write-Host "? Herramienta de puntos de restauración abierta" -ForegroundColor Green
+        Write-Host "?? Sigue estos pasos:" -ForegroundColor Cyan
         Write-Host "   1. Haz clic en 'Crear...'" -ForegroundColor White
         Write-Host "   2. Usa el nombre: 'Go-Tweak $(Get-Date -Format 'yyyy-MM-dd HH:mm')'" -ForegroundColor Yellow
         Write-Host "   3. Sigue las instrucciones" -ForegroundColor White
@@ -90,8 +90,8 @@ function Create-RestorePoint {
         return $true
     } catch {
         Write-Log "Error opening System Protection: $($_.Exception.Message)" "ERROR"
-        Write-Host "❌ No se pudo abrir la herramienta de restauración" -ForegroundColor Red
-        Write-Host "💡 Abre manualmente: Panel de Control → Sistema → Protección del sistema" -ForegroundColor Yellow
+        Write-Host "? No se pudo abrir la herramienta de restauración" -ForegroundColor Red
+        Write-Host "?? Abre manualmente: Panel de Control ? Sistema ? Protección del sistema" -ForegroundColor Yellow
         return $false
     }
 }
@@ -324,18 +324,18 @@ function Install-VisualsAndDirectX {
             Start-Sleep -Milliseconds 500  # Pequeña pausa entre enlaces
         }
         
-        Write-Host "`n✅ Download pages opened successfully!" -ForegroundColor Green
-        Write-Host "`n📥 Please download and install:" -ForegroundColor Cyan
+        Write-Host "`n? Download pages opened successfully!" -ForegroundColor Green
+        Write-Host "`n?? Please download and install:" -ForegroundColor Cyan
         Write-Host "   1. Visual C++ Redistributable (vc_redist.x64.exe)" -ForegroundColor Yellow
         Write-Host "   2. DirectX Web Installer (dxwebsetup.exe)" -ForegroundColor Yellow
         Write-Host "   3. Run both installers as Administrator" -ForegroundColor Red
-        Write-Host "`n⚡ These are essential for gaming and applications!" -ForegroundColor Magenta
+        Write-Host "`n? These are essential for gaming and applications!" -ForegroundColor Magenta
         
         return $true
     } catch {
         Write-Log "Error opening browser: $($_.Exception.Message)" "ERROR"
-        Write-Host "`n❌ Error opening browser" -ForegroundColor Red
-        Write-Host "📋 Please manually visit these links:" -ForegroundColor Yellow
+        Write-Host "`n? Error opening browser" -ForegroundColor Red
+        Write-Host "?? Please manually visit these links:" -ForegroundColor Yellow
         Write-Host "   Visual C++: https://aka.ms/vs/16/release/vc_redist.x64.exe" -ForegroundColor Cyan
         Write-Host "   DirectX: https://download.microsoft.com/download/1/7/1/1718CCC4-6315-4D8E-9543-8E28A4E18C4C/dxwebsetup.exe" -ForegroundColor Cyan
         return $false
@@ -613,9 +613,9 @@ function Main {
                     Write-Log "Running Windows cleanup..."
                     $result = Invoke-WindowsCleanup
                     if ($result) {
-                        Write-Host "✅ Windows cleanup completed successfully" -ForegroundColor Green
+                        Write-Host "? Windows cleanup completed successfully" -ForegroundColor Green
                     } else {
-                        Write-Host "❌ Error running Windows cleanup" -ForegroundColor Red
+                        Write-Host "? Error running Windows cleanup" -ForegroundColor Red
                     }
                     Read-Host "Press Enter to continue..."
                 }
@@ -630,9 +630,9 @@ function Main {
                                 Write-Log "Applying 4GB RAM optimization..."
                                 $result = Optimize-RAM -RAMSize "4GB RAM"
                                 if ($result) {
-                                    Write-Host "✅ 4GB RAM optimization applied successfully" -ForegroundColor Green
+                                    Write-Host "? 4GB RAM optimization applied successfully" -ForegroundColor Green
                                 } else {
-                                    Write-Host "❌ Error applying 4GB RAM optimization" -ForegroundColor Red
+                                    Write-Host "? Error applying 4GB RAM optimization" -ForegroundColor Red
                                 }
                                 Read-Host "Press Enter to continue..."
                             }
@@ -640,9 +640,9 @@ function Main {
                                 Write-Log "Applying 6GB RAM optimization..."
                                 $result = Optimize-RAM -RAMSize "6GB RAM"
                                 if ($result) {
-                                    Write-Host "✅ 6GB RAM optimization applied successfully" -ForegroundColor Green
+                                    Write-Host "? 6GB RAM optimization applied successfully" -ForegroundColor Green
                                 } else {
-                                    Write-Host "❌ Error applying 6GB RAM optimization" -ForegroundColor Red
+                                    Write-Host "? Error applying 6GB RAM optimization" -ForegroundColor Red
                                 }
                                 Read-Host "Press Enter to continue..."
                             }
@@ -650,9 +650,9 @@ function Main {
                                 Write-Log "Applying 8GB RAM optimization..."
                                 $result = Optimize-RAM -RAMSize "8GB RAM"
                                 if ($result) {
-                                    Write-Host "✅ 8GB RAM optimization applied successfully" -ForegroundColor Green
+                                    Write-Host "? 8GB RAM optimization applied successfully" -ForegroundColor Green
                                 } else {
-                                    Write-Host "❌ Error applying 8GB RAM optimization" -ForegroundColor Red
+                                    Write-Host "? Error applying 8GB RAM optimization" -ForegroundColor Red
                                 }
                                 Read-Host "Press Enter to continue..."
                             }
@@ -660,9 +660,9 @@ function Main {
                                 Write-Log "Applying 12GB RAM optimization..."
                                 $result = Optimize-RAM -RAMSize "12GB RAM"
                                 if ($result) {
-                                    Write-Host "✅ 12GB RAM optimization applied successfully" -ForegroundColor Green
+                                    Write-Host "? 12GB RAM optimization applied successfully" -ForegroundColor Green
                                 } else {
-                                    Write-Host "❌ Error applying 12GB RAM optimization" -ForegroundColor Red
+                                    Write-Host "? Error applying 12GB RAM optimization" -ForegroundColor Red
                                 }
                                 Read-Host "Press Enter to continue..."
                             }
@@ -670,9 +670,9 @@ function Main {
                                 Write-Log "Applying 16GB RAM optimization..."
                                 $result = Optimize-RAM -RAMSize "16GB RAM"
                                 if ($result) {
-                                    Write-Host "✅ 16GB RAM optimization applied successfully" -ForegroundColor Green
+                                    Write-Host "? 16GB RAM optimization applied successfully" -ForegroundColor Green
                                 } else {
-                                    Write-Host "❌ Error applying 16GB RAM optimization" -ForegroundColor Red
+                                    Write-Host "? Error applying 16GB RAM optimization" -ForegroundColor Red
                                 }
                                 Read-Host "Press Enter to continue..."
                             }
@@ -680,9 +680,9 @@ function Main {
                                 Write-Log "Applying 24GB RAM optimization..."
                                 $result = Optimize-RAM -RAMSize "24GB RAM"
                                 if ($result) {
-                                    Write-Host "✅ 24GB RAM optimization applied successfully" -ForegroundColor Green
+                                    Write-Host "? 24GB RAM optimization applied successfully" -ForegroundColor Green
                                 } else {
-                                    Write-Host "❌ Error applying 24GB RAM optimization" -ForegroundColor Red
+                                    Write-Host "? Error applying 24GB RAM optimization" -ForegroundColor Red
                                 }
                                 Read-Host "Press Enter to continue..."
                             }
@@ -690,9 +690,9 @@ function Main {
                                 Write-Log "Applying 32GB RAM optimization..."
                                 $result = Optimize-RAM -RAMSize "32GB RAM"
                                 if ($result) {
-                                    Write-Host "✅ 32GB RAM optimization applied successfully" -ForegroundColor Green
+                                    Write-Host "? 32GB RAM optimization applied successfully" -ForegroundColor Green
                                 } else {
-                                    Write-Host "❌ Error applying 32GB RAM optimization" -ForegroundColor Red
+                                    Write-Host "? Error applying 32GB RAM optimization" -ForegroundColor Red
                                 }
                                 Read-Host "Press Enter to continue..."
                             }
@@ -700,9 +700,9 @@ function Main {
                                 Write-Log "Applying 64GB RAM optimization..."
                                 $result = Optimize-RAM -RAMSize "64GB RAM"
                                 if ($result) {
-                                    Write-Host "✅ 64GB RAM optimization applied successfully" -ForegroundColor Green
+                                    Write-Host "? 64GB RAM optimization applied successfully" -ForegroundColor Green
                                 } else {
-                                    Write-Host "❌ Error applying 64GB RAM optimization" -ForegroundColor Red
+                                    Write-Host "? Error applying 64GB RAM optimization" -ForegroundColor Red
                                 }
                                 Read-Host "Press Enter to continue..."
                             }
@@ -710,9 +710,9 @@ function Main {
                                 Write-Log "Restoring default RAM values..."
                                 $result = Optimize-RAM -RAMSize "Restablecer valores predeterminados"
                                 if ($result) {
-                                    Write-Host "✅ Default RAM values restored successfully" -ForegroundColor Green
+                                    Write-Host "? Default RAM values restored successfully" -ForegroundColor Green
                                 } else {
-                                    Write-Host "❌ Error restoring default RAM values" -ForegroundColor Red
+                                    Write-Host "? Error restoring default RAM values" -ForegroundColor Red
                                 }
                                 Read-Host "Press Enter to continue..."
                             }
@@ -721,7 +721,7 @@ function Main {
                                 break
                             }
                             default {
-                                Write-Host "❌ Invalid option. Try again." -ForegroundColor Red
+                                Write-Host "? Invalid option. Try again." -ForegroundColor Red
                                 Start-Sleep -Seconds 1
                             }
                         }
@@ -731,9 +731,9 @@ function Main {
                     Write-Log "Applying FPS optimization..."
                     $result = Invoke-OptimizationScript -ScriptCategory "globaloptimization" -ScriptName "globaloptimization.reg" -Enable $true -FriendlyName "FPS Optimization"
                     if ($result) {
-                        Write-Host "✅ FPS optimization enabled successfully" -ForegroundColor Green
+                        Write-Host "? FPS optimization enabled successfully" -ForegroundColor Green
                     } else {
-                        Write-Host "❌ Error enabling FPS optimization" -ForegroundColor Red
+                        Write-Host "? Error enabling FPS optimization" -ForegroundColor Red
                     }
                     Read-Host "Press Enter to continue..."
                 }
@@ -741,9 +741,9 @@ function Main {
                     Write-Log "Removing Microsoft Apps..."
                     $result = Remove-MSApps
                     if ($result) {
-                        Write-Host "✅ Microsoft Apps removed successfully" -ForegroundColor Green
+                        Write-Host "? Microsoft Apps removed successfully" -ForegroundColor Green
                     } else {
-                        Write-Host "❌ Error removing Microsoft Apps" -ForegroundColor Red
+                        Write-Host "? Error removing Microsoft Apps" -ForegroundColor Red
                     }
                     Read-Host "Press Enter to continue..."
                 }
@@ -751,9 +751,9 @@ function Main {
                     Write-Log "Applying other system tweaks..."
                     $result = Invoke-OtherTweaks
                     if ($result) {
-                        Write-Host "✅ Other tweaks applied successfully" -ForegroundColor Green
+                        Write-Host "? Other tweaks applied successfully" -ForegroundColor Green
                     } else {
-                        Write-Host "❌ Error applying other tweaks" -ForegroundColor Red
+                        Write-Host "? Error applying other tweaks" -ForegroundColor Red
                     }
                     Read-Host "Press Enter to continue..."
                 }
@@ -761,9 +761,9 @@ function Main {
                     Write-Log "Applying internet optimization..."
                     $result = Invoke-OptimizationScript -ScriptCategory "internet" -ScriptName "internetscript.bat" -Enable $true -FriendlyName "Internet Optimization"
                     if ($result) {
-                        Write-Host "✅ Internet optimization enabled successfully" -ForegroundColor Green
+                        Write-Host "? Internet optimization enabled successfully" -ForegroundColor Green
                     } else {
-                        Write-Host "❌ Error enabling internet optimization" -ForegroundColor Red
+                        Write-Host "? Error enabling internet optimization" -ForegroundColor Red
                     }
                     Read-Host "Press Enter to continue..."
                 }
@@ -771,9 +771,9 @@ function Main {
                     Write-Log "Installing GPEdit..."
                     $result = Install-GPEdit
                     if ($result) {
-                        Write-Host "✅ GPEdit installed successfully" -ForegroundColor Green
+                        Write-Host "? GPEdit installed successfully" -ForegroundColor Green
                     } else {
-                        Write-Host "❌ Error installing GPEdit" -ForegroundColor Red
+                        Write-Host "? Error installing GPEdit" -ForegroundColor Red
                     }
                     Read-Host "Press Enter to continue..."
                 }
@@ -781,9 +781,9 @@ function Main {
                     Write-Log "Configuring maximum performance power plan..."
                     $result = Set-MaxPerformancePowerPlan
                     if ($result) {
-                        Write-Host "✅ MAXIMUM performance power plan configured successfully" -ForegroundColor Green
+                        Write-Host "? MAXIMUM performance power plan configured successfully" -ForegroundColor Green
                     } else {
-                        Write-Host "❌ Error configuring power plan" -ForegroundColor Red
+                        Write-Host "? Error configuring power plan" -ForegroundColor Red
                     }
                     Read-Host "Press Enter to continue..."
                 }
@@ -791,10 +791,10 @@ function Main {
                     Write-Log "Installing components..."
                     $result = Install-VisualsAndDirectX
                     if ($result) {
-                        Write-Host "✅ Microsoft download pages opened successfully!" -ForegroundColor Green
-                        Write-Host "📥 Please check your browser for download links" -ForegroundColor Cyan
+                        Write-Host "? Microsoft download pages opened successfully!" -ForegroundColor Green
+                        Write-Host "?? Please check your browser for download links" -ForegroundColor Cyan
                     } else {
-                        Write-Host "❌ Error opening browser" -ForegroundColor Red
+                        Write-Host "? Error opening browser" -ForegroundColor Red
                     }
                     Read-Host "Press Enter to continue..."
                 }
@@ -802,9 +802,9 @@ function Main {
                     Write-Log "Opening keyboard properties..."
                     $result = Open-KeyboardProperties
                     if ($result) {
-                        Write-Host "✅ Keyboard properties opened" -ForegroundColor Green
+                        Write-Host "? Keyboard properties opened" -ForegroundColor Green
                     } else {
-                        Write-Host "❌ Error opening keyboard properties" -ForegroundColor Red
+                        Write-Host "? Error opening keyboard properties" -ForegroundColor Red
                     }
                     Read-Host "Press Enter to continue..."
                 }
@@ -812,9 +812,9 @@ function Main {
                     Write-Log "Opening mouse properties..."
                     $result = Open-MouseProperties
                     if ($result) {
-                        Write-Host "✅ Mouse properties opened" -ForegroundColor Green
+                        Write-Host "? Mouse properties opened" -ForegroundColor Green
                     } else {
-                        Write-Host "❌ Error opening mouse properties" -ForegroundColor Red
+                        Write-Host "? Error opening mouse properties" -ForegroundColor Red
                     }
                     Read-Host "Press Enter to continue..."
                 }
@@ -822,9 +822,9 @@ function Main {
                     Write-Log "Opening performance options..."
                     $result = Open-PerformanceOptions
                     if ($result) {
-                        Write-Host "✅ Performance options opened" -ForegroundColor Green
+                        Write-Host "? Performance options opened" -ForegroundColor Green
                     } else {
-                        Write-Host "❌ Error opening performance options" -ForegroundColor Red
+                        Write-Host "? Error opening performance options" -ForegroundColor Red
                     }
                     Read-Host "Press Enter to continue..."
                 }
@@ -832,9 +832,9 @@ function Main {
                     Write-Log "Opening Device Manager..."
                     $result = Open-DeviceManager
                     if ($result) {
-                        Write-Host "✅ Device Manager opened" -ForegroundColor Green
+                        Write-Host "? Device Manager opened" -ForegroundColor Green
                     } else {
-                        Write-Host "❌ Error opening Device Manager" -ForegroundColor Red
+                        Write-Host "? Error opening Device Manager" -ForegroundColor Red
                     }
                     Read-Host "Press Enter to continue..."
                 }
@@ -842,9 +842,9 @@ function Main {
                     Write-Log "Opening network connections..."
                     $result = Open-NetworkConnections
                     if ($result) {
-                        Write-Host "✅ Network connections opened" -ForegroundColor Green
+                        Write-Host "? Network connections opened" -ForegroundColor Green
                     } else {
-                        Write-Host "❌ Error opening network connections" -ForegroundColor Red
+                        Write-Host "? Error opening network connections" -ForegroundColor Red
                     }
                     Read-Host "Press Enter to continue..."
                 }
@@ -859,9 +859,9 @@ function Main {
                                 Write-Log "Disabling FPS optimization..."
                                 $result = Invoke-OptimizationScript -ScriptCategory "globaloptimization" -ScriptName "globaloptimization.reg" -Enable $false -FriendlyName "FPS Optimization"
                                 if ($result) {
-                                    Write-Host "✅ FPS optimization disabled successfully" -ForegroundColor Green
+                                    Write-Host "? FPS optimization disabled successfully" -ForegroundColor Green
                                 } else {
-                                    Write-Host "❌ Error disabling FPS optimization" -ForegroundColor Red
+                                    Write-Host "? Error disabling FPS optimization" -ForegroundColor Red
                                 }
                                 Read-Host "Press Enter to continue..."
                             }
@@ -869,9 +869,9 @@ function Main {
                                 Write-Log "Disabling internet optimization..."
                                 $result = Invoke-OptimizationScript -ScriptCategory "internet" -ScriptName "internetscript.bat" -Enable $false -FriendlyName "Internet Optimization"
                                 if ($result) {
-                                    Write-Host "✅ Internet optimization disabled successfully" -ForegroundColor Green
+                                    Write-Host "? Internet optimization disabled successfully" -ForegroundColor Green
                                 } else {
-                                    Write-Host "❌ Error disabling internet optimization" -ForegroundColor Red
+                                    Write-Host "? Error disabling internet optimization" -ForegroundColor Red
                                 }
                                 Read-Host "Press Enter to continue..."
                             }
@@ -879,9 +879,9 @@ function Main {
                                 Write-Log "Reverting other tweaks..."
                                 $result = Invoke-RevertTweaks
                                 if ($result) {
-                                    Write-Host "✅ Other tweaks reverted successfully" -ForegroundColor Green
+                                    Write-Host "? Other tweaks reverted successfully" -ForegroundColor Green
                                 } else {
-                                    Write-Host "❌ Error reverting other tweaks" -ForegroundColor Red
+                                    Write-Host "? Error reverting other tweaks" -ForegroundColor Red
                                 }
                                 Read-Host "Press Enter to continue..."
                             }
@@ -889,9 +889,9 @@ function Main {
                                 Write-Log "Restoring Microsoft Apps..."
                                 $result = Restore-MSApps
                                 if ($result) {
-                                    Write-Host "✅ Microsoft Apps restored successfully" -ForegroundColor Green
+                                    Write-Host "? Microsoft Apps restored successfully" -ForegroundColor Green
                                 } else {
-                                    Write-Host "❌ Error restoring Microsoft Apps" -ForegroundColor Red
+                                    Write-Host "? Error restoring Microsoft Apps" -ForegroundColor Red
                                 }
                                 Read-Host "Press Enter to continue..."
                             }
@@ -900,7 +900,7 @@ function Main {
                                 break
                             }
                             default {
-                                Write-Host "❌ Invalid option. Try again." -ForegroundColor Red
+                                Write-Host "? Invalid option. Try again." -ForegroundColor Red
                                 Start-Sleep -Seconds 1
                             }
                         }
@@ -908,11 +908,11 @@ function Main {
                 }
                 "16" { 
                     Write-Log "Exiting Go-Tweak" "SUCCESS"
-                    Write-Host "Goodbye! 👋" -ForegroundColor Green
+                    Write-Host "Goodbye! ??" -ForegroundColor Green
                     exit 0
                 }
                 default {
-                    Write-Host "❌ Invalid option. Try again." -ForegroundColor Red
+                    Write-Host "? Invalid option. Try again." -ForegroundColor Red
                     Start-Sleep -Seconds 1
                 }
             }
@@ -920,3 +920,4 @@ function Main {
     }
 }
 Main
+
