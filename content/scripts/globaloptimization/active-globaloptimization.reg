@@ -383,12 +383,6 @@ Windows Registry Editor Version 5.00
 "CryptoWalletEnabled"=dword:00000000
 "WalletDonationEnabled"=dword:00000000
 
-; 27. WPFTweaksRazerBlock - Block Razer Software Installs
-[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\DriverSearching]
-"SearchOrderConfig"=dword:00000000
-[HKEY_LOCAL_MACHINE\SOFTWARE\Microsoft\Windows\CurrentVersion\Device Installer]
-"DisableCoInstallers"=dword:00000001
-
 ; ==========================================
 ; >>> CONFIGURACIÓN DE ESCRITORIO Y USUARIO <<<
 ; ==========================================
@@ -1841,5 +1835,6 @@ Windows Registry Editor Version 5.00
 
 [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
 "Hidden"=dword:00000001
+
 
 
