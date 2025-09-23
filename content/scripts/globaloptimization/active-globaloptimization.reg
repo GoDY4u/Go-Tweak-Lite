@@ -609,9 +609,6 @@ Windows Registry Editor Version 5.00
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\AudioSrv]
 "Start"=dword:00000002
 
-[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Audiosrv]
-"Start"=dword:00000002
-
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\AxInstSV]
 "Start"=dword:00000003
 
@@ -1834,3 +1831,4 @@ Windows Registry Editor Version 5.00
 
 [HKEY_CURRENT_USER\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced]
 "Hidden"=dword:00000001
+
