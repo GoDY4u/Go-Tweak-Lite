@@ -863,9 +863,6 @@ function Optimize-SystemPerformance {
     # Optimize for background applications
     Set-ItemPropertyVerified -Path "HKLM:\SYSTEM\CurrentControlSet\Control\PriorityControl" -Name "Win32PrioritySeparation" -Value 26 | Out-Null
     
-    # Configure power policies for maximum performance
-    powercfg -setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c  # High performance scheme
-    
     Write-Status -Types "+" -Status "Advanced system optimizations applied"
 }
 
@@ -946,9 +943,6 @@ function Optimize-Gaming {
     # Enable GPU hardware acceleration
     Set-ItemPropertyVerified -Path "HKLM:\SYSTEM\CurrentControlSet\Control\GraphicsDrivers" -Name "HwSchMode" -Value 2 | Out-Null
     
-    # Configure power plan for gaming
-    powercfg -setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c  # High performance
-    
     Write-Status -Types "+" -Status "Gaming optimizations applied"
 }
 
@@ -968,33 +962,6 @@ function Optimize-Audio {
     Set-ItemPropertyVerified -Path "HKCU:\AppEvents\Schemes\Apps\.Default" -Name "(Default)" -Value ".None" | Out-Null
     
     Write-Status -Types "+" -Status "Audio configuration optimized"
-}
-
-# ========== ADVANCED POWER OPTIMIZATIONS ==========
-function Optimize-PowerAdvanced {
-    Write-Status -Types "@" -Status "Applying advanced power optimizations..."
-    
-    # Configure high performance plan
-    powercfg -setactive 8c5e7fda-e8bf-4a96-9a85-a6e23a8c635c
-    
-    # Disable USB suspension
-    powercfg -setdcvalueindex SCHEME_CURRENT 2a737441-1930-4402-8d77-b2bebba308a3 48e6b7a6-50f5-4782-a5d4-53bb8f07e226 0
-    powercfg -setacvalueindex SCHEME_CURRENT 2a737441-1930-4402-8d77-b2bebba308a3 48e6b7a6-50f5-4782-a5d4-53bb8f07e226 0
-    
-    # Configure PCI Express
-    powercfg -setdcvalueindex SCHEME_CURRENT 501a4d13-42af-4429-9fd1-a8218c268e20 ee12f906-d277-404b-b6da-e5fa1a576df5 0
-    powercfg -setacvalueindex SCHEME_CURRENT 501a4d13-42af-4429-9fd1-a8218c268e20 ee12f906-d277-404b-b6da-e5fa1a576df5 0
-    
-    # Configure processor
-    powercfg -setdcvalueindex SCHEME_CURRENT 54533251-82be-4824-96c1-47b60b740d00 893dee8e-2bef-41e0-89c6-b55d0929964c 100
-    powercfg -setacvalueindex SCHEME_CURRENT 54533251-82be-4824-96c1-47b60b740d00 893dee8e-2bef-41e0-89c6-b55d0929964c 100
-    powercfg -setdcvalueindex SCHEME_CURRENT 54533251-82be-4824-96c1-47b60b740d00 bc5038f7-23e0-4960-96da-33abaf5935ec 100
-    powercfg -setacvalueindex SCHEME_CURRENT 54533251-82be-4824-96c1-47b60b740d00 bc5038f7-23e0-4960-96da-33abaf5935ec 100
-    
-    # Apply changes
-    powercfg -setactive SCHEME_CURRENT
-    
-    Write-Status -Types "+" -Status "Advanced power optimizations applied"
 }
 
 # ========== FIREWALL OPTIMIZATIONS ==========
@@ -1146,8 +1113,6 @@ function Optimize-UserExperience {
 }
 
 # ========== COMPLETE CLEANUP ==========
-
-
 function Clean-TemporaryFiles {
     Write-Status -Types "@" -Status "Cleaning temporary files..."
     
@@ -1248,7 +1213,6 @@ function Clean-TemporaryFiles {
     Write-Status -Types "+" -Status "Temporary files cleanup completed"
 }
 
-
 function Remove-WindowsOld {
     Write-Status -Types "@" -Status "Checking for Windows.old..."
     try {
@@ -1323,11 +1287,11 @@ function Start-FullOptimization {
     
     # Final confirmation before starting
     Write-Host "This script will perform the following actions:" -ForegroundColor Yellow
-    Write-Host "• Disable unnecessary services and features" -ForegroundColor White
-    Write-Host "• Remove preinstalled apps (Bloatware)" -ForegroundColor White
-    Write-Host "• Optimize performance and privacy" -ForegroundColor White
-    Write-Host "• Apply security configurations" -ForegroundColor White
-    Write-Host "• Disable Hyper-V for VMware compatibility" -ForegroundColor White
+    Write-Host "- Disable unnecessary services and features" -ForegroundColor White
+    Write-Host "- Remove preinstalled apps (Bloatware)" -ForegroundColor White
+    Write-Host "- Optimize performance and privacy" -ForegroundColor White
+    Write-Host "- Apply security configurations" -ForegroundColor White
+    Write-Host "- Disable Hyper-V for VMware compatibility" -ForegroundColor White
     Write-Host ""
     Write-Host "Are you sure you want to continue? (y/n)" -ForegroundColor Yellow
     $confirm = Read-Host
@@ -1417,7 +1381,6 @@ function Start-FullOptimization {
     Write-Host "`n=== SPECIALIZED OPTIMIZATIONS ===" -ForegroundColor Cyan
     Optimize-Gaming
     Optimize-Audio
-    Optimize-PowerAdvanced
     Optimize-Firewall
     Optimize-DNS
     Optimize-Maintenance
@@ -1437,23 +1400,23 @@ function Start-FullOptimization {
     Write-Host "================================================" -ForegroundColor Green
     Write-Host ""
     Write-Host "SUMMARY OF APPLIED OPTIMIZATIONS:" -ForegroundColor Yellow
-    Write-Host "  ✓ Hyper-V disabled for VMware compatibility" -ForegroundColor Green
-    Write-Host "  ✓ SSD optimized and hibernation disabled" -ForegroundColor Green
-    Write-Host "  ✓ 65+ unnecessary services disabled" -ForegroundColor Green
-    Write-Host "  ✓ Intel LMS, Adobe, Teredo, IPv6 disabled" -ForegroundColor Green
-    Write-Host "  ✓ 25+ Windows features disabled" -ForegroundColor Green
-    Write-Host "  ✓ Telemetry COMPLETELY disabled (ZERO data)" -ForegroundColor Green
-    Write-Host "  ✓ Cortana and location tracking disabled" -ForegroundColor Green
-    Write-Host "  ✓ Speech recognition and history disabled" -ForegroundColor Green
-    Write-Host "  ✓ Windows Update configured (MANUAL control)" -ForegroundColor Green
-    Write-Host "  ✓ OneDrive and Xbox completely removed" -ForegroundColor Green
-    Write-Host "  ✓ 70+ bloatware apps removed" -ForegroundColor Green
-    Write-Host "  ✓ System and network performance optimized" -ForegroundColor Green
-    Write-Host "  ✓ Security enhanced (Defender, UAC, Firewall)" -ForegroundColor Green
-    Write-Host "  ✓ 25+ scheduled tasks disabled" -ForegroundColor Green
-    Write-Host "  ✓ File Explorer, Taskbar and Start Menu optimized" -ForegroundColor Green
-    Write-Host "  ✓ Temporary files and Windows.old cleaned" -ForegroundColor Green
-    Write-Host "  ✓ God Mode created on desktop" -ForegroundColor Green
+    Write-Host "  - Hyper-V disabled for VMware compatibility" -ForegroundColor Green
+    Write-Host "  - SSD optimized and hibernation disabled" -ForegroundColor Green
+    Write-Host "  - 65+ unnecessary services disabled" -ForegroundColor Green
+    Write-Host "  - Intel LMS, Adobe, Teredo, IPv6 disabled" -ForegroundColor Green
+    Write-Host "  - 25+ Windows features disabled" -ForegroundColor Green
+    Write-Host "  - Telemetry COMPLETELY disabled (ZERO data)" -ForegroundColor Green
+    Write-Host "  - Cortana and location tracking disabled" -ForegroundColor Green
+    Write-Host "  - Speech recognition and history disabled" -ForegroundColor Green
+    Write-Host "  - Windows Update configured (MANUAL control)" -ForegroundColor Green
+    Write-Host "  - OneDrive and Xbox completely removed" -ForegroundColor Green
+    Write-Host "  - 70+ bloatware apps removed" -ForegroundColor Green
+    Write-Host "  - System and network performance optimized" -ForegroundColor Green
+    Write-Host "  - Security enhanced (Defender, UAC, Firewall)" -ForegroundColor Green
+    Write-Host "  - 25+ scheduled tasks disabled" -ForegroundColor Green
+    Write-Host "  - File Explorer, Taskbar and Start Menu optimized" -ForegroundColor Green
+    Write-Host "  - Temporary files and Windows.old cleaned" -ForegroundColor Green
+    Write-Host "  - God Mode created on desktop" -ForegroundColor Green
     Write-Host ""
     Write-Host "VMware will now work at maximum performance!" -ForegroundColor Green
     Write-Host "Some changes require restart to fully apply!" -ForegroundColor Yellow
