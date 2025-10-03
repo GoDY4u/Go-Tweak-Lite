@@ -752,7 +752,6 @@ function Disable-UnnecessaryTasks {
 }
 
 # ========== COMPLETE EXPLORER AND INTERFACE ==========
-# ========== COMPLETE EXPLORER AND INTERFACE ==========
 function Optimize-Explorer {
     Write-Status -Types "@" -Status "Optimizing File Explorer..."
     
@@ -858,7 +857,7 @@ function Optimize-Taskbar {
     # 10. Si todavía no funciona, mostrar instrucciones manuales
     Write-Status -Types "!" -Status "If labels still show, manually set: Right-click taskbar → Taskbar settings → Combine taskbar buttons → Always"
     
-    Write-Status -Types "+" -Status "Taskbar optimized - Icons only, no labels (TaskbarGlomLevel=2, TaskbarSr=1)")
+    Write-Status -Types "+" -Status "Taskbar optimized - Icons only, no labels"
 }
 
 function Optimize-StartMenu {
@@ -877,7 +876,6 @@ function Optimize-StartMenu {
     
     Write-Status -Types "+" -Status "Start Menu optimized"
 }
-
 
 # ========== SYSTEM AND ADVANCED PERFORMANCE ==========
 function Optimize-SystemPerformance {
@@ -1490,5 +1488,6 @@ function Start-FullOptimization {
 
 # AUTOMATICALLY EXECUTE WHEN SCRIPT STARTS
 Start-FullOptimization
+
 
 
