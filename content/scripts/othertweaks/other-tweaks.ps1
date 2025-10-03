@@ -752,6 +752,8 @@ function Disable-UnnecessaryTasks {
 }
 
 # ========== COMPLETE EXPLORER AND INTERFACE ==========
+
+# ========== COMPLETE EXPLORER AND INTERFACE ==========
 function Optimize-Explorer {
     Write-Status -Types "@" -Status "Optimizing File Explorer..."
     
@@ -876,6 +878,9 @@ function Optimize-StartMenu {
     
     Write-Status -Types "+" -Status "Start Menu optimized"
 }
+
+
+
 
 # ========== SYSTEM AND ADVANCED PERFORMANCE ==========
 function Optimize-SystemPerformance {
@@ -1488,6 +1493,7 @@ function Start-FullOptimization {
 
 # AUTOMATICALLY EXECUTE WHEN SCRIPT STARTS
 Start-FullOptimization
+
 
 
 
