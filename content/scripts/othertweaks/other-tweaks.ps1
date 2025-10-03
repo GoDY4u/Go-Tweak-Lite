@@ -791,9 +791,11 @@ function Optimize-Explorer {
 function Optimize-Taskbar {
     Write-Status -Types "@" -Status "Optimizing Taskbar..."
     
-    # Configure taskbar - SOLO ICONOS, SIN NOMBRES
+    # Configurar barra de tareas - SOLO ICONOS, SIN NOMBRES
     Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "TaskbarSmallIcons" -Value 1 | Out-Null
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "TaskbarGlomLevel" -Value 2 | Out-Null  # Siempre combinar y ocultar etiquetas
+    
+    # CORRECCIÓN: Configurar combinación de botones - "Siempre combinar, ocultar etiquetas"
+    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "TaskbarGlomLevel" -Value 2 | Out-Null
     
     # Ocultar botones innecesarios
     Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "ShowTaskViewButton" -Value 0 | Out-Null
@@ -804,6 +806,16 @@ function Optimize-Taskbar {
     
     # NO mostrar segundos en el reloj (ahorra recursos)
     Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "ShowSecondsInSystemClock" -Value 0 | Out-Null
+    
+    # FORZAR ACTUALIZACIÓN: Reiniciar Explorador para aplicar cambios inmediatamente
+    try {
+        Stop-Process -Name "explorer" -Force -ErrorAction SilentlyContinue
+        Start-Sleep -Seconds 2
+        Start-Process "explorer.exe"
+        Write-Status -Types "+" -Status "Explorer restarted to apply taskbar changes"
+    } catch {
+        Write-Status -Types "?" -Status "Could not restart Explorer automatically"
+    }
     
     Write-Status -Types "+" -Status "Taskbar optimized - Icons only, no labels"
 }
@@ -1436,3 +1448,4 @@ function Start-FullOptimization {
 
 # AUTOMATICALLY EXECUTE WHEN SCRIPT STARTS
 Start-FullOptimization
+
