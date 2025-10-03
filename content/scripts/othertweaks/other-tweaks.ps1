@@ -752,6 +752,7 @@ function Disable-UnnecessaryTasks {
 }
 
 # ========== COMPLETE EXPLORER AND INTERFACE ==========
+# ========== COMPLETE EXPLORER AND INTERFACE ==========
 function Optimize-Explorer {
     Write-Status -Types "@" -Status "Optimizing File Explorer..."
     
@@ -791,33 +792,73 @@ function Optimize-Explorer {
 function Optimize-Taskbar {
     Write-Status -Types "@" -Status "Optimizing Taskbar..."
     
-    # Configurar barra de tareas - SOLO ICONOS, SIN NOMBRES
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "TaskbarSmallIcons" -Value 1 | Out-Null
+    # SOLUCIÓN COMPLETA para Windows 10/11 - SOLO ICONOS, SIN ETIQUETAS
+    $taskbarPath = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
     
-    # CORRECCIÓN: Configurar combinación de botones - "Siempre combinar, ocultar etiquetas"
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "TaskbarGlomLevel" -Value 2 | Out-Null
+    # 1. Configurar combinación de botones - "SIEMPRE COMBINAR, OCULTAR ETIQUETAS"
+    Set-ItemPropertyVerified -Path $taskbarPath -Name "TaskbarGlomLevel" -Value 2 | Out-Null
     
-    # Ocultar botones innecesarios
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "ShowTaskViewButton" -Value 0 | Out-Null
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "ShowCortanaButton" -Value 0 | Out-Null
+    # 2. Método moderno para Windows 10/11 (2018+)
+    Set-ItemPropertyVerified -Path $taskbarPath -Name "TaskbarSr" -Value 1 | Out-Null
     
-    # Mostrar todos los iconos en área de notificación
+    # 3. Configuración adicional para Windows 11
+    Set-ItemPropertyVerified -Path $taskbarPath -Name "TaskbarAl" -Value 0 | Out-Null
+    
+    # 4. Iconos pequeños (compatibilidad doble)
+    Set-ItemPropertyVerified -Path $taskbarPath -Name "TaskbarSmallIcons" -Value 1 | Out-Null
+    Set-ItemPropertyVerified -Path $taskbarPath -Name "TaskbarSi" -Value 0 | Out-Null
+    
+    # 5. Tamaño de barra pequeño para mejor apariencia
+    Set-ItemPropertyVerified -Path $taskbarPath -Name "TaskbarSize" -Value 0 | Out-Null
+    
+    # 6. Ocultar botones innecesarios
+    Set-ItemPropertyVerified -Path $taskbarPath -Name "ShowTaskViewButton" -Value 0 | Out-Null
+    Set-ItemPropertyVerified -Path $taskbarPath -Name "ShowCortanaButton" -Value 0 | Out-Null
+    
+    # 7. Mostrar todos los iconos en área de notificación
     Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" -Name "EnableAutoTray" -Value 0 | Out-Null
     
-    # NO mostrar segundos en el reloj (ahorra recursos)
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "ShowSecondsInSystemClock" -Value 0 | Out-Null
+    # 8. NO mostrar segundos en el reloj (ahorra recursos)
+    Set-ItemPropertyVerified -Path $taskbarPath -Name "ShowSecondsInSystemClock" -Value 0 | Out-Null
     
-    # FORZAR ACTUALIZACIÓN: Reiniciar Explorador para aplicar cambios inmediatamente
+    # 9. FORZAR ACTUALIZACIÓN COMPLETA - Método más robusto
     try {
-        Stop-Process -Name "explorer" -Force -ErrorAction SilentlyContinue
-        Start-Sleep -Seconds 2
+        Write-Status -Types "@" -Status "Applying taskbar changes and restarting Explorer..."
+        
+        # Guardar cualquier trabajo abierto en el Explorador
+        $shell = New-Object -ComObject "Shell.Application"
+        $shell.Windows() | ForEach-Object { $_.Quit() }
+        
+        # Detener Explorer completamente
+        Get-Process -Name "explorer" -ErrorAction SilentlyContinue | Stop-Process -Force
+        Start-Sleep -Seconds 3
+        
+        # Reforzar configuraciones mientras Explorer está detenido
+        Set-ItemProperty -Path $taskbarPath -Name "TaskbarGlomLevel" -Value 2 -Force -ErrorAction SilentlyContinue
+        Set-ItemProperty -Path $taskbarPath -Name "TaskbarSr" -Value 1 -Force -ErrorAction SilentlyContinue
+        Set-ItemProperty -Path $taskbarPath -Name "TaskbarSmallIcons" -Value 1 -Force -ErrorAction SilentlyContinue
+        
+        # Reiniciar Explorer
         Start-Process "explorer.exe"
-        Write-Status -Types "+" -Status "Explorer restarted to apply taskbar changes"
+        Start-Sleep -Seconds 2
+        
+        Write-Status -Types "+" -Status "Explorer restarted - taskbar changes applied"
+        
+        # Verificación adicional después del reinicio
+        Start-Sleep -Seconds 3
+        $currentSetting = Get-ItemProperty -Path $taskbarPath -Name "TaskbarGlomLevel" -ErrorAction SilentlyContinue
+        if ($currentSetting.TaskbarGlomLevel -eq 2) {
+            Write-Status -Types "+" -Status "Taskbar configuration verified successfully"
+        }
+        
     } catch {
-        Write-Status -Types "?" -Status "Could not restart Explorer automatically"
+        Write-Status -Types "?" -Status "Error during Explorer restart: $($_.Exception.Message)"
     }
     
-    Write-Status -Types "+" -Status "Taskbar optimized - Icons only, no labels"
+    # 10. Si todavía no funciona, mostrar instrucciones manuales
+    Write-Status -Types "!" -Status "If labels still show, manually set: Right-click taskbar → Taskbar settings → Combine taskbar buttons → Always"
+    
+    Write-Status -Types "+" -Status "Taskbar optimized - Icons only, no labels (TaskbarGlomLevel=2, TaskbarSr=1)")
 }
 
 function Optimize-StartMenu {
@@ -836,6 +877,7 @@ function Optimize-StartMenu {
     
     Write-Status -Types "+" -Status "Start Menu optimized"
 }
+
 
 # ========== SYSTEM AND ADVANCED PERFORMANCE ==========
 function Optimize-SystemPerformance {
@@ -1448,4 +1490,5 @@ function Start-FullOptimization {
 
 # AUTOMATICALLY EXECUTE WHEN SCRIPT STARTS
 Start-FullOptimization
+
 
