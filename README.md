@@ -1,11 +1,19 @@
 # 🚀 Go-Tweak - Windows Optimization Tool
 
-[https://img.shields.io/badge/PowerShell-5.1+-blue.svg](https://img.shields.io/badge/PowerShell-5.1+-blue.svg)  
-[https://img.shields.io/badge/Windows-10%7C11-0078D6.svg](https://img.shields.io/badge/Windows-10%7C11-0078D6.svg)  
-[https://img.shields.io/badge/License-MIT-green.svg](https://img.shields.io/badge/License-MIT-green.svg)  
-[https://img.shields.io/badge/Version-Complete%2520Optimization-brightgreen.svg](https://img.shields.io/badge/Version-Complete%2520Optimization-brightgreen.svg)  
-[https://img.shields.io/badge/Maintenance-Actively%2520Developed-brightgreen.svg](https://img.shields.io/badge/Maintenance-Actively%2520Developed-brightgreen.svg)
+![PowerShell](https://img.shields.io/badge/PowerShell-5.1+-blue.svg)
+![Batch](https://img.shields.io/badge/Batch-Script-yellow.svg)
+![Windows](https://img.shields.io/badge/Windows-10|11-0078D6.svg)
+![License](https://img.shields.io/badge/License-MIT-green.svg)
+![Version](https://img.shields.io/badge/Version-Lite%20Edition-lightgrey.svg)
+![Maintenance](https://img.shields.io/badge/Maintenance-Actively%20Developed-brightgreen.svg)
 
+![GitHub repo size](https://img.shields.io/github/repo-size/GoDY4u/Go-Tweak-Lite)
+![GitHub stars](https://img.shields.io/github/stars/GoDY4u/Go-Tweak-Lite?style=social)
+![GitHub forks](https://img.shields.io/github/forks/GoDY4u/Go-Tweak-Lite?style=social)
+![GitHub issues](https://img.shields.io/github/issues/GoDY4u/Go-Tweak-Lite)
+![GitHub license](https://img.shields.io/github/license/GoDY4u/Go-Tweak-Lite)
+![GitHub last commit](https://img.shields.io/github/last-commit/GoDY4u/Go-Tweak-Lite)
+![GitHub contributors](https://img.shields.io/github/contributors/GoDY4u/Go-Tweak-Lite)
 **Go-Tweak** is a comprehensive PowerShell-based optimization suite designed for gamers, power users, and privacy-conscious individuals. This complete edition delivers maximum performance, privacy, and system optimization through an intuitive console interface.
 
 ## ⚡ Performance Features
