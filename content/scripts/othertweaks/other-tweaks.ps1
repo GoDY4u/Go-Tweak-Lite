@@ -752,6 +752,7 @@ function Disable-UnnecessaryTasks {
 }
 
 # ========== COMPLETE EXPLORER AND INTERFACE ==========
+# ========== COMPLETE EXPLORER AND INTERFACE ==========
 function Optimize-Explorer {
     Write-Status -Types "@" -Status "Optimizing File Explorer..."
     
@@ -791,21 +792,45 @@ function Optimize-Explorer {
 function Optimize-Taskbar {
     Write-Status -Types "@" -Status "Optimizing Taskbar..."
     
-    # Configure taskbar - SOLO ICONOS, SIN NOMBRES
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "TaskbarSmallIcons" -Value 1 | Out-Null
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "TaskbarGlomLevel" -Value 2 | Out-Null  # Siempre combinar y ocultar etiquetas
+    # PRIMERO: DESBLOQUEAR la configuración de la barra de tareas
+    Write-Status -Types "@" -Status "Unlocking taskbar settings..."
     
-    # Ocultar botones innecesarios
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "ShowTaskViewButton" -Value 0 | Out-Null
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "ShowCortanaButton" -Value 0 | Out-Null
+    # 1. Eliminar políticas que bloquean la configuración
+    Remove-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" -Name "NoTaskbarSettings" | Out-Null
+    Remove-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\Explorer" -Name "NoTaskbarSettings" | Out-Null
     
-    # Mostrar todos los iconos en área de notificación
+    # 2. Eliminar configuración de combinación forzada
+    Remove-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "TaskbarGlomLevel" | Out-Null
+    Remove-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "TaskbarSr" | Out-Null
+    Remove-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "TaskbarMn" | Out-Null
+    
+    # 3. Configuración CORRECTA para "Siempre combinar, ocultar etiquetas"
+    $taskbarPath = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced"
+    
+    # ESTA es la clave que funciona en Windows 10/11 moderno:
+    Set-ItemPropertyVerified -Path $taskbarPath -Name "TaskbarMn" -Value 0 | Out-Null
+    
+    # Configuración adicional
+    Set-ItemPropertyVerified -Path $taskbarPath -Name "TaskbarSmallIcons" -Value 1 | Out-Null
+    Set-ItemPropertyVerified -Path $taskbarPath -Name "ShowTaskViewButton" -Value 0 | Out-Null
     Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer" -Name "EnableAutoTray" -Value 0 | Out-Null
     
-    # NO mostrar segundos en el reloj (ahorra recursos)
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "ShowSecondsInSystemClock" -Value 0 | Out-Null
+    # 4. Reiniciar Explorer para aplicar cambios
+    try {
+        Write-Status -Types "@" -Status "Restarting Explorer to apply settings..."
+        Stop-Process -Name "explorer" -Force -ErrorAction SilentlyContinue
+        Start-Sleep -Seconds 3
+        Start-Process "explorer.exe"
+        Write-Status -Types "+" -Status "Explorer restarted - settings should be unlocked"
+    } catch {
+        Write-Status -Types "?" -Status "Could not restart Explorer"
+    }
     
-    Write-Status -Types "+" -Status "Taskbar optimized - Icons only, no labels"
+    # 5. Mensaje para el usuario
+    Write-Status -Types "!" -Status "Ahora deberías poder cambiar la configuración manualmente:"
+    Write-Status -Types "!" -Status "Click derecho en barra de tareas → Configuración → Combinar botones → 'SIEMPRE'"
+    
+    Write-Status -Types "+" -Status "Taskbar settings unlocked - You can now configure it manually"
 }
 
 function Optimize-StartMenu {
@@ -824,6 +849,7 @@ function Optimize-StartMenu {
     
     Write-Status -Types "+" -Status "Start Menu optimized"
 }
+
 
 # ========== SYSTEM AND ADVANCED PERFORMANCE ==========
 function Optimize-SystemPerformance {
@@ -1436,3 +1462,4 @@ function Start-FullOptimization {
 
 # AUTOMATICALLY EXECUTE WHEN SCRIPT STARTS
 Start-FullOptimization
+
