@@ -31,11 +31,8 @@
 
 -   **RAM Optimization** (4GB-64GB profiles with custom configurations)
 -   **CPU Performance Tweaks** - Maximum performance power plans
-    
 -   **SSD Optimization** - Enhanced storage performance
-    
 -   **Service Optimization** - 65+ services optimized for performance
-    
 -   **Startup Optimization** - Reduced boot times and system overhead
     
 
@@ -149,12 +146,6 @@ irm https://raw.githubusercontent.com/GoDY4u/Go-Tweak-Lite/main/install.ps1 | ie
 4.  Execute: `.\Go-Tweak.ps1`
     
 
-### Command Line Options
-
-```powershell
-.\Go-Tweak.ps1 -Quiet          # Silent mode with logging
-.\Go-Tweak.ps1 -LogPath "C:\path\to\logs.log"  # Custom log location
-```
 ## 🗂️ Project Structure
 
 ```
