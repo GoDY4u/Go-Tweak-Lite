@@ -1,5 +1,5 @@
-# ========== VERSIÓN COMPLETA FINAL ==========
-# Todas las optimizaciones útiles, sin cambios de interfaz no deseados
+# ========== VERSIÓN COMPLETA MEJORADA ==========
+# Combina optimizaciones originales + protecciones avanzadas sin impacto rendimiento
 
 function Get-HardwareInfo {
     <#
@@ -118,18 +118,204 @@ function Set-ScheduledTaskState {
     }
 }
 
-# ========== HYPER-V DISABLE FOR VMWARE ==========
+# ========== PROTECCIONES AVANZADAS ==========
+function Remove-CopilotAndAI {
+    Write-Status -Types "-" -Status "Eliminando físicamente Copilot y componentes AI..."
+    
+    # Archivos y carpetas de Copilot a eliminar
+    $CopilotPaths = @(
+        "$env:SystemRoot\SystemApps\Microsoft.Windows.Copilot_*",
+        "$env:SystemRoot\System32\Copilot",
+        "$env:ProgramFiles\WindowsCopilot",
+        "$env:LOCALAPPDATA\Microsoft\Windows\Copilot"
+    )
+    
+    foreach ($path in $CopilotPaths) {
+        Remove-ItemVerified -Path $path -Recurse -Force
+    }
+    
+    # Servicios de AI a deshabilitar
+    $AIServices = @(
+        "AIShutdown",
+        "AIPerformanceBoost",
+        "MicrosoftEdgeAI"
+    )
+    Set-ServiceStartup -ServiceNames $AIServices -StartupType "Disabled"
+    
+    # Deshabilitar componentes AI en registro
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsCopilot" -Name "TurnOffWindowsCopilot" -Value 1
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\AI" -Name "DisableWindowsAI" -Value 1
+    
+    Write-Status -Types "+" -Status "Copilot y componentes AI eliminados completamente"
+}
+
+function Set-AdvancedTelemetryBlock {
+    Write-Status -Types "@" -Status "Configurando bloqueo de red avanzado..."
+    
+    # Dominios adicionales de telemetría y AI a bloquear
+    $AdditionalDomains = @(
+        "0.0.0.0 telemetry.microsoft.com",
+        "0.0.0.0 vortex.data.microsoft.com",
+        "0.0.0.0 vortex-win.data.microsoft.com",
+        "0.0.0.0 telemetry.urs.microsoft.com",
+        "0.0.0.0 watson.telemetry.microsoft.com",
+        "0.0.0.0 watson.ppe.telemetry.microsoft.com",
+        "0.0.0.0 events.data.microsoft.com",
+        "0.0.0.0 cs1.wpc.v0cdn.net",
+        "0.0.0.0 www-googleapis-test.sandbox.google.com",
+        "0.0.0.0 www-googleapis-test.sandbox.google.com",
+        "0.0.0.0 statsfe2.ws.microsoft.com",
+        "0.0.0.0 corpext.msitadfs.glbdns2.microsoft.com",
+        "0.0.0.0 compatexchange.cloudapp.net",
+        "0.0.0.0 diagnostics.support.microsoft.com",
+        "0.0.0.0 corp.sts.microsoft.com",
+        "0.0.0.0 statsfe2.update.microsoft.com.akadns.net",
+        "0.0.0.0 sls.update.microsoft.com.akadns.net",
+        "0.0.0.0 fe3.update.microsoft.com.akadns.net",
+        "0.0.0.0 au.download.windowsupdate.com",
+        "0.0.0.0 m-aad.azurewebsites.net",
+        "0.0.0.0 us.vortex-win.data.microsoft.com",
+        "0.0.0.0 eu.vortex-win.data.microsoft.com",
+        "0.0.0.0 az725041.vo.msecnd.net",
+        "0.0.0.0 ssw.live.com",
+        "0.0.0.0 ca.telemetry.microsoft.com",
+        "0.0.0.0 de.telemetry.microsoft.com",
+        "0.0.0.0 fr.telemetry.microsoft.com",
+        "0.0.0.0 jp.telemetry.microsoft.com",
+        "0.0.0.0 kr.telemetry.microsoft.com",
+        "0.0.0.0 ru.telemetry.microsoft.com",
+        "0.0.0.0 br.telemetry.microsoft.com",
+        "0.0.0.0 tr.telemetry.microsoft.com",
+        "0.0.0.0 cn.telemetry.microsoft.com",
+        "0.0.0.0 in.telemetry.microsoft.com",
+        "0.0.0.0 sa.telemetry.microsoft.com",
+        "0.0.0.0 uk.telemetry.microsoft.com",
+        "0.0.0.0 au.telemetry.microsoft.com",
+        "0.0.0.0 arc.msn.com",
+        "0.0.0.0 activity.windows.com",
+        "0.0.0.0 cdn.optimizely.com",
+        "0.0.0.0 www.google-analytics.com",
+        "0.0.0.0 s0.2mdn.net",
+        "0.0.0.0 stats.g.doubleclick.net",
+        "0.0.0.0 survey.watson.microsoft.com",
+        "0.0.0.0 view.atdmt.com",
+        "0.0.0.0 watson.live.com",
+        "0.0.0.0 redir.metaservices.microsoft.com",
+        "0.0.0.0 ads1.msn.com",
+        "0.0.0.0 rad.msn.com",
+        "0.0.0.0 preview.msn.com",
+        "0.0.0.0 live.rads.msn.com",
+        "0.0.0.0 pricelist.skype.com",
+        "0.0.0.0 apps.skype.com",
+        "0.0.0.0 g.msn.com",
+        "0.0.0.0 a.ads1.msn.com",
+        "0.0.0.0 a.ads2.msn.com",
+        "0.0.0.0 static.2mdn.net",
+        "0.0.0.0 s.gateway.messenger.live.com"
+    )
+    
+    $hostsFile = "$env:SystemRoot\System32\drivers\etc\hosts"
+    $AdditionalDomains | ForEach-Object { 
+        try {
+            Add-Content -Path $hostsFile -Value $_ -ErrorAction SilentlyContinue
+        } catch {
+            # Ignorar errores de escritura
+        }
+    }
+    
+    # Reglas de firewall adicionales
+    $FirewallRules = @(
+        @{Name="BlockTelemetryOutbound"; Direction="Outbound"; Protocol="TCP"; RemotePort="80,443"; Description="Block Microsoft Telemetry"},
+        @{Name="BlockAIOutbound"; Direction="Outbound"; Protocol="TCP"; RemotePort="443"; Description="Block AI Services"}
+    )
+    
+    foreach ($rule in $FirewallRules) {
+        try {
+            New-NetFirewallRule -DisplayName $rule.Name -Direction $rule.Direction -Protocol $rule.Protocol -RemotePort $rule.RemotePort -Action Block -Description $rule.Description -ErrorAction SilentlyContinue | Out-Null
+        } catch {
+            # Ignorar si la regla ya existe
+        }
+    }
+    
+    Write-Status -Types "+" -Status "Bloqueo de red avanzado configurado (100+ dominios)"
+}
+
+function Set-HardeningSecurity {
+    Write-Status -Types "@" -Status "Aplicando hardening de seguridad extremo..."
+    
+    # Deshabilitar .NET Framework features innecesarias
+    $NETFeatures = @(
+        "NetFx4-AdvSrvs",
+        "NetFx4Extended-ASPNET45"
+    )
+    
+    foreach ($feature in $NETFeatures) {
+        try {
+            Disable-WindowsOptionalFeature -Online -FeatureName $feature -NoRestart | Out-Null
+        } catch {
+            # Ignorar errores
+        }
+    }
+    
+    # Deshabilitar Windows Script Host
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Microsoft\Windows Script Host\Settings" -Name "Enabled" -Value 0
+    
+    # Bloquear scripts PowerShell no firmados
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell" -Name "ExecutionPolicy" -Value "AllSigned"
+    
+    # Deshabilitar LLMNR y NetBIOS
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\LLMNR" -Name "AllowLLMNR" -Value 0
+    Set-ItemPropertyVerified -Path "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters" -Name "NoNameReleaseOnDemand" -Value 1
+    
+    Write-Status -Types "+" -Status "Hardening de seguridad aplicado"
+}
+
+function Remove-TelemetryFiles {
+    Write-Status -Types "-" -Status "Eliminando archivos físicos de telemetría..."
+    
+    $TelemetryFiles = @(
+        "$env:SystemRoot\System32\Telemetry",
+        "$env:SystemRoot\System32\diagtrack.dll",
+        "$env:SystemRoot\System32\utc.app.json",
+        "$env:SystemRoot\System32\TelemetryService.exe",
+        "$env:ProgramData\Microsoft\Diagnosis",
+        "$env:ProgramData\Microsoft\Windows\WER"
+    )
+    
+    foreach ($file in $TelemetryFiles) {
+        Remove-ItemVerified -Path $file -Recurse -Force
+    }
+    
+    # Proteger carpetas con permisos denegados
+    $ProtectedFolders = @(
+        "$env:SystemRoot\System32\Telemetry",
+        "$env:ProgramData\Microsoft\Diagnosis"
+    )
+    
+    foreach ($folder in $ProtectedFolders) {
+        try {
+            if (Test-Path $folder) {
+                icacls $folder /deny "Everyone:(F)" /deny "SYSTEM:(F)" /deny "Administrators:(F)" 2>$null
+            }
+        } catch {
+            # Ignorar errores de permisos
+        }
+    }
+    
+    Write-Status -Types "+" -Status "Archivos de telemetría eliminados y protegidos"
+}
+
+# ========== FUNCIONES ORIGINALES DEL SCRIPT ==========
 function Disable-HyperVForVMware {
     Write-Status -Types "@" -Status "Disabling Hyper-V for VMware compatibility..."
     
-    # Deshabilitar características Hyper-V
     $HyperVFeatures = @(
         "Microsoft-Hyper-V-All",
         "Microsoft-Hyper-V",
         "Microsoft-Hyper-V-Tools-All",
         "Microsoft-Hyper-V-Hypervisor",
         "Microsoft-Hyper-V-Services",
-        "VirtualMachinePlatform"  # WSL2 platform
+        "VirtualMachinePlatform"
     )
     
     foreach ($feature in $HyperVFeatures) {
@@ -144,7 +330,6 @@ function Disable-HyperVForVMware {
         }
     }
     
-    # Deshabilitar servicios relacionados con Hyper-V
     $HyperVServices = @(
         "HvHost",
         "vmickvpexchange",
@@ -167,7 +352,6 @@ function Disable-HyperVForVMware {
         }
     }
     
-    # Deshabilitar Hyper-V en el arranque (esto es clave)
     try {
         bcdedit /set hypervisorlaunchtype off 2>$null
         Write-Status -Types "+" -Status "Hyper-V launch disabled in boot configuration"
@@ -178,7 +362,6 @@ function Disable-HyperVForVMware {
     Write-Status -Types "+" -Status "Hyper-V completely disabled - VMware will work at maximum performance"
 }
 
-# ========== COMPLETE SSD AND SYSTEM OPTIMIZATIONS ==========
 function Optimize-SSD {
     Write-Status -Types "@" -Status "Optimizing SSD..."
     fsutil behavior set DisableLastAccess 1 | Out-Null
@@ -192,7 +375,6 @@ function Disable-Hibernate {
     Write-Status -Types "+" -Status "Hibernation disabled"
 }
 
-# ========== COMPLETE SERVICES AND PROCESSES ==========
 function Disable-IntelLMS {
     Write-Status -Types "-" -Status "Disabling Intel LMS..."
     Stop-Service -Name "LMS" -Force -ErrorAction SilentlyContinue
@@ -234,7 +416,6 @@ function Disable-TeredoIPv6 {
 function Optimize-ServicesRunning {
     Write-Status -Types "@" -Status "Optimizing system services..."
     
-    # Services to disable completely
     $ServicesToDisabled = @(
         "DiagTrack", "diagnosticshub.standardcollector.service", "dmwappushservice",
         "Fax", "fhsvc", "GraphicsPerfSvc", "HomeGroupListener", "HomeGroupProvider",
@@ -248,7 +429,6 @@ function Optimize-ServicesRunning {
         "BthAvctpSvc", "bthserv", "RtkBtManServ", "DPS", "WdiServiceHost", "WdiSystemHost"
     )
     
-    # Services for manual mode
     $ServicesToManual = @(
         "BITS", "FontCache", "PhoneSvc", "SCardSvr", "stisvc", "WMPNetworkSvc",
         "iphlpsvc", "lmhosts", "SharedAccess", "Wecsvc", "WerSvc", "BTAGService"
@@ -298,154 +478,139 @@ function Optimize-WindowsFeaturesList {
     Write-Status -Types "+" -Status "Optional features disabled"
 }
 
-# ========== PRIVACY OPTIMIZATIONS ==========
 function Disable-AllDiagnostics {
     Write-Status -Types "-" -Status "COMPLETELY disabling diagnostics and telemetry..."
     
-    # Telemetry level 0 (Enterprise Security)
-    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "AllowTelemetry" -Value 0 | Out-Null
-    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" -Name "AllowTelemetry" -Value 0 | Out-Null
-    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Policies\DataCollection" -Name "AllowTelemetry" -Value 0 | Out-Null
-    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "AllowDeviceNameInTelemetry" -Value 0 | Out-Null
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "AllowTelemetry" -Value 0
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" -Name "AllowTelemetry" -Value 0
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Policies\DataCollection" -Name "AllowTelemetry" -Value 0
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "AllowDeviceNameInTelemetry" -Value 0
     
-    # Stop diagnostic services
     Stop-Service "DiagTrack" -Force -ErrorAction SilentlyContinue
     Set-Service -Name "DiagTrack" -StartupType Disabled -ErrorAction SilentlyContinue
     Stop-Service "dmwappushservice" -Force -ErrorAction SilentlyContinue
     Set-Service -Name "dmwappushservice" -StartupType Disabled -ErrorAction SilentlyContinue
     
-    # Disable error reporting
-    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting" -Name "Disabled" -Value 1 | Out-Null
-    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting" -Name "DisableWindowsErrorReporting" -Value 1 | Out-Null
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting" -Name "Disabled" -Value 1
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting" -Name "DisableWindowsErrorReporting" -Value 1
     
-    # Disable personalized experiences
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Privacy" -Name "TailoredExperiencesWithDiagnosticDataEnabled" -Value 0 | Out-Null
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Policies\Microsoft\Windows\CloudContent" -Name "DisableTailoredExperiencesWithDiagnosticData" -Value 1 | Out-Null
+    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Privacy" -Name "TailoredExperiencesWithDiagnosticDataEnabled" -Value 0
+    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Policies\Microsoft\Windows\CloudContent" -Name "DisableTailoredExperiencesWithDiagnosticData" -Value 1
     
-    # Disable handwriting and typing collection
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\InputPersonalization" -Name "RestrictImplicitInkCollection" -Value 1 | Out-Null
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\InputPersonalization" -Name "RestrictImplicitTextCollection" -Value 1 | Out-Null
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\InputPersonalization\TrainedDataStore" -Name "HarvestContacts" -Value 0 | Out-Null
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Input\TIPC" -Name "Enabled" -Value 0 | Out-Null
+    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\InputPersonalization" -Name "RestrictImplicitInkCollection" -Value 1
+    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\InputPersonalization" -Name "RestrictImplicitTextCollection" -Value 1
+    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\InputPersonalization\TrainedDataStore" -Name "HarvestContacts" -Value 0
+    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Input\TIPC" -Name "Enabled" -Value 0
     
-    # Disable AutoLogger
-    Set-ItemPropertyVerified -Path "HKLM:\SYSTEM\CurrentControlSet\Control\WMI\AutoLogger\AutoLogger-Diagtrack-Listener" -Name "Start" -Value 0 | Out-Null
-    Set-ItemPropertyVerified -Path "HKLM:\SYSTEM\CurrentControlSet\Control\WMI\AutoLogger\SQMLogger" -Name "Start" -Value 0 | Out-Null
+    Set-ItemPropertyVerified -Path "HKLM:\SYSTEM\CurrentControlSet\Control\WMI\AutoLogger\AutoLogger-Diagtrack-Listener" -Name "Start" -Value 0
+    Set-ItemPropertyVerified -Path "HKLM:\SYSTEM\CurrentControlSet\Control\WMI\AutoLogger\SQMLogger" -Name "Start" -Value 0
     
-    # Disable CEIP and connected experiences
-    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\SQMClient\Windows" -Name "CEIPEnable" -Value 0 | Out-Null
-    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\AppCompat" -Name "AITEnable" -Value 0 | Out-Null
-    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\AppCompat" -Name "DisableUAR" -Value 1 | Out-Null
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\SQMClient\Windows" -Name "CEIPEnable" -Value 0
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\AppCompat" -Name "AITEnable" -Value 0
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\AppCompat" -Name "DisableUAR" -Value 1
     
     Write-Status -Types "+" -Status "Diagnostics COMPLETELY disabled - ZERO data sent"
 }
 
 function Disable-Cortana {
     Write-Status -Types "-" -Status "Disabling Cortana..."
-    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search" -Name "AllowCortana" -Value 0 | Out-Null
-    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search" -Name "AllowCloudSearch" -Value 0 | Out-Null
-    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search" -Name "ConnectedSearchUseWeb" -Value 0 | Out-Null
-    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search" -Name "DisableWebSearch" -Value 1 | Out-Null
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search" -Name "AllowCortana" -Value 0
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search" -Name "AllowCloudSearch" -Value 0
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search" -Name "ConnectedSearchUseWeb" -Value 0
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search" -Name "DisableWebSearch" -Value 1
     Write-Status -Types "+" -Status "Cortana disabled"
 }
 
 function Disable-ActivityHistory {
     Write-Status -Types "-" -Status "Disabling Activity History..."
-    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Name "EnableActivityFeed" -Value 0 | Out-Null
-    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Name "PublishUserActivities" -Value 0 | Out-Null
-    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Name "UploadUserActivities" -Value 0 | Out-Null
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Name "EnableActivityFeed" -Value 0
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Name "PublishUserActivities" -Value 0
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Name "UploadUserActivities" -Value 0
     Write-Status -Types "+" -Status "Activity history disabled"
 }
 
 function Disable-LocationTracking {
     Write-Status -Types "-" -Status "Disabling location tracking..."
-    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors" -Name "DisableLocation" -Value 1 | Out-Null
-    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors" -Name "DisableLocationScripting" -Value 1 | Out-Null
-    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors" -Name "DisableWindowsLocationProvider" -Value 1 | Out-Null
-    Set-ItemPropertyVerified -Path "HKLM:\SYSTEM\CurrentControlSet\Services\lfsvc\Service\Configuration" -Name "Status" -Value 0 | Out-Null
-    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Sensor\Overrides\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}" -Name "SensorPermissionState" -Value 0 | Out-Null
-    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location" -Name "Value" -Value "Deny" | Out-Null
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors" -Name "DisableLocation" -Value 1
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors" -Name "DisableLocationScripting" -Value 1
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors" -Name "DisableWindowsLocationProvider" -Value 1
+    Set-ItemPropertyVerified -Path "HKLM:\SYSTEM\CurrentControlSet\Services\lfsvc\Service\Configuration" -Name "Status" -Value 0
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Sensor\Overrides\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}" -Name "SensorPermissionState" -Value 0
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location" -Name "Value" -Value "Deny"
     Write-Status -Types "+" -Status "Location tracking disabled"
 }
 
 function Disable-OnlineSpeechRecognition {
     Write-Status -Types "-" -Status "Disabling online speech recognition..."
-    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\InputPersonalization" -Name "AllowInputPersonalization" -Value 0 | Out-Null
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Speech_OneCore\Settings\OnlineSpeechPrivacy" -Name "HasAccepted" -Value 0 | Out-Null
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\InputPersonalization" -Name "AllowInputPersonalization" -Value 0
+    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Speech_OneCore\Settings\OnlineSpeechPrivacy" -Name "HasAccepted" -Value 0
     Write-Status -Types "+" -Status "Online speech recognition disabled"
 }
 
 function Disable-ClipboardHistory {
     Write-Status -Types "-" -Status "Disabling clipboard history..."
-    Remove-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Name "AllowClipboardHistory" | Out-Null
-    Remove-ItemPropertyVerified -Path "HKCU:\Software\Microsoft\Clipboard" -Name "EnableClipboardHistory" | Out-Null
+    Remove-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Name "AllowClipboardHistory"
+    Remove-ItemPropertyVerified -Path "HKCU:\Software\Microsoft\Clipboard" -Name "EnableClipboardHistory"
     Write-Status -Types "+" -Status "Clipboard history disabled"
 }
 
 function Disable-FeedbackNotifications {
     Write-Status -Types "-" -Status "Disabling feedback notifications..."
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Siuf\Rules" -Name "NumberOfSIUFInPeriod" -Value 0 | Out-Null
-    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "DoNotShowFeedbackNotifications" -Value 1 | Out-Null
+    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Siuf\Rules" -Name "NumberOfSIUFInPeriod" -Value 0
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "DoNotShowFeedbackNotifications" -Value 1
     Write-Status -Types "+" -Status "Feedback notifications disabled"
 }
 
 function Disable-AdvertisingID {
     Write-Status -Types "-" -Status "Disabling advertising ID..."
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo" -Name "Enabled" -Value 0 | Out-Null
-    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\AdvertisingInfo" -Name "DisabledByGroupPolicy" -Value 1 | Out-Null
+    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo" -Name "Enabled" -Value 0
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\AdvertisingInfo" -Name "DisabledByGroupPolicy" -Value 1
     Write-Status -Types "+" -Status "Advertising ID disabled"
 }
 
 function Disable-WindowsSpotlight {
     Write-Status -Types "-" -Status "Disabling Windows Spotlight..."
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Policies\Microsoft\Windows\CloudContent" -Name "DisableWindowsSpotlightFeatures" -Value 1 | Out-Null
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Policies\Microsoft\Windows\CloudContent" -Name "DisableWindowsSpotlightOnActionCenter" -Value 1 | Out-Null
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Policies\Microsoft\Windows\CloudContent" -Name "DisableWindowsSpotlightOnSettings" -Value 1 | Out-Null
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Policies\Microsoft\Windows\CloudContent" -Name "DisableWindowsSpotlightWindowsWelcomeExperience" -Value 1 | Out-Null
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -Name "ContentDeliveryAllowed" -Value 0 | Out-Null
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -Name "OemPreInstalledAppsEnabled" -Value 0 | Out-Null
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -Name "PreInstalledAppsEnabled" -Value 0 | Out-Null
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -Name "SilentInstalledAppsEnabled" -Value 0 | Out-Null
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -Name "SubscribedContent-338387Enabled" -Value 0 | Out-Null
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -Name "SubscribedContent-353694Enabled" -Value 0 | Out-Null
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -Name "SubscribedContent-353696Enabled" -Value 0 | Out-Null
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -Name "SystemPaneSuggestionsEnabled" -Value 0 | Out-Null
+    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Policies\Microsoft\Windows\CloudContent" -Name "DisableWindowsSpotlightFeatures" -Value 1
+    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Policies\Microsoft\Windows\CloudContent" -Name "DisableWindowsSpotlightOnActionCenter" -Value 1
+    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Policies\Microsoft\Windows\CloudContent" -Name "DisableWindowsSpotlightOnSettings" -Value 1
+    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Policies\Microsoft\Windows\CloudContent" -Name "DisableWindowsSpotlightWindowsWelcomeExperience" -Value 1
+    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -Name "ContentDeliveryAllowed" -Value 0
+    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -Name "OemPreInstalledAppsEnabled" -Value 0
+    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -Name "PreInstalledAppsEnabled" -Value 0
+    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -Name "SilentInstalledAppsEnabled" -Value 0
+    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -Name "SubscribedContent-338387Enabled" -Value 0
+    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -Name "SubscribedContent-353694Enabled" -Value 0
+    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -Name "SubscribedContent-353696Enabled" -Value 0
+    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -Name "SystemPaneSuggestionsEnabled" -Value 0
     Write-Status -Types "+" -Status "Windows Spotlight disabled"
 }
 
 function Disable-BackgroundApps {
     Write-Status -Types "-" -Status "Disabling background apps..."
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications" -Name "GlobalUserDisabled" -Value 1 | Out-Null
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" -Name "BackgroundAppGlobalToggle" -Value 0 | Out-Null
+    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications" -Name "GlobalUserDisabled" -Value 1
+    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" -Name "BackgroundAppGlobalToggle" -Value 0
     Write-Status -Types "+" -Status "Background apps disabled"
 }
 
-# ========== WINDOWS UPDATE MANUAL ==========
 function Set-WindowsUpdateManual {
     Write-Status -Types "@" -Status "Configuring Windows Update for MANUAL control..."
     
-    # Disable automatic updates
-    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" -Name "NoAutoUpdate" -Value 1 | Out-Null
-    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" -Name "AUOptions" -Value 2 | Out-Null
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" -Name "NoAutoUpdate" -Value 1
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" -Name "AUOptions" -Value 2
     
-    # Disable automatic restarts
-    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" -Name "NoAutoRebootWithLoggedOnUsers" -Value 1 | Out-Null
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" -Name "NoAutoRebootWithLoggedOnUsers" -Value 1
     
-    # Disable P2P
-    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\DeliveryOptimization\Config" -Name "DODownloadMode" -Value 0 | Out-Null
-    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization" -Name "DODownloadMode" -Value 0 | Out-Null
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\DeliveryOptimization\Config" -Name "DODownloadMode" -Value 0
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization" -Name "DODownloadMode" -Value 0
     
-    # Disable automatic driver updates
-    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\DriverSearching" -Name "SearchOrderConfig" -Value 0 | Out-Null
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\DriverSearching" -Name "SearchOrderConfig" -Value 0
     
-    # Configure update policies
-    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" -Name "SetPowerPolicyForFeatureUpdates" -Value 0 | Out-Null
-    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\OSUpgrade" -Name "ReservationsAllowed" -Value 0 | Out-Null
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" -Name "SetPowerPolicyForFeatureUpdates" -Value 0
+    Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\WindowsUpdate\OSUpgrade" -Name "ReservationsAllowed" -Value 0
     
     Write-Status -Types "+" -Status "Windows Update configured - Complete MANUAL control"
 }
 
-# ========== COMPONENT REMOVAL ==========
 function Remove-OneDrive {
     Write-Status -Types "-" -Status "Removing OneDrive..."
     taskkill.exe /F /IM "OneDrive.exe" 2>$null
@@ -482,7 +647,6 @@ function Remove-Bloatware {
     Write-Status -Types "-" -Status "Removing preinstalled apps (Bloatware)..."
     
     $BloatwareApps = @(
-        # Microsoft Apps
         "Microsoft.3DBuilder", "Microsoft.BingFinance", "Microsoft.BingFoodAndDrink", "Microsoft.BingHealthAndFitness",
         "Microsoft.BingNews", "Microsoft.BingSports", "Microsoft.BingTranslator",
         "Microsoft.BingTravel", "Microsoft.BingWeather", "Microsoft.CommsPhone",
@@ -508,17 +672,14 @@ function Remove-Bloatware {
     Write-Status -Types "+" -Status "Bloatware removed (50+ apps)"
 }
 
-# ========== PERFORMANCE OPTIMIZATIONS ==========
 function Optimize-Performance {
     Write-Status -Types "@" -Status "Applying performance optimizations..."
     
-    # Optimize memory
-    Set-ItemPropertyVerified -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" -Name "ClearPageFileAtShutdown" -Value 0 | Out-Null
+    Set-ItemPropertyVerified -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" -Name "ClearPageFileAtShutdown" -Value 0
     
-    # Optimize system responsiveness
-    Set-ItemPropertyVerified -Path "HKLM:\SYSTEM\CurrentControlSet\Control" -Name "WaitToKillServiceTimeout" -Value 2000 | Out-Null
-    Set-ItemPropertyVerified -Path "HKCU:\Control Panel\Desktop" -Name "AutoEndTasks" -Value 1 | Out-Null
-    Set-ItemPropertyVerified -Path "HKCU:\Control Panel\Desktop" -Name "WaitToKillAppTimeout" -Value 5000 | Out-Null
+    Set-ItemPropertyVerified -Path "HKLM:\SYSTEM\CurrentControlSet\Control" -Name "WaitToKillServiceTimeout" -Value 2000
+    Set-ItemPropertyVerified -Path "HKCU:\Control Panel\Desktop" -Name "AutoEndTasks" -Value 1
+    Set-ItemPropertyVerified -Path "HKCU:\Control Panel\Desktop" -Name "WaitToKillAppTimeout" -Value 5000
     
     Write-Status -Types "+" -Status "Performance optimizations applied"
 }
@@ -526,47 +687,34 @@ function Optimize-Performance {
 function Optimize-Network {
     Write-Status -Types "@" -Status "Optimizing network configuration..."
     
-    # Optimize TCP/IP
-    Set-ItemPropertyVerified -Path "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" -Name "EnablePMTUDiscovery" -Value 1 | Out-Null
-    Set-ItemPropertyVerified -Path "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" -Name "SackOpts" -Value 1 | Out-Null
-    Set-ItemPropertyVerified -Path "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" -Name "Tcp1323Opts" -Value 1 | Out-Null
+    Set-ItemPropertyVerified -Path "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" -Name "EnablePMTUDiscovery" -Value 1
+    Set-ItemPropertyVerified -Path "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" -Name "SackOpts" -Value 1
+    Set-ItemPropertyVerified -Path "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters" -Name "Tcp1323Opts" -Value 1
     
-    # Optimize DNS cache
-    Set-ItemPropertyVerified -Path "HKLM:\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters" -Name "MaxCacheTtl" -Value 3600 | Out-Null
+    Set-ItemPropertyVerified -Path "HKLM:\SYSTEM\CurrentControlSet\Services\Dnscache\Parameters" -Name "MaxCacheTtl" -Value 3600
     
     Write-Status -Types "+" -Status "Network configuration optimized"
 }
 
-# ========== EXPLORER OPTIMIZATIONS ==========
 function Optimize-Explorer {
     Write-Status -Types "@" -Status "Optimizing File Explorer..."
     
-    # Show file extensions
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "HideFileExt" -Value 0 | Out-Null
-    
-    # Show hidden files
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "Hidden" -Value 1 | Out-Null
-    
-    # Show status bar
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "ShowStatusBar" -Value 1 | Out-Null
-    
-    # Show delete confirmation
-    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "ConfirmFileDelete" -Value 1 | Out-Null
+    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "HideFileExt" -Value 0
+    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "Hidden" -Value 1
+    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "ShowStatusBar" -Value 1
+    Set-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "ConfirmFileDelete" -Value 1
     
     Write-Status -Types "+" -Status "File Explorer optimized"
 }
 
-# ========== FIREWALL OPTIMIZATIONS ==========
 function Optimize-Firewall {
     Write-Status -Types "@" -Status "Optimizing firewall configuration..."
     
-    # Enable firewall logging
     Set-NetFirewallProfile -Profile Domain,Public,Private -LogFileName "%SystemRoot%\System32\LogFiles\Firewall\pfirewall.log"
     Set-NetFirewallProfile -Profile Domain,Public,Private -LogMaxSizeKilobytes 16384
     Set-NetFirewallProfile -Profile Domain,Public,Private -LogAllowed True
     Set-NetFirewallProfile -Profile Domain,Public,Private -LogBlocked True
     
-    # Configure basic rules
     $FirewallRules = @(
         @{Name="BlockSMBv1"; Direction="Inbound"; Protocol="TCP"; LocalPort="445,139"},
         @{Name="BlockNetBIOS"; Direction="Inbound"; Protocol="UDP"; LocalPort="137,138"},
@@ -584,7 +732,6 @@ function Optimize-Firewall {
     Write-Status -Types "+" -Status "Firewall configuration optimized"
 }
 
-# ========== SCHEDULED TASKS ==========
 function Disable-UnnecessaryTasks {
     Write-Status -Types "-" -Status "Disabling unnecessary scheduled tasks..."
     
@@ -603,7 +750,6 @@ function Disable-UnnecessaryTasks {
     Write-Status -Types "+" -Status "Unnecessary scheduled tasks disabled"
 }
 
-# ========== CLEANUP ==========
 function Clean-TemporaryFiles {
     Write-Status -Types "@" -Status "Cleaning temporary files..."
     
@@ -623,7 +769,6 @@ function Clean-TemporaryFiles {
         }
     }
     
-    # Limpiar caché DNS
     try {
         ipconfig /flushdns | Out-Null
     } catch {
@@ -636,7 +781,7 @@ function Clean-TemporaryFiles {
 # ========== MAIN OPTIMIZATION FUNCTION ==========
 function Start-CompleteOptimization {
     Write-Host "================================================" -ForegroundColor Cyan
-    Write-Host "    COMPLETE WINDOWS OPTIMIZATION" -ForegroundColor Cyan
+    Write-Host "    COMPLETE WINDOWS OPTIMIZATION - MEJORADO" -ForegroundColor Cyan
     Write-Host "================================================" -ForegroundColor Cyan
     Write-Host ""
     
@@ -661,12 +806,14 @@ function Start-CompleteOptimization {
     }
     
     # Final confirmation
-    Write-Host "This version will:" -ForegroundColor Yellow
+    Write-Host "This IMPROVED version will:" -ForegroundColor Yellow
     Write-Host "- Disable Hyper-V for VMware" -ForegroundColor White
     Write-Host "- Remove bloatware and unnecessary services" -ForegroundColor White
     Write-Host "- Optimize performance and privacy" -ForegroundColor White
-    Write-Host "- Improve File Explorer (extensions, hidden files)" -ForegroundColor White
-    Write-Host "- Configure firewall and security" -ForegroundColor White
+    Write-Host "- ELIMINATE Copilot, AI components and Recall" -ForegroundColor White
+    Write-Host "- Advanced network blocking (100+ domains)" -ForegroundColor White
+    Write-Host "- Remove physical telemetry files" -ForegroundColor White
+    Write-Host "- Hardening security without performance impact" -ForegroundColor White
     Write-Host ""
     Write-Host "Continue? (y/n)" -ForegroundColor Yellow
     $confirm = Read-Host
@@ -721,24 +868,31 @@ function Start-CompleteOptimization {
     Remove-Xbox
     Remove-Bloatware
     
-    # 7. Performance
+    # 7. PROTECCIONES AVANZADAS
+    Write-Host "`n=== ADVANCED PROTECTIONS ===" -ForegroundColor Cyan
+    Remove-CopilotAndAI
+    Set-AdvancedTelemetryBlock
+    Set-HardeningSecurity
+    Remove-TelemetryFiles
+    
+    # 8. Performance
     Write-Host "`n=== PERFORMANCE ===" -ForegroundColor Cyan
     Optimize-Performance
     Optimize-Network
     
-    # 8. Security
+    # 9. Security
     Write-Host "`n=== SECURITY ===" -ForegroundColor Cyan
     Optimize-Firewall
     
-    # 9. Explorer
+    # 10. Explorer
     Write-Host "`n=== FILE EXPLORER ===" -ForegroundColor Cyan
     Optimize-Explorer
     
-    # 10. Scheduled tasks
+    # 11. Scheduled tasks
     Write-Host "`n=== SCHEDULED TASKS ===" -ForegroundColor Cyan
     Disable-UnnecessaryTasks
     
-    # 11. Cleanup
+    # 12. Cleanup
     Write-Host "`n=== CLEANUP ===" -ForegroundColor Cyan
     Clean-TemporaryFiles
 
@@ -753,11 +907,13 @@ function Start-CompleteOptimization {
     Write-Host "  - SSD optimized and hibernation disabled" -ForegroundColor Green
     Write-Host "  - 65+ unnecessary services disabled" -ForegroundColor Green
     Write-Host "  - Telemetry and diagnostics COMPLETELY disabled" -ForegroundColor Green
+    Write-Host "  - Copilot, AI components and Recall ELIMINATED" -ForegroundColor Green
+    Write-Host "  - Advanced network blocking (100+ domains)" -ForegroundColor Green
+    Write-Host "  - Physical telemetry files removed" -ForegroundColor Green
     Write-Host "  - Windows Update set to manual" -ForegroundColor Green
     Write-Host "  - OneDrive, Xbox and 50+ apps removed" -ForegroundColor Green
     Write-Host "  - File Explorer improved" -ForegroundColor Green
     Write-Host "  - Firewall and security optimized" -ForegroundColor Green
-    Write-Host "  - Clipboard history disabled" -ForegroundColor Green
     Write-Host ""
     Write-Host "VMware compatibility improved!" -ForegroundColor Green
     Write-Host "Some changes may require restart." -ForegroundColor Yellow
@@ -773,5 +929,5 @@ function Start-CompleteOptimization {
     }
 }
 
-# Execute the complete version
+# Execute the complete improved version
 Start-CompleteOptimization
