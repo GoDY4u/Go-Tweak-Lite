@@ -135,7 +135,7 @@
 Run this command in **PowerShell (Administrator)**:
 
 ```powershell
-powershell -ExecutionPolicy Bypass -Command "irm https://raw.githubusercontent.com/YourRepo/Go-Tweak/main/install.ps1 | iex"
+irm https://raw.githubusercontent.com/GoDY4u/Go-Tweak-Lite/main/install.ps1 | iex
 ```
 
 ### Manual Installation
