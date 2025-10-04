@@ -116,23 +116,70 @@ try {
         }
     }
     
-    # CORREGIR ERRORES EN EL ARCHIVO PRINCIPAL
-    Write-Host "🔧 Fixing errors in Go-Tweak.ps1..." -ForegroundColor Cyan
+    # DESCARGAR EL SCRIPT PRINCIPAL CON CODIFICACIÓN CORRECTA
+    Write-Host "📥 Downloading main script with correct encoding..." -ForegroundColor Cyan
+    $mainScriptUrl = "https://raw.githubusercontent.com/GoDY4u/Go-Tweak-Lite/main/Go-Tweak.ps1"
     $mainScriptPath = Join-Path $installPath "Go-Tweak.ps1"
     
+    try {
+        # Usar WebClient para mejor manejo de codificación
+        $webClient = New-Object System.Net.WebClient
+        $webClient.Encoding = [System.Text.Encoding]::UTF8
+        $scriptContent = $webClient.DownloadString($mainScriptUrl)
+        
+        # Guardar con codificación UTF-8 con BOM (para PowerShell)
+        $utf8WithBom = New-Object System.Text.UTF8Encoding($true)
+        [System.IO.File]::WriteAllText($mainScriptPath, $scriptContent, $utf8WithBom)
+        
+        Write-Host "✅ Main script downloaded with UTF-8 encoding" -ForegroundColor Green
+    } catch {
+        Write-Host "⚠️  Using alternative download method..." -ForegroundColor Yellow
+        # Método alternativo si falla el primero
+        try {
+            Invoke-WebRequest -Uri $mainScriptUrl -OutFile $mainScriptPath -UseBasicParsing
+            Write-Host "✅ Main script downloaded (alternative method)" -ForegroundColor Green
+        } catch {
+            Write-Host "❌ Failed to download main script" -ForegroundColor Red
+        }
+    }
+    
+    # VERIFICAR Y CORREGIR CODIFICACIÓN SI ES NECESARIO
+    Write-Host "🔍 Verifying script encoding..." -ForegroundColor Cyan
     if (Test-Path $mainScriptPath) {
-        # Leer el contenido del archivo
         $content = Get-Content -Path $mainScriptPath -Raw
         
-        # CORREGIR ERROR 1: Expresión regular mal formada
-        $content = $content -replace '\(\{\[a-fA-F0-9\\-\]\+\}\)', '(\{[a-fA-F0-9\-]+\})'
+        # Verificar si hay caracteres corruptos
+        $hasCorruptedChars = $content -match '[Ã¡Ã©Ã­Ã³ÃºÃ±ÃÃ‰ÃÃ“ÃšÃ‘]' -or $content -match 'â€'
         
-        # CORREGIR ERROR 2: Caracteres corruptos
-        $content = $content -replace 'âŒ', '❌'
-        
-        # Guardar el archivo corregido
-        Set-Content -Path $mainScriptPath -Value $content -Force
-        Write-Host "✅ Script errors fixed" -ForegroundColor Green
+        if ($hasCorruptedChars) {
+            Write-Host "🔄 Fixing corrupted characters..." -ForegroundColor Yellow
+            
+            # Reemplazar caracteres corruptos comunes
+            $content = $content -replace 'Ã¡', 'á'
+            $content = $content -replace 'Ã©', 'é'
+            $content = $content -replace 'Ã­', 'í'
+            $content = $content -replace 'Ã³', 'ó'
+            $content = $content -replace 'Ãº', 'ú'
+            $content = $content -replace 'Ã±', 'ñ'
+            $content = $content -replace 'Ã', 'Á'
+            $content = $content -replace 'Ã‰', 'É'
+            $content = $content -replace 'Ã', 'Í'
+            $content = $content -replace 'Ã“', 'Ó'
+            $content = $content -replace 'Ãš', 'Ú'
+            $content = $content -replace 'Ã‘', 'Ñ'
+            $content = $content -replace 'â€œ', '"'
+            $content = $content -replace 'â€', '"'
+            $content = $content -replace 'â€™', "'"
+            $content = $content -replace 'â€¦', '...'
+            
+            # Guardar con codificación correcta
+            $utf8WithBom = New-Object System.Text.UTF8Encoding($true)
+            [System.IO.File]::WriteAllText($mainScriptPath, $content, $utf8WithBom)
+            
+            Write-Host "✅ Character encoding fixed" -ForegroundColor Green
+        } else {
+            Write-Host "✅ Script encoding is correct" -ForegroundColor Green
+        }
     }
     
     Write-Host "✅ Installation complete!" -ForegroundColor Green
@@ -153,7 +200,15 @@ try {
     
     # Ejecutar el script principal
     if (Test-Path $mainScriptPath) {
+        # Verificar encoding final
+        $finalContent = Get-Content -Path $mainScriptPath -Raw -Encoding UTF8
+        if ($finalContent -match '[Ã¡Ã©Ã­Ã³ÃºÃ±]') {
+            Write-Host "⚠️  Warning: Some characters may still be corrupted" -ForegroundColor Yellow
+            Write-Host "💡 Tip: Download the script manually from GitHub for best results" -ForegroundColor Cyan
+        }
+        
         # Ejecutar el script
+        Write-Host "🚀 Launching Go-Tweak.ps1..." -ForegroundColor Green
         PowerShell -ExecutionPolicy Bypass -File "Go-Tweak.ps1"
     } else {
         Write-Host "❌ Main script not found: Go-Tweak.ps1" -ForegroundColor Red
