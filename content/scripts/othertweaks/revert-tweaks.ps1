@@ -1,5 +1,5 @@
 # ========== SCRIPT DE REVERSIÓN ==========
-# Deshace todos los cambios del script de optimización
+# Revierte la mayoría de cambios del script de optimización
 
 function Write-Status {
     param([string]$Types, [string]$Status)
@@ -7,403 +7,411 @@ function Write-Status {
         "*+*" { "Green" }
         "*-*" { "Yellow" }
         "*@*" { "Cyan" }
+        "*?*" { "Magenta" }
         default { "White" }
     }
     Write-Host "[$Types] $Status" -ForegroundColor $color
 }
 
-function Remove-ItemPropertyVerified {
-    param([string]$Path, [string]$Name)
-    try {
-        if (Test-Path $Path) {
-            Remove-ItemProperty -Path $Path -Name $Name -ErrorAction SilentlyContinue
-            return $true
-        }
-        return $false
-    } catch {
-        return $false
-    }
-}
-
-function Set-ServiceStartup {
+function Enable-ServiceStartup {
     param([string[]]$ServiceNames, [string]$StartupType = "Automatic")
     foreach ($service in $ServiceNames) {
         try {
             if (Get-Service -Name $service -ErrorAction SilentlyContinue) {
-                Set-Service -Name $service -StartupType $StartupType -ErrorAction SilentlyContinue
+                Set-Service -Name $service -StartupType $StartupType -ErrorAction SilentlyContinue | Out-Null
+                Write-Status -Types "+" -Status "Servicio $service configurado como $StartupType"
             }
         } catch {
-            # Ignore errors
+            Write-Status -Types "?" -Status "No se pudo configurar servicio $service"
         }
     }
 }
 
-function Set-ScheduledTaskState {
-    param([string[]]$TaskNames, [string]$State = "Enable")
-    foreach ($task in $TaskNames) {
-        try {
-            if ($State -eq "Enable") {
-                Enable-ScheduledTask -TaskName $task -ErrorAction SilentlyContinue
-            } else {
-                Disable-ScheduledTask -TaskName $task -ErrorAction SilentlyContinue
-            }
-        } catch {
-            # Ignore errors
-        }
-    }
-}
-
-# ========== REVERT HYPER-V ==========
-function Enable-HyperV {
-    Write-Status -Types "+" -Status "Re-enabling Hyper-V..."
+function Restore-HyperV {
+    Write-Status -Types "@" -Status "Restaurando Hyper-V..."
     
-    # Habilitar Hyper-V en el arranque
     try {
         bcdedit /set hypervisorlaunchtype auto 2>$null
-        Write-Status -Types "+" -Status "Hyper-V launch enabled in boot configuration"
+        Write-Status -Types "+" -Status "Hyper-V habilitado en configuración de arranque"
     } catch {
-        Write-Status -Types "?" -Status "Could not modify boot configuration"
+        Write-Status -Types "?" -Status "No se pudo modificar configuración de arranque"
     }
     
-    Write-Status -Types "+" -Status "Hyper-V re-enabled"
-}
-
-# ========== REVERT SSD OPTIMIZATIONS ==========
-function Revert-SSDOptimizations {
-    Write-Status -Types "+" -Status "Reverting SSD optimizations..."
-    fsutil behavior set DisableLastAccess 0 | Out-Null
-    fsutil behavior set EncryptPagingFile 1 | Out-Null
-    Write-Status -Types "+" -Status "SSD optimizations reverted"
+    $HyperVServices = @(
+        "HvHost",
+        "vmickvpexchange", 
+        "vmicguestinterface",
+        "vmicshutdown",
+        "vmicheartbeat",
+        "vmicvmsession",
+        "vmicrdv",
+        "vmictimesync"
+    )
+    
+    Enable-ServiceStartup -ServiceNames $HyperVServices -StartupType "Manual"
+    Write-Status -Types "+" -Status "Servicios Hyper-V restaurados"
 }
 
 function Enable-Hibernate {
-    Write-Status -Types "+" -Status "Enabling hibernation..."
+    Write-Status -Types "+" -Status "Habilitando hibernación..."
     powercfg -Hibernate on | Out-Null
-    Write-Status -Types "+" -Status "Hibernation enabled"
+    Write-Status -Types "+" -Status "Hibernación habilitada"
 }
 
-# ========== REVERT SERVICES ==========
-function Enable-IntelLMS {
-    Write-Status -Types "+" -Status "Enabling Intel LMS..."
-    Set-Service -Name "LMS" -StartupType Automatic -ErrorAction SilentlyContinue
-    Start-Service -Name "LMS" -ErrorAction SilentlyContinue
-    Write-Status -Types "+" -Status "Intel LMS enabled"
+function Restore-SSDDefaults {
+    Write-Status -Types "@" -Status "Restaurando configuración SSD por defecto..."
+    fsutil behavior set DisableLastAccess 0 | Out-Null
+    fsutil behavior set EncryptPagingFile 1 | Out-Null
+    Write-Status -Types "+" -Status "Configuración SSD restaurada"
 }
 
-function Revert-AdobeServices {
-    Write-Status -Types "+" -Status "Reverting Adobe services block..."
-    $CCPath = "C:\Program Files (x86)\Common Files\Adobe\Adobe Desktop Common\ADS\Adobe Desktop Service.exe.old"
-    if (Test-Path $CCPath) {
-        Rename-Item -Path $CCPath -NewName "Adobe Desktop Service.exe" -Force
-        Write-Status -Types "+" -Status "Adobe Desktop Service restored"
-    }
+function Restore-Services {
+    Write-Status -Types "@" -Status "Restaurando servicios del sistema..."
     
-    # Limpiar hosts file
-    $hostsFile = "$env:SystemRoot\System32\drivers\etc\hosts"
-    $adobeDomains = @(
-        "0.0.0.0 cc-api-data.adobe.io",
-        "0.0.0.0 ic.adobe.io", 
-        "0.0.0.0 p13n.adobe.io",
-        "0.0.0.0 prod.adobegenuine.com"
+    # Servicios para habilitar en Automático
+    $ServicesToAuto = @(
+        "DiagTrack", "dmwappushservice", "WSearch",
+        "FontCache", "BITS", "PhoneSvc", "WMPNetworkSvc"
     )
     
-    $content = Get-Content $hostsFile -ErrorAction SilentlyContinue
-    $newContent = $content | Where-Object { $adobeDomains -notcontains $_ }
-    Set-Content -Path $hostsFile -Value $newContent -ErrorAction SilentlyContinue
+    # Servicios para habilitar en Manual
+    $ServicesToManual = @(
+        "Fax", "fhsvc", "GraphicsPerfSvc", "HomeGroupListener", 
+        "HomeGroupProvider", "lfsvc", "MapsBroker", "PcaSvc",
+        "RemoteAccess", "RemoteRegistry", "TrkWks", "XblAuthManager",
+        "XblGameSave", "XboxGipSvc", "XboxNetApiSvc"
+    )
     
-    Write-Status -Types "+" -Status "Adobe domains unblocked"
+    Enable-ServiceStartup -ServiceNames $ServicesToAuto -StartupType "Automatic"
+    Enable-ServiceStartup -ServiceNames $ServicesToManual -StartupType "Manual"
+    Write-Status -Types "+" -Status "Servicios del sistema restaurados"
 }
 
-function Enable-TeredoIPv6 {
-    Write-Status -Types "+" -Status "Enabling Teredo and IPv6..."
-    netsh interface teredo set state default
+function Restore-PrivacySettings {
+    Write-Status -Types "@" -Status "Restaurando configuración de privacidad..."
+    
+    # Restaurar telemetría
+    Remove-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "AllowTelemetry" -ErrorAction SilentlyContinue
+    Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" -Name "AllowTelemetry" -ErrorAction SilentlyContinue
+    
+    # Restaurar Cortana
+    Remove-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search" -Name "AllowCortana" -ErrorAction SilentlyContinue
+    Remove-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search" -Name "AllowCloudSearch" -ErrorAction SilentlyContinue
+    
+    # Restaurar ubicación
+    Remove-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors" -Name "DisableLocation" -ErrorAction SilentlyContinue
+    
+    # Restaurar reporte de errores
+    Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting" -Name "Disabled" -ErrorAction SilentlyContinue
+    
+    # Restaurar experiencias personalizadas
+    Remove-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Privacy" -Name "TailoredExperiencesWithDiagnosticDataEnabled" -ErrorAction SilentlyComplete
+    
+    Write-Status -Types "+" -Status "Configuración de privacidad restaurada"
+}
+
+function Restore-WindowsUpdate {
+    Write-Status -Types "@" -Status "Restaurando Windows Update automático..."
+    
+    # Eliminar políticas de update
+    Remove-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" -Name "NoAutoUpdate" -ErrorAction SilentlyContinue
+    Remove-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" -Name "AUOptions" -ErrorAction SilentlyContinue
+    Remove-ItemProperty -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" -Name "NoAutoRebootWithLoggedOnUsers" -ErrorAction SilentlyContinue
+    
+    # Restaurar búsqueda de drivers
+    Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\DriverSearching" -Name "SearchOrderConfig" -ErrorAction SilentlyContinue
+    
+    Write-Status -Types "+" -Status "Windows Update automático restaurado"
+}
+
+function Restore-NetworkSettings {
+    Write-Status -Types "@" -Status "Restaurando configuración de red..."
+    
+    # Habilitar IPv6
     Enable-NetAdapterBinding -Name "*" -ComponentID ms_tcpip6
-    Write-Status -Types "+" -Status "Teredo and IPv6 enabled"
-}
-
-function Revert-Services {
-    Write-Status -Types "+" -Status "Reverting service changes..."
     
-    # Services to re-enable
-    $ServicesToEnable = @(
-        "DiagTrack", "dmwappushservice", "MapsBroker", "RemoteAccess", 
-        "RemoteRegistry", "WSearch", "XblAuthManager", "XblGameSave", 
-        "XboxGipSvc", "XboxNetApiSvc", "WpnService"
-    )
+    # Restaurar Teredo
+    netsh interface teredo set state type=default
     
-    Set-ServiceStartup -ServiceNames $ServicesToEnable -StartupType "Automatic"
-    
-    # Start essential services
-    $ServicesToStart = @("DiagTrack", "WSearch", "WpnService")
-    foreach ($service in $ServicesToStart) {
-        try {
-            Start-Service -Name $service -ErrorAction SilentlyContinue
-        } catch { }
-    }
-    
-    Write-Status -Types "+" -Status "Services reverted to default"
-}
-
-# ========== REVERT PRIVACY SETTINGS ==========
-function Enable-Diagnostics {
-    Write-Status -Types "+" -Status "Re-enabling diagnostics..."
-    
-    # Remover políticas restrictivas
-    Remove-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "AllowTelemetry"
-    Remove-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection" -Name "AllowTelemetry"
-    Remove-ItemPropertyVerified -Path "HKLM:\SOFTWARE\WOW6432Node\Microsoft\Windows\CurrentVersion\Policies\DataCollection" -Name "AllowTelemetry"
-    
-    # Re-enable error reporting
-    Remove-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Microsoft\Windows\Windows Error Reporting" -Name "Disabled"
-    Remove-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Error Reporting" -Name "DisableWindowsErrorReporting"
-    
-    # Re-enable services
-    Set-Service -Name "DiagTrack" -StartupType Automatic -ErrorAction SilentlyContinue
-    Set-Service -Name "dmwappushservice" -StartupType Automatic -ErrorAction SilentlyContinue
-    Start-Service -Name "DiagTrack" -ErrorAction SilentlyContinue
-    Start-Service -Name "dmwappushservice" -ErrorAction SilentlyContinue
-    
-    Write-Status -Types "+" -Status "Diagnostics re-enabled"
-}
-
-function Enable-Cortana {
-    Write-Status -Types "+" -Status "Enabling Cortana..."
-    Remove-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search" -Name "AllowCortana"
-    Remove-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search" -Name "AllowCloudSearch"
-    Remove-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search" -Name "ConnectedSearchUseWeb"
-    Remove-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\Windows Search" -Name "DisableWebSearch"
-    Write-Status -Types "+" -Status "Cortana enabled"
-}
-
-function Enable-ActivityHistory {
-    Write-Status -Types "+" -Status "Enabling Activity History..."
-    Remove-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Name "EnableActivityFeed"
-    Remove-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Name "PublishUserActivities"
-    Remove-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Name "UploadUserActivities"
-    Write-Status -Types "+" -Status "Activity history enabled"
-}
-
-function Enable-LocationTracking {
-    Write-Status -Types "+" -Status "Enabling location tracking..."
-    Remove-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors" -Name "DisableLocation"
-    Remove-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors" -Name "DisableLocationScripting"
-    Remove-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\LocationAndSensors" -Name "DisableWindowsLocationProvider"
-    Write-Status -Types "+" -Status "Location tracking enabled"
-}
-
-function Enable-OnlineSpeechRecognition {
-    Write-Status -Types "+" -Status "Enabling online speech recognition..."
-    Remove-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\InputPersonalization" -Name "AllowInputPersonalization"
-    Write-Status -Types "+" -Status "Online speech recognition enabled"
-}
-
-function Enable-ClipboardHistory {
-    Write-Status -Types "+" -Status "Enabling clipboard history..."
-    Remove-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System" -Name "AllowClipboardHistory"
-    Remove-ItemPropertyVerified -Path "HKCU:\Software\Microsoft\Clipboard" -Name "EnableClipboardHistory"
-    Write-Status -Types "+" -Status "Clipboard history enabled"
-}
-
-function Enable-FeedbackNotifications {
-    Write-Status -Types "+" -Status "Enabling feedback notifications..."
-    Remove-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Siuf\Rules" -Name "NumberOfSIUFInPeriod"
-    Remove-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DataCollection" -Name "DoNotShowFeedbackNotifications"
-    Write-Status -Types "+" -Status "Feedback notifications enabled"
-}
-
-function Enable-AdvertisingID {
-    Write-Status -Types "+" -Status "Enabling advertising ID..."
-    Remove-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\AdvertisingInfo" -Name "Enabled"
-    Remove-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\AdvertisingInfo" -Name "DisabledByGroupPolicy"
-    Write-Status -Types "+" -Status "Advertising ID enabled"
-}
-
-function Enable-WindowsSpotlight {
-    Write-Status -Types "+" -Status "Enabling Windows Spotlight..."
-    Remove-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Policies\Microsoft\Windows\CloudContent" -Name "DisableWindowsSpotlightFeatures"
-    Remove-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Policies\Microsoft\Windows\CloudContent" -Name "DisableWindowsSpotlightOnActionCenter"
-    Remove-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Policies\Microsoft\Windows\CloudContent" -Name "DisableWindowsSpotlightOnSettings"
-    Remove-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Policies\Microsoft\Windows\CloudContent" -Name "DisableWindowsSpotlightWindowsWelcomeExperience"
-    
-    # Restaurar valores por defecto
-    Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -Name "ContentDeliveryAllowed" -Value 1 -ErrorAction SilentlyContinue
-    Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -Name "OemPreInstalledAppsEnabled" -Value 1 -ErrorAction SilentlyContinue
-    Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -Name "PreInstalledAppsEnabled" -Value 1 -ErrorAction SilentlyContinue
-    
-    Write-Status -Types "+" -Status "Windows Spotlight enabled"
-}
-
-function Enable-BackgroundApps {
-    Write-Status -Types "+" -Status "Enabling background apps..."
-    Remove-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications" -Name "GlobalUserDisabled"
-    Remove-ItemPropertyVerified -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Search" -Name "BackgroundAppGlobalToggle"
-    Write-Status -Types "+" -Status "Background apps enabled"
-}
-
-# ========== REVERT WINDOWS UPDATE ==========
-function Set-WindowsUpdateAuto {
-    Write-Status -Types "+" -Status "Setting Windows Update to automatic..."
-    
-    # Remover políticas
-    Remove-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" -Name "NoAutoUpdate"
-    Remove-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate\AU" -Name "AUOptions"
-    Remove-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsUpdate" -Name "NoAutoRebootWithLoggedOnUsers"
-    
-    # Re-enable P2P
-    Remove-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\DeliveryOptimization\Config" -Name "DODownloadMode"
-    Remove-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\DeliveryOptimization" -Name "DODownloadMode"
-    
-    Write-Status -Types "+" -Status "Windows Update set to automatic"
-}
-
-# ========== REVERT FIREWALL ==========
-function Revert-Firewall {
-    Write-Status -Types "+" -Status "Reverting firewall changes..."
-    
-    # Remover reglas personalizadas
-    $FirewallRules = @("BlockSMBv1", "BlockNetBIOS", "BlockLLMNR")
-    
-    foreach ($rule in $FirewallRules) {
+    # Limpiar reglas de firewall personalizadas
+    $CustomFirewallRules = @("BlockSMBv1", "BlockNetBIOS", "BlockLLMNR", "BlockTelemetryOutbound", "BlockAIOutbound")
+    foreach ($rule in $CustomFirewallRules) {
         try {
             Remove-NetFirewallRule -DisplayName $rule -ErrorAction SilentlyContinue
         } catch {
-            # Ignore if rule doesn't exist
+            # Ignorar si no existe
         }
     }
     
-    Write-Status -Types "+" -Status "Firewall changes reverted"
+    Write-Status -Types "+" -Status "Configuración de red restaurada"
 }
 
-# ========== REVERT EXPLORER ==========
-function Revert-Explorer {
-    Write-Status -Types "+" -Status "Reverting File Explorer changes..."
+function Restore-ExplorerSettings {
+    Write-Status -Types "@" -Status "Restaurando File Explorer por defecto..."
     
     # Ocultar extensiones de archivo
     Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "HideFileExt" -Value 1 -ErrorAction SilentlyContinue
     
     # Ocultar archivos ocultos
-    Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "Hidden" -Value 2 -ErrorAction SilentlyContinue
+    Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "Hidden" -Value 0 -ErrorAction SilentlyContinue
     
-    Write-Status -Types "+" -Status "File Explorer settings reverted to default"
+    # Restaurar confirmación de eliminación
+    Set-ItemProperty -Path "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\Advanced" -Name "ConfirmFileDelete" -Value 1 -ErrorAction SilentlyContinue
+    
+    Write-Status -Types "+" -Status "File Explorer restaurado"
 }
 
-# ========== REVERT SCHEDULED TASKS ==========
 function Enable-ScheduledTasks {
-    Write-Status -Types "+" -Status "Re-enabling scheduled tasks..."
+    Write-Status -Types "@" -Status "Habilitando tareas programadas..."
     
     $TasksToEnable = @(
         "\Microsoft\Windows\Application Experience\Microsoft Compatibility Appraiser",
-        "\Microsoft\Windows\Application Experience\ProgramDataUpdater",
+        "\Microsoft\Windows\Application Experience\ProgramDataUpdater", 
+        "\Microsoft\Windows\Application Experience\StartupAppTask",
         "\Microsoft\Windows\Customer Experience Improvement Program\Consolidator",
         "\Microsoft\Windows\Customer Experience Improvement Program\KernelCeipTask",
-        "\Microsoft\Windows\Customer Experience Improvement Program\Uploader"
+        "\Microsoft\Windows\Customer Experience Improvement Program\Uploader",
+        "\Microsoft\Windows\Customer Experience Improvement Program\UsbCeip",
+        "\Microsoft\Windows\DiskDiagnostic\Microsoft-Windows-DiskDiagnosticDataCollector"
     )
     
-    Set-ScheduledTaskState -TaskNames $TasksToEnable -State "Enable"
-    Write-Status -Types "+" -Status "Scheduled tasks re-enabled"
+    foreach ($task in $TasksToEnable) {
+        try {
+            Enable-ScheduledTask -TaskName $task -ErrorAction SilentlyContinue | Out-Null
+        } catch {
+            # Ignorar errores
+        }
+    }
+    
+    Write-Status -Types "+" -Status "Tareas programadas habilitadas"
 }
 
-# ========== MAIN REVERT FUNCTION ==========
-function Start-RevertAll {
+function Restore-PerformanceSettings {
+    Write-Status -Types "@" -Status "Restaurando configuración de rendimiento..."
+    
+    # Restaurar timeout de servicios
+    Remove-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control" -Name "WaitToKillServiceTimeout" -ErrorAction SilentlyContinue
+    
+    # Restaurar configuración de memoria
+    Remove-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management" -Name "ClearPageFileAtShutdown" -ErrorAction SilentlyContinue
+    
+    Write-Status -Types "+" -Status "Configuración de rendimiento restaurada"
+}
+
+function Restore-SecuritySettings {
+    Write-Status -Types "@" -Status "Restaurando configuración de seguridad..."
+    
+    # Restaurar Windows Script Host
+    Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\Windows Script Host\Settings" -Name "Enabled" -ErrorAction SilentlyContinue
+    
+    # Restaurar política de ejecución PowerShell
+    Remove-ItemProperty -Path "HKLM:\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell" -Name "ExecutionPolicy" -ErrorAction SilentlyContinue
+    
+    Write-Status -Types "+" -Status "Configuración de seguridad restaurada"
+}
+
+function Clear-HostsFile {
+    Write-Status -Types "@" -Status "Limpiando archivo hosts..."
+    
+    $hostsFile = "$env:SystemRoot\System32\drivers\etc\hosts"
+    $backupHosts = "$env:SystemRoot\System32\drivers\etc\hosts.backup"
+    
+    try {
+        # Crear backup si no existe
+        if (-not (Test-Path $backupHosts)) {
+            Copy-Item $hostsFile $backupHosts -Force
+        }
+        
+        # Restaurar hosts original (solo líneas esenciales)
+        $originalContent = @"
+# Copyright (c) 1993-2009 Microsoft Corp.
+#
+# This is a sample HOSTS file used by Microsoft TCP/IP for Windows.
+#
+# This file contains the mappings of IP addresses to host names. Each
+# entry should be kept on an individual line. The IP address should
+# be placed in the first column followed by the corresponding host name.
+# The IP address and the host name should be separated by at least one
+# space.
+#
+# Additionally, comments (such as these) may be inserted on individual
+# lines or following the machine name denoted by a '#' symbol.
+#
+# For example:
+#
+#      102.54.94.97     rhino.acme.com          # source server
+#       38.25.63.10     x.acme.com              # x client host
+
+# localhost name resolution is handled within DNS itself.
+#	127.0.0.1       localhost
+#	::1             localhost
+"@
+        Set-Content -Path $hostsFile -Value $originalContent -Force
+        Write-Status -Types "+" -Status "Archivo hosts limpiado"
+    } catch {
+        Write-Status -Types "?" -Status "No se pudo limpiar archivo hosts"
+    }
+}
+
+function Restore-WindowsFeatures {
+    Write-Status -Types "@" -Status "Restaurando características de Windows..."
+    
+    $FeaturesToEnable = @(
+        "Internet-Explorer-Optional-amd64",
+        "MediaPlayback",
+        "XPS-Foundation-XPS-Viewer"
+    )
+    
+    foreach ($feature in $FeaturesToEnable) {
+        try {
+            Enable-WindowsOptionalFeature -Online -FeatureName $feature -NoRestart | Out-Null
+        } catch {
+            # Ignorar errores
+        }
+    }
+    
+    Write-Status -Types "+" -Status "Características de Windows restauradas"
+}
+
+function Restore-DefaultSettings {
+    Write-Status -Types "@" -Status "Restaurando configuraciones por defecto..."
+    
+    # Restaurar Adobe services
+    $CCPath = "C:\Program Files (x86)\Common Files\Adobe\Adobe Desktop Common\ADS\Adobe Desktop Service.exe.old"
+    $CCNewPath = "C:\Program Files (x86)\Common Files\Adobe\Adobe Desktop Common\ADS\Adobe Desktop Service.exe"
+    if (Test-Path $CCPath) {
+        try {
+            Rename-Item -Path $CCPath -NewName "Adobe Desktop Service.exe" -Force
+            Write-Status -Types "+" -Status "Adobe Desktop Service restaurado"
+        } catch {
+            Write-Status -Types "?" -Status "No se pudo restaurar Adobe Desktop Service"
+        }
+    }
+    
+    # Restaurar Intel LMS
+    try {
+        Set-Service -Name "LMS" -StartupType "Automatic" -ErrorAction SilentlyContinue
+        Start-Service -Name "LMS" -ErrorAction SilentlyContinue
+    } catch {
+        # Ignorar errores
+    }
+    
+    Write-Status -Types "+" -Status "Configuraciones por defecto restauradas"
+}
+
+# ========== FUNCIÓN PRINCIPAL ==========
+function Start-CompleteRestoration {
     Write-Host "================================================" -ForegroundColor Cyan
-    Write-Host "    REVERT WINDOWS OPTIMIZATIONS" -ForegroundColor Cyan
-    Write-Host "    Deshacer todos los cambios" -ForegroundColor Cyan
+    Write-Host "    RESTAURACIÓN DE CONFIGURACIÓN WINDOWS" -ForegroundColor Cyan
     Write-Host "================================================" -ForegroundColor Cyan
     Write-Host ""
     
-    # Check administrator permissions
+    # Verificar permisos de administrador
     if (-NOT ([Security.Principal.WindowsPrincipal] [Security.Principal.WindowsIdentity]::GetCurrent()).IsInRole([Security.Principal.WindowsBuiltInRole] "Administrator")) {
-        Write-Host "ERROR: This script requires Administrator permissions" -ForegroundColor Red
-        Write-Host "Run PowerShell as Administrator and try again" -ForegroundColor Yellow
+        Write-Host "ERROR: Este script requiere permisos de Administrador" -ForegroundColor Red
+        Write-Host "Ejecuta PowerShell como Administrador e intenta nuevamente" -ForegroundColor Yellow
         pause
         exit 1
     }
     
-    Write-Host "This will revert ALL optimizations to Windows defaults." -ForegroundColor Yellow
-    Write-Host "Continue? (y/n)" -ForegroundColor Yellow
+    # Confirmación final
+    Write-Host "Este script revertirá:" -ForegroundColor Yellow
+    Write-Host "- Configuración de Hyper-V y virtualización" -ForegroundColor White
+    Write-Host "- Servicios del sistema y tareas programadas" -ForegroundColor White
+    Write-Host "- Configuración de privacidad y telemetría" -ForegroundColor White
+    Write-Host "- Windows Update automático" -ForegroundColor White
+    Write-Host "- Configuración de red y firewall" -ForegroundColor White
+    Write-Host "- File Explorer por defecto" -ForegroundColor White
+    Write-Host ""
+    Write-Host "NOTA: Algunos cambios (apps eliminadas) pueden requerir reinstalación manual" -ForegroundColor Magenta
+    Write-Host ""
+    Write-Host "¿Continuar? (y/n)" -ForegroundColor Yellow
     $confirm = Read-Host
     
     if ($confirm -ne 'y' -and $confirm -ne 'Y') {
-        Write-Host "Reversion cancelled" -ForegroundColor Red
+        Write-Host "Restauración cancelada" -ForegroundColor Red
         exit 0
     }
     
+    # EJECUTAR RESTAURACIÓN
     Write-Host ""
-    Write-Host "REVERTING CHANGES..." -ForegroundColor Yellow
-    Write-Host "================================================" -ForegroundColor Yellow
+    Write-Host "INICIANDO RESTAURACIÓN..." -ForegroundColor Green
+    Write-Host "================================================" -ForegroundColor Green
     
     # 1. Hyper-V
-    Write-Host "`n=== HYPER-V ===" -ForegroundColor Cyan
-    Enable-HyperV
+    Write-Host "`n=== HYPER-V ====" -ForegroundColor Cyan
+    Restore-HyperV
     
-    # 2. System optimizations
-    Write-Host "`n=== SYSTEM OPTIMIZATIONS ===" -ForegroundColor Cyan
-    Revert-SSDOptimizations
+    # 2. Sistema
+    Write-Host "`n=== SISTEMA ====" -ForegroundColor Cyan
     Enable-Hibernate
+    Restore-SSDDefaults
+    Restore-PerformanceSettings
     
-    # 3. Services
-    Write-Host "`n=== SERVICES ===" -ForegroundColor Cyan
-    Enable-IntelLMS
-    Revert-AdobeServices
-    Enable-TeredoIPv6
-    Revert-Services
+    # 3. Servicios
+    Write-Host "`n=== SERVICIOS ====" -ForegroundColor Cyan
+    Restore-Services
+    Restore-DefaultSettings
     
-    # 4. Privacy
-    Write-Host "`n=== PRIVACY ===" -ForegroundColor Cyan
-    Enable-Diagnostics
-    Enable-Cortana
-    Enable-ActivityHistory
-    Enable-LocationTracking
-    Enable-OnlineSpeechRecognition
-    Enable-ClipboardHistory
-    Enable-FeedbackNotifications
-    Enable-AdvertisingID
-    Enable-WindowsSpotlight
-    Enable-BackgroundApps
+    # 4. Privacidad
+    Write-Host "`n=== PRIVACIDAD ====" -ForegroundColor Cyan
+    Restore-PrivacySettings
     
     # 5. Windows Update
-    Write-Host "`n=== WINDOWS UPDATE ===" -ForegroundColor Cyan
-    Set-WindowsUpdateAuto
+    Write-Host "`n=== WINDOWS UPDATE ====" -ForegroundColor Cyan
+    Restore-WindowsUpdate
     
-    # 6. Firewall
-    Write-Host "`n=== FIREWALL ===" -ForegroundColor Cyan
-    Revert-Firewall
+    # 6. Red
+    Write-Host "`n=== RED ====" -ForegroundColor Cyan
+    Restore-NetworkSettings
+    Clear-HostsFile
     
-    # 7. Explorer
-    Write-Host "`n=== FILE EXPLORER ===" -ForegroundColor Cyan
-    Revert-Explorer
+    # 7. Seguridad
+    Write-Host "`n=== SEGURIDAD ====" -ForegroundColor Cyan
+    Restore-SecuritySettings
     
-    # 8. Scheduled tasks
-    Write-Host "`n=== SCHEDULED TASKS ===" -ForegroundColor Cyan
+    # 8. Explorer
+    Write-Host "`n=== FILE EXPLORER ====" -ForegroundColor Cyan
+    Restore-ExplorerSettings
+    
+    # 9. Tareas programadas
+    Write-Host "`n=== TAREAS PROGRAMADAS ====" -ForegroundColor Cyan
     Enable-ScheduledTasks
-
-    # FINAL SUMMARY
-    Write-Host ""
-    Write-Host "================================================" -ForegroundColor Green
-    Write-Host "    REVERSION COMPLETED!" -ForegroundColor Green
-    Write-Host "================================================" -ForegroundColor Green
-    Write-Host ""
-    Write-Host "All optimizations have been reverted:" -ForegroundColor Yellow
-    Write-Host "  - Hyper-V re-enabled" -ForegroundColor White
-    Write-Host "  - Services restored to default" -ForegroundColor White
-    Write-Host "  - Privacy settings reset" -ForegroundColor White
-    Write-Host "  - Windows Update set to automatic" -ForegroundColor White
-    Write-Host "  - Firewall rules removed" -ForegroundColor White
-    Write-Host "  - File Explorer settings reset" -ForegroundColor White
-    Write-Host "  - Scheduled tasks re-enabled" -ForegroundColor White
-    Write-Host ""
-    Write-Host "Some changes require restart to fully apply." -ForegroundColor Yellow
     
-    $reboot = Read-Host "`nRestart now? (y/n)"
+    # 10. Características Windows
+    Write-Host "`n=== CARACTERÍSTICAS WINDOWS ====" -ForegroundColor Cyan
+    Restore-WindowsFeatures
+
+    # RESUMEN FINAL
+    Write-Host ""
+    Write-Host "================================================" -ForegroundColor Green
+    Write-Host "    RESTAURACIÓN COMPLETADA!" -ForegroundColor Green
+    Write-Host "================================================" -ForegroundColor Green
+    Write-Host ""
+    Write-Host "Configuraciones restauradas:" -ForegroundColor Yellow
+    Write-Host "  - Hyper-V y virtualización habilitados" -ForegroundColor Green
+    Write-Host "  - Servicios del sistema restaurados" -ForegroundColor Green
+    Write-Host "  - Telemetría y privacidad por defecto" -ForegroundColor Green
+    Write-Host "  - Windows Update automático" -ForegroundColor Green
+    Write-Host "  - Configuración de red restaurada" -ForegroundColor Green
+    Write-Host "  - File Explorer por defecto" -ForegroundColor Green
+    Write-Host ""
+    Write-Host "NOTA: Para restaurar completamente:" -ForegroundColor Magenta
+    Write-Host "  - Algunas apps eliminadas pueden requerir reinstalación manual" -ForegroundColor White
+    Write-Host "  - OneDrive puede necesitar reinstalación desde Microsoft" -ForegroundColor White
+    Write-Host "  - Xbox apps pueden requerir reinstalación desde Microsoft Store" -ForegroundColor White
+    Write-Host ""
+    
+    $reboot = Read-Host "¿Reiniciar ahora? (y/n)"
     if ($reboot -eq 'y' -or $reboot -eq 'Y') {
-        Write-Host "Restarting in 5 seconds..." -ForegroundColor Yellow
+        Write-Host "Reiniciando en 5 segundos..." -ForegroundColor Yellow
         Start-Sleep 5
         Restart-Computer -Force
     } else {
-        Write-Host "Reversion completed. Restart when convenient." -ForegroundColor Green
+        Write-Host "Restauración completada. Reinicia cuando sea conveniente." -ForegroundColor Green
         pause
     }
 }
 
-# Execute the reversion
-Start-RevertAll
+# Ejecutar restauración
+Start-CompleteRestoration
