@@ -22,17 +22,25 @@
 ### 🎮 Gaming Optimization
 
 -   **FPS Boost** - Gaming-optimized registry tweaks and system tuning
+
 -   **Reduced Input Lag** - Optimized polling rates and input timing
+
 -   **Network Optimization** - Lower ping and reduced packet loss
+
 -   **Faster Load Times** - Optimized memory and storage management
+
 -   **Fullscreen Optimizations** - Disabled DVR and background recording
     
 ### 🖥️ System Performance
 
 -   **RAM Optimization** (4GB-64GB profiles with custom configurations)
+
 -   **CPU Performance Tweaks** - Maximum performance power plans
+
 -   **SSD Optimization** - Enhanced storage performance
+
 -   **Service Optimization** - 65+ services optimized for performance
+  
 -   **Startup Optimization** - Reduced boot times and system overhead
     
 
