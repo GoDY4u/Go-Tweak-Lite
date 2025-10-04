@@ -222,21 +222,6 @@ function Set-AdvancedTelemetryBlock {
             # Ignorar errores de escritura
         }
     }
-    
-    # Reglas de firewall adicionales
-    $FirewallRules = @(
-        @{Name="BlockTelemetryOutbound"; Direction="Outbound"; Protocol="TCP"; RemotePort="80,443"; Description="Block Microsoft Telemetry"},
-        @{Name="BlockAIOutbound"; Direction="Outbound"; Protocol="TCP"; RemotePort="443"; Description="Block AI Services"}
-    )
-    
-    foreach ($rule in $FirewallRules) {
-        try {
-            New-NetFirewallRule -DisplayName $rule.Name -Direction $rule.Direction -Protocol $rule.Protocol -RemotePort $rule.RemotePort -Action Block -Description $rule.Description -ErrorAction SilentlyContinue | Out-Null
-        } catch {
-            # Ignorar si la regla ya existe
-        }
-    }
-    
     Write-Status -Types "+" -Status "Bloqueo de red avanzado configurado (100+ dominios)"
 }
 
@@ -931,3 +916,4 @@ function Start-CompleteOptimization {
 
 # Execute the complete improved version
 Start-CompleteOptimization
+
