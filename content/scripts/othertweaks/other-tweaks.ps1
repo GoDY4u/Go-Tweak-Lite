@@ -1,6 +1,3 @@
-# ========== VERSIÓN COMPLETA MEJORADA ==========
-# Combina optimizaciones originales + protecciones avanzadas sin impacto rendimiento
-
 function Get-HardwareInfo {
     <#
     .SYNOPSIS
@@ -916,4 +913,5 @@ function Start-CompleteOptimization {
 
 # Execute the complete improved version
 Start-CompleteOptimization
+
 
