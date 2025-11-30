@@ -288,8 +288,8 @@ function Remove-TelemetryFiles {
 }
 
 # ========== FUNCIONES ORIGINALES DEL SCRIPT ==========
-function Disable-HyperVForVMware {
-    Write-Status -Types "@" -Status "Disabling Hyper-V for VMware compatibility..."
+function Disable-HyperV {
+    Write-Status -Types "@" -Status "Disabling Hyper-V..."
     
     $HyperVFeatures = @(
         "Microsoft-Hyper-V-All",
@@ -913,5 +913,6 @@ function Start-CompleteOptimization {
 
 # Execute the complete improved version
 Start-CompleteOptimization
+
 
 
