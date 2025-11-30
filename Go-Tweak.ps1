@@ -543,7 +543,7 @@ function Install-VisualsAndDirectX {
         Write-Log "Error opening browser: $($_.Exception.Message)" "ERROR"
         Show-Notification "Error" "Could not open browser automatically" "Error"
         Write-Host "   Please manually visit these links:" -ForegroundColor Yellow
-        Write-Host "   Visual C++: https://aka.ms/vs/16/release/vc_redist.x64.exe" -ForegroundColor Cyan
+        Write-Host "   Visual C++: https://aka.ms/vc14/vc_redist.x64.exe" -ForegroundColor Cyan
         Write-Host "   DirectX: https://download.microsoft.com/download/1/7/1/1718CCC4-6315-4D8E-9543-8E28A4E18C4C/dxwebsetup.exe" -ForegroundColor Cyan
         return $false
     }
@@ -1084,4 +1084,5 @@ function Main {
 # Script execution
 if ($MyInvocation.InvocationName -ne '.') {
     Main
+
 }
