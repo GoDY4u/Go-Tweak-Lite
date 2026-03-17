@@ -1,6 +1,16 @@
 Windows Registry Editor Version 5.00
 
 ; ==========================================
+; >>> OPTIMIZACIONES RAM <<<
+; ==========================================
+
+[HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Services\Ndu]
+"Start"=dword:00000004
+
+[HKEY_LOCAL_MACHINE\SYSTEM\ControlSet001\Control\Session Manager\Memory Management]
+"ClearPageFileAtShutdown"=dword:00000001
+
+; ==========================================
 ; >>> OPTIMIZACIONES DE GPU Y ENERGÍA <<<
 ; ==========================================
 
