@@ -18,19 +18,14 @@ if %errorLevel% neq 0 (
     exit
 )
 
-:: ================================
-:: FUNCTION: Get folder size
-:: ================================
-:: Usage: call :GetFolderSize "folderpath" sizeVar
+:: Function to get folder size
 :GetFolderSize
 set sizeTemp=0
 for /f "usebackq" %%S in (`PowerShell -Command "(Get-ChildItem -Recurse -Force '%~1' | Measure-Object -Property Length -Sum).Sum"`) do set sizeTemp=%%S
 set "%~2=%sizeTemp%"
 exit /b
 
-:: ================================
-:: FOLDERS TO CLEAN
-:: ================================
+:: Folders to clean
 set folders=(
 "%TEMP%" "%TMP%" "%LOCALAPPDATA%\Temp" "C:\Windows\Temp" 
 "C:\Windows\Logs" "C:\Windows\LiveKernelReports" 
@@ -40,9 +35,7 @@ set folders=(
 "C:\Windows\System32\FxsTmp" "C:\Windows\System32\spool\PRINTERS"
 )
 
-:: ================================
-:: 1. CALCULATE SIZE BEFORE CLEANUP
-:: ================================
+:: Calculate size before cleanup
 set totalBefore=0
 for %%F in %folders% do (
     if exist %%F (
@@ -51,21 +44,25 @@ for %%F in %folders% do (
     )
 )
 
-:: ================================
-:: 2. CLEAN FOLDERS
-:: ================================
-echo Cleaning temp, logs, caches, mini-dumps, thumbnails...
+echo.
+echo =========================
+echo Cleaning files...
+echo =========================
+:: Clean folders
 for %%F in %folders% do (
     if exist %%F (
+        echo Cleaning: %%F
         del /s /f /q "%%F\*" >nul 2>&1
         for /d %%D in ("%%F\*") do rd /s /q "%%D" >nul 2>&1
     )
 )
 
 :: Prefetch
+echo Cleaning Prefetch...
 del /s /f /q C:\Windows\Prefetch\* >nul 2>&1
 
 :: Windows Update
+echo Resetting Windows Update...
 net stop wuauserv >nul 2>&1
 net stop bits >nul 2>&1
 rd /s /q C:\Windows\SoftwareDistribution >nul 2>&1
@@ -74,29 +71,37 @@ net start wuauserv >nul 2>&1
 net start bits >nul 2>&1
 
 :: Icon & Thumbnail cache
+echo Cleaning icon and thumbnail cache...
 del /s /f /q "%LocalAppData%\Microsoft\Windows\Explorer\thumbcache_*.db" >nul 2>&1
 del /s /f /q "%LocalAppData%\Microsoft\Windows\Explorer\iconcache_*.db" >nul 2>&1
 
 :: Hibernation
+echo Disabling hibernation...
 powercfg -h off >nul 2>&1
 
 :: Windows Store cache
+echo Resetting Windows Store cache...
 wsreset.exe >nul 2>&1
 
 :: RAM cleanup
+echo Clearing RAM cache...
 PowerShell -Command "Clear-RecycleBin -Confirm:$false" >nul 2>&1
 PowerShell -Command "Try {Add-Type -AssemblyName System.Runtime.InteropServices; $code = '[DllImport(""ntdll.dll"")] public static extern uint NtSetSystemInformation(int SystemInformationClass, IntPtr SystemInformation, int SystemInformationLength);'; $ntdll = Add-Type -MemberDefinition $code -Name Ntdll -Namespace Win32 -PassThru; $ntdll::NtSetSystemInformation(80, [IntPtr]::Zero, 0)} Catch {}" >nul 2>&1
 
 :: DISM + SFC
+echo Running DISM cleanup...
 dism /online /cleanup-image /startcomponentcleanup /quiet
+echo Running SFC scan...
 sfc /scannow >nul
 
 :: Flush DNS + Network reset
+echo Flushing DNS and resetting network...
 ipconfig /flushdns >nul
 netsh int ip reset >nul
 netsh winsock reset >nul
 
 :: Browser caches
+echo Cleaning browser caches...
 set browsers=(
 "%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Cache"
 "%LOCALAPPDATA%\Google\Chrome\User Data\Default\Cache"
@@ -110,11 +115,10 @@ for /d %%F in ("%APPDATA%\Mozilla\Firefox\Profiles\*") do (
 )
 
 :: Mini-dumps
+echo Deleting mini-dumps...
 del /s /f /q C:\Windows\Minidump\* >nul 2>&1
 
-:: ================================
-:: 3. CALCULATE SIZE AFTER CLEANUP
-:: ================================
+:: Calculate size after cleanup
 set totalAfter=0
 for %%F in %folders% do (
     if exist %%F (
@@ -123,9 +127,7 @@ for %%F in %folders% do (
     )
 )
 
-:: ================================
-:: 4. REPORT
-:: ================================
+:: Report
 set /a freed=totalBefore-totalAfter
 set /a freedMB=freed/1048576
 set /a freedGB=freed/1073741824
@@ -136,5 +138,5 @@ echo        CLEANUP COMPLETED
 echo ============================================
 echo Total space freed: !freedMB! MB (~!freedGB! GB)
 echo.
-
-pause
+echo Press any key to exit...
+pause >nul
