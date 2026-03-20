@@ -689,6 +689,18 @@ function Optimize-Explorer {
     Write-Status -Types "+" -Status "File Explorer optimized"
 }
 
+function Disable-HyperVForVMware {
+    Write-Host "Disabling Hyper-V for VMware..." -ForegroundColor Yellow
+    
+    try {
+        bcdedit /set hypervisorlaunchtype off | Out-Null
+        Disable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All -NoRestart -ErrorAction SilentlyContinue
+        Write-Host "[+] Hyper-V disabled successfully" -ForegroundColor Green
+    } catch {
+        Write-Host "[-] Error disabling Hyper-V: $_" -ForegroundColor Red
+    }
+}
+
 function Optimize-Firewall {
     Write-Status -Types "@" -Status "Optimizing firewall configuration..."
     
