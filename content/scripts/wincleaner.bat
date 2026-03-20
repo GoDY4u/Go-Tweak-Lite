@@ -1,11 +1,12 @@
 @echo off
 setlocal enabledelayedexpansion
 
-title Advanced Cleanup + RAM Flush
-color 0A
+title MAXIMUM CLEANUP - SPACE REPORT
+color 0C
 
 echo ============================================
-echo        ADVANCED SYSTEM CLEANUP
+echo        MAXIMUM SYSTEM CLEANUP
+echo       WITH SPACE LIBERATION REPORT
 echo ============================================
 echo.
 
@@ -17,75 +18,123 @@ if %errorLevel% neq 0 (
     exit
 )
 
-echo Starting cleanup...
-echo.
+:: ================================
+:: FUNCTION: Get folder size
+:: ================================
+:: Usage: call :GetFolderSize "folderpath" sizeVar
+:GetFolderSize
+set sizeTemp=0
+for /f "usebackq" %%S in (`PowerShell -Command "(Get-ChildItem -Recurse -Force '%~1' | Measure-Object -Property Length -Sum).Sum"`) do set sizeTemp=%%S
+set "%~2=%sizeTemp%"
+exit /b
 
 :: ================================
-:: 1. TEMP FILES (AGGRESSIVE)
+:: FOLDERS TO CLEAN
 :: ================================
-echo [1/5] Cleaning TEMP folders...
-
-for %%T in (
-    "%TEMP%"
-    "%TMP%"
-    "%LOCALAPPDATA%\Temp"
-    "C:\Windows\Temp"
-) do (
-    echo Cleaning: %%T
-    del /s /f /q "%%T\*" >nul 2>&1
-    for /d %%D in ("%%T\*") do rd /s /q "%%D" >nul 2>&1
+set folders=(
+"%TEMP%" "%TMP%" "%LOCALAPPDATA%\Temp" "C:\Windows\Temp" 
+"C:\Windows\Logs" "C:\Windows\LiveKernelReports" 
+"C:\Windows\System32\winevt\Logs" "C:\Windows\Downloaded Program Files" 
+"C:\Windows\CSC" "C:\Windows\SoftwareDistribution\DeliveryOptimization\Cache" 
+"C:\Windows\SoftwareDistribution\Download" "C:\Users\%USERNAME%\AppData\Local\Packages" 
+"C:\Windows\System32\FxsTmp" "C:\Windows\System32\spool\PRINTERS"
 )
 
 :: ================================
-:: 2. PREFETCH
+:: 1. CALCULATE SIZE BEFORE CLEANUP
 :: ================================
-echo [2/5] Cleaning Prefetch...
+set totalBefore=0
+for %%F in %folders% do (
+    if exist %%F (
+        call :GetFolderSize "%%F" size
+        set /a totalBefore+=!size!
+    )
+)
 
+:: ================================
+:: 2. CLEAN FOLDERS
+:: ================================
+echo Cleaning temp, logs, caches, mini-dumps, thumbnails...
+for %%F in %folders% do (
+    if exist %%F (
+        del /s /f /q "%%F\*" >nul 2>&1
+        for /d %%D in ("%%F\*") do rd /s /q "%%D" >nul 2>&1
+    )
+)
+
+:: Prefetch
 del /s /f /q C:\Windows\Prefetch\* >nul 2>&1
 
-:: ================================
-:: 3. WINDOWS UPDATE CACHE
-:: ================================
-echo [3/5] Resetting Windows Update...
-
+:: Windows Update
 net stop wuauserv >nul 2>&1
 net stop bits >nul 2>&1
-
 rd /s /q C:\Windows\SoftwareDistribution >nul 2>&1
 md C:\Windows\SoftwareDistribution >nul 2>&1
-
 net start wuauserv >nul 2>&1
 net start bits >nul 2>&1
 
-:: ================================
-:: 4. RAM CLEAN (REAL METHOD)
-:: ================================
-echo [4/5] Cleaning RAM...
+:: Icon & Thumbnail cache
+del /s /f /q "%LocalAppData%\Microsoft\Windows\Explorer\thumbcache_*.db" >nul 2>&1
+del /s /f /q "%LocalAppData%\Microsoft\Windows\Explorer\iconcache_*.db" >nul 2>&1
 
-echo Freeing standby memory...
+:: Hibernation
+powercfg -h off >nul 2>&1
+
+:: Windows Store cache
+wsreset.exe >nul 2>&1
+
+:: RAM cleanup
 PowerShell -Command "Clear-RecycleBin -Confirm:$false" >nul 2>&1
+PowerShell -Command "Try {Add-Type -AssemblyName System.Runtime.InteropServices; $code = '[DllImport(""ntdll.dll"")] public static extern uint NtSetSystemInformation(int SystemInformationClass, IntPtr SystemInformation, int SystemInformationLength);'; $ntdll = Add-Type -MemberDefinition $code -Name Ntdll -Namespace Win32 -PassThru; $ntdll::NtSetSystemInformation(80, [IntPtr]::Zero, 0)} Catch {}" >nul 2>&1
 
-:: Vaciar standby list (RAM cache real)
-PowerShell -Command "Try {Add-Type -AssemblyName System.Runtime.InteropServices; $code = '[DllImport(\"ntdll.dll\")] public static extern uint NtSetSystemInformation(int SystemInformationClass, IntPtr SystemInformation, int SystemInformationLength);'; $ntdll = Add-Type -MemberDefinition $code -Name Ntdll -Namespace Win32 -PassThru; $ntdll::NtSetSystemInformation(80, [IntPtr]::Zero, 0)} Catch {}" >nul 2>&1
+:: DISM + SFC
+dism /online /cleanup-image /startcomponentcleanup /quiet
+sfc /scannow >nul
+
+:: Flush DNS + Network reset
+ipconfig /flushdns >nul
+netsh int ip reset >nul
+netsh winsock reset >nul
+
+:: Browser caches
+set browsers=(
+"%LOCALAPPDATA%\Microsoft\Edge\User Data\Default\Cache"
+"%LOCALAPPDATA%\Google\Chrome\User Data\Default\Cache"
+"%LOCALAPPDATA%\BraveSoftware\Brave-Browser\User Data\Default\Cache"
+)
+for %%B in %browsers% do (
+    if exist %%B rd /s /q "%%B" >nul 2>&1
+)
+for /d %%F in ("%APPDATA%\Mozilla\Firefox\Profiles\*") do (
+    if exist "%%F\cache2" rd /s /q "%%F\cache2" >nul 2>&1
+)
+
+:: Mini-dumps
+del /s /f /q C:\Windows\Minidump\* >nul 2>&1
 
 :: ================================
-:: 5. DISM CLEANUP
+:: 3. CALCULATE SIZE AFTER CLEANUP
 :: ================================
-echo [5/5] System cleanup...
+set totalAfter=0
+for %%F in %folders% do (
+    if exist %%F (
+        call :GetFolderSize "%%F" size
+        set /a totalAfter+=!size!
+    )
+)
 
-dism /online /cleanup-image /startcomponentcleanup >nul
+:: ================================
+:: 4. REPORT
+:: ================================
+set /a freed=totalBefore-totalAfter
+set /a freedMB=freed/1048576
+set /a freedGB=freed/1073741824
 
 echo.
 echo ============================================
 echo        CLEANUP COMPLETED
 echo ============================================
+echo Total space freed: !freedMB! MB (~!freedGB! GB)
 echo.
 
-echo ✔ Temp cleaned
-echo ✔ Prefetch cleaned
-echo ✔ Windows Update reset
-echo ✔ RAM cache cleared
-echo ✔ System optimized
-
-echo.
 pause
