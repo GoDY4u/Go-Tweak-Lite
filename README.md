@@ -142,7 +142,7 @@
 Run this command in **PowerShell (Administrator)**:
 
 ```powershell
-irm https://raw.githubusercontent.com/GoDY4u/Go-Tweak-Lite/main/install.ps1 | iex
+irm https://raw.githubusercontent.com/GoDY4u/Go-Tweak/main/install.ps1 | iex
 ```
 
 ### Manual Installation
