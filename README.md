@@ -1,4 +1,5 @@
-# 🚀 Go-Tweak - Windows Optimization Tool
+# <img width="100" height="100" alt="Go-Tweak" src="https://github.com/user-attachments/assets/5d74054c-6c56-491e-9e63-d5f79b1edcab" />
+ 🚀 Go-Tweak - Windows Optimization Tool
 
 ![PowerShell](https://img.shields.io/badge/PowerShell-5.1+-blue.svg)
 ![Batch](https://img.shields.io/badge/Batch-Script-yellow.svg)
@@ -17,7 +18,6 @@
 
 **Go-Tweak** is a comprehensive PowerShell-based optimization suite designed for gamers, power users, and privacy-conscious individuals. This complete edition delivers maximum performance, privacy, and system optimization through an intuitive console interface.
 
-<img width="100" height="100" alt="Go-Tweak" src="https://github.com/user-attachments/assets/5d74054c-6c56-491e-9e63-d5f79b1edcab" />
 
 ## ⚡ Performance Features
 
