@@ -17,6 +17,8 @@
 
 **Go-Tweak** is a comprehensive PowerShell-based optimization suite designed for gamers, power users, and privacy-conscious individuals. This complete edition delivers maximum performance, privacy, and system optimization through an intuitive console interface.
 
+<img width="497" height="497" alt="Go-Tweak" src="https://github.com/user-attachments/assets/5d74054c-6c56-491e-9e63-d5f79b1edcab" />
+
 ## ⚡ Performance Features
 
 ### 🎮 Gaming Optimization
