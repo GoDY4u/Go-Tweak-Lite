@@ -1,9 +1,7 @@
 # Script para eliminar APPS de la lista WPFTweaksDeBloat
-# EXCLUYE EXPRESSAMENTE Minecraft y GamingServices
 # EJECUTAR COMO ADMINISTRADOR
 
 Write-Host "Iniciando eliminacion de apps preinstaladas..." -ForegroundColor Cyan
-Write-Host "SE PRESERVARAN Minecraft y GamingServices." -ForegroundColor Green
 
 # Lista de paquetes a ELIMINAR (la lista completa, excluyendo los que tú quieres guardar)
 $appxPackages = @(
