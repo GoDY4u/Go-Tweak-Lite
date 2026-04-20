@@ -1,3 +1,12 @@
+# =============================================================================
+# SCRIPT: other-tweaks.ps1
+# VERSIÓN: 2.1 (Mejorada con funciones adicionales)
+# DESCRIPCIÓN: Optimización completa de Windows 10/11 para rendimiento,
+#               privacidad extrema y eliminación de telemetría/AI/Copilot.
+# EJECUTAR: PowerShell como Administrador
+# =============================================================================
+
+# ========== FUNCIONES AUXILIARES BÁSICAS ==========
 function Get-HardwareInfo {
     <#
     .SYNOPSIS
@@ -24,6 +33,15 @@ function Get-HardwareInfo {
     }
 }
 
+# Sistema de logging (se crea archivo en %TEMP%)
+$script:LogFile = "$env:TEMP\OptimizationLog_$(Get-Date -Format 'yyyyMMdd_HHmmss').txt"
+function Write-Log {
+    param([string]$Message, [string]$Level = "INFO")
+    $timestamp = Get-Date -Format 'yyyy-MM-dd HH:mm:ss'
+    "$timestamp [$Level] $Message" | Out-File -FilePath $script:LogFile -Append -Encoding utf8
+}
+
+# Función Write-Status mejorada: escribe en consola y en log
 function Write-Status {
     param([string]$Types, [string]$Status)
     $color = switch -Wildcard ($Types) {
@@ -34,6 +52,7 @@ function Write-Status {
         default { "White" }
     }
     Write-Host "[$Types] $Status" -ForegroundColor $color
+    Write-Log -Message "[$Types] $Status" -Level "ACTION"
 }
 
 function Remove-ItemVerified {
@@ -115,11 +134,106 @@ function Set-ScheduledTaskState {
     }
 }
 
-# ========== PROTECCIONES AVANZADAS ==========
+# ========== NUEVAS FUNCIONES (2,5,6,7,9,10,11) ==========
+
+# 2. Limpieza profunda del sistema (DISM y caché de Windows Update)
+function Invoke-DeepSystemCleanup {
+    Write-Status -Types "@" -Status "Running DISM component cleanup..."
+    try {
+        Dism /Online /Cleanup-Image /StartComponentCleanup /ResetBase | Out-Null
+        Write-Status -Types "+" -Status "DISM component cleanup completed"
+        Write-Log -Message "DISM /StartComponentCleanup /ResetBase executed" -Level "SUCCESS"
+    } catch {
+        Write-Status -Types "?" -Status "DISM cleanup failed"
+        Write-Log -Message "DISM cleanup failed: $_" -Level "ERROR"
+    }
+
+    Write-Status -Types "@" -Status "Cleaning Windows Update cache..."
+    try {
+        Stop-Service -Name wuauserv -Force -ErrorAction SilentlyContinue
+        Remove-Item -Path "$env:SystemRoot\SoftwareDistribution\Download\*" -Recurse -Force -ErrorAction SilentlyContinue
+        Start-Service -Name wuauserv -ErrorAction SilentlyContinue
+        Write-Status -Types "+" -Status "Windows Update cache cleaned"
+        Write-Log -Message "Windows Update download cache cleared" -Level "SUCCESS"
+    } catch {
+        Write-Status -Types "?" -Status "Could not clean Windows Update cache"
+        Write-Log -Message "Failed to clean Windows Update cache: $_" -Level "ERROR"
+    }
+}
+
+# 5. Deshabilitar envío de datos de escritura a mano y teclado
+function Disable-InputPersonalization {
+    Write-Status -Types "-" -Status "Disabling handwriting and typing data collection..."
+    Set-ItemPropertyVerified -Path "HKCU:\Software\Microsoft\InputPersonalization" -Name "RestrictImplicitInkCollection" -Value 1
+    Set-ItemPropertyVerified -Path "HKCU:\Software\Microsoft\InputPersonalization" -Name "RestrictImplicitTextCollection" -Value 1
+    Set-ItemPropertyVerified -Path "HKCU:\Software\Microsoft\Input\Settings" -Name "EnableHwkbTextSuggestions" -Value 0
+    Write-Status -Types "+" -Status "Handwriting and typing data collection disabled"
+    Write-Log -Message "Input personalization data collection disabled" -Level "SUCCESS"
+}
+
+# 6. Optimización de NTFS (deshabilitar 8.3 y último acceso)
+function Optimize-NTFS {
+    Write-Status -Types "@" -Status "Optimizing NTFS settings..."
+    try {
+        fsutil behavior set disable8dot3 1
+        fsutil behavior set disablelastaccess 1
+        Write-Status -Types "+" -Status "NTFS optimizations applied (8.3 names disabled, last access disabled)"
+        Write-Log -Message "NTFS: disable8dot3=1, disablelastaccess=1" -Level "SUCCESS"
+    } catch {
+        Write-Status -Types "?" -Status "NTFS optimization failed"
+        Write-Log -Message "NTFS optimization failed: $_" -Level "ERROR"
+    }
+}
+
+# 7. Deshabilitar sugerencias de inicio y bienvenida (NO afecta a notificaciones del sistema)
+function Disable-StartupSuggestions {
+    Write-Status -Types "-" -Status "Disabling startup suggestions and welcome experience (notifications untouched)..."
+    Set-ItemPropertyVerified -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\UserProfileEngagement" -Name "ScoobeSystemSettingEnabled" -Value 0
+    Set-ItemPropertyVerified -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -Name "SubscribedContent-310093Enabled" -Value 0
+    Set-ItemPropertyVerified -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -Name "SubscribedContent-338388Enabled" -Value 0
+    Set-ItemPropertyVerified -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -Name "SubscribedContent-338389Enabled" -Value 0
+    Set-ItemPropertyVerified -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -Name "SubscribedContent-353698Enabled" -Value 0
+    Write-Status -Types "+" -Status "Startup suggestions disabled"
+    Write-Log -Message "Startup suggestions and welcome experience disabled (notifications NOT affected)" -Level "SUCCESS"
+}
+
+# 9. Verificación y reparación de archivos de sistema (SFC / DISM)
+function Repair-SystemFiles {
+    Write-Status -Types "@" -Status "Checking and repairing system files..."
+    try {
+        sfc /scannow
+        Write-Log -Message "SFC /scannow executed" -Level "INFO"
+        Dism /Online /Cleanup-Image /RestoreHealth
+        Write-Log -Message "DISM /RestoreHealth executed" -Level "INFO"
+        Write-Status -Types "+" -Status "System file check and repair completed"
+    } catch {
+        Write-Status -Types "?" -Status "Error during system file repair"
+        Write-Log -Message "System file repair failed: $_" -Level "ERROR"
+    }
+}
+
+# 10. Eliminación de paquetes de idioma no usados
+function Remove-UnusedLanguagePacks {
+    Write-Status -Types "-" -Status "Removing unused language packs..."
+    try {
+        $currentLang = (Get-WinSystemLocale).Name
+        Get-WindowsPackage -Online | Where-Object {
+            $_.PackageName -like "*LanguagePack*" -and $_.PackageName -notlike "*$currentLang*"
+        } | Remove-WindowsPackage -Online -NoRestart -ErrorAction SilentlyContinue
+        Write-Status -Types "+" -Status "Unused language packs removed"
+        Write-Log -Message "Language packs removed (current: $currentLang)" -Level "SUCCESS"
+    } catch {
+        Write-Status -Types "?" -Status "Could not remove language packs"
+        Write-Log -Message "Failed to remove language packs: $_" -Level "ERROR"
+    }
+}
+
+# ========== FUNCIONES ORIGINALES DEL SCRIPT ==========
+
+# PROTECCIONES AVANZADAS
 function Remove-CopilotAndAI {
     Write-Status -Types "-" -Status "Eliminando físicamente Copilot y componentes AI..."
     
-    # Archivos y carpetas de Copilot a eliminar
     $CopilotPaths = @(
         "$env:SystemRoot\SystemApps\Microsoft.Windows.Copilot_*",
         "$env:SystemRoot\System32\Copilot",
@@ -131,7 +245,6 @@ function Remove-CopilotAndAI {
         Remove-ItemVerified -Path $path -Recurse -Force
     }
     
-    # Servicios de AI a deshabilitar
     $AIServices = @(
         "AIShutdown",
         "AIPerformanceBoost",
@@ -139,7 +252,6 @@ function Remove-CopilotAndAI {
     )
     Set-ServiceStartup -ServiceNames $AIServices -StartupType "Disabled"
     
-    # Deshabilitar componentes AI en registro
     Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\WindowsCopilot" -Name "TurnOffWindowsCopilot" -Value 1
     Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\AI" -Name "DisableWindowsAI" -Value 1
     
@@ -149,7 +261,6 @@ function Remove-CopilotAndAI {
 function Set-AdvancedTelemetryBlock {
     Write-Status -Types "@" -Status "Configurando bloqueo de red avanzado..."
     
-    # Dominios adicionales de telemetría y AI a bloquear
     $AdditionalDomains = @(
         "0.0.0.0 telemetry.microsoft.com",
         "0.0.0.0 vortex.data.microsoft.com",
@@ -159,7 +270,6 @@ function Set-AdvancedTelemetryBlock {
         "0.0.0.0 watson.ppe.telemetry.microsoft.com",
         "0.0.0.0 events.data.microsoft.com",
         "0.0.0.0 cs1.wpc.v0cdn.net",
-        "0.0.0.0 www-googleapis-test.sandbox.google.com",
         "0.0.0.0 www-googleapis-test.sandbox.google.com",
         "0.0.0.0 statsfe2.ws.microsoft.com",
         "0.0.0.0 corpext.msitadfs.glbdns2.microsoft.com",
@@ -225,7 +335,6 @@ function Set-AdvancedTelemetryBlock {
 function Set-HardeningSecurity {
     Write-Status -Types "@" -Status "Aplicando hardening de seguridad extremo..."
     
-    # Deshabilitar .NET Framework features innecesarias
     $NETFeatures = @(
         "NetFx4-AdvSrvs",
         "NetFx4Extended-ASPNET45"
@@ -239,13 +348,9 @@ function Set-HardeningSecurity {
         }
     }
     
-    # Deshabilitar Windows Script Host
     Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Microsoft\Windows Script Host\Settings" -Name "Enabled" -Value 0
-    
-    # Bloquear scripts PowerShell no firmados
     Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Microsoft\PowerShell\1\ShellIds\Microsoft.PowerShell" -Name "ExecutionPolicy" -Value "AllSigned"
     
-    # Deshabilitar LLMNR y NetBIOS
     Set-ItemPropertyVerified -Path "HKLM:\SOFTWARE\Policies\Microsoft\Windows\LLMNR" -Name "AllowLLMNR" -Value 0
     Set-ItemPropertyVerified -Path "HKLM:\SYSTEM\CurrentControlSet\Services\NetBT\Parameters" -Name "NoNameReleaseOnDemand" -Value 1
     
@@ -268,7 +373,6 @@ function Remove-TelemetryFiles {
         Remove-ItemVerified -Path $file -Recurse -Force
     }
     
-    # Proteger carpetas con permisos denegados
     $ProtectedFolders = @(
         "$env:SystemRoot\System32\Telemetry",
         "$env:ProgramData\Microsoft\Diagnosis"
@@ -287,7 +391,6 @@ function Remove-TelemetryFiles {
     Write-Status -Types "+" -Status "Archivos de telemetría eliminados y protegidos"
 }
 
-# ========== FUNCIONES ORIGINALES DEL SCRIPT ==========
 function Disable-HyperV {
     Write-Status -Types "@" -Status "Disabling Hyper-V..."
     
@@ -772,7 +875,7 @@ function Clean-TemporaryFiles {
     Write-Status -Types "+" -Status "Temporary files cleaned"
 }
 
-# ========== MAIN OPTIMIZATION FUNCTION ==========
+# ========== FUNCIÓN PRINCIPAL DE OPTIMIZACIÓN ==========
 function Start-CompleteOptimization {
     Write-Host "================================================" -ForegroundColor Cyan
     Write-Host "    COMPLETE WINDOWS OPTIMIZATION - MEJORADO" -ForegroundColor Cyan
@@ -801,6 +904,7 @@ function Start-CompleteOptimization {
     
     # Final confirmation
     Write-Host "This IMPROVED version will:" -ForegroundColor Yellow
+    Write-Host "- Verify and repair system files (SFC/DISM)" -ForegroundColor White
     Write-Host "- Disable Hyper-V for VMware" -ForegroundColor White
     Write-Host "- Remove bloatware and unnecessary services" -ForegroundColor White
     Write-Host "- Optimize performance and privacy" -ForegroundColor White
@@ -808,6 +912,10 @@ function Start-CompleteOptimization {
     Write-Host "- Advanced network blocking (100+ domains)" -ForegroundColor White
     Write-Host "- Remove physical telemetry files" -ForegroundColor White
     Write-Host "- Hardening security without performance impact" -ForegroundColor White
+    Write-Host "- Deep system cleanup (DISM, WinSxS, Update cache)" -ForegroundColor White
+    Write-Host "- Disable input data collection & startup suggestions" -ForegroundColor White
+    Write-Host "- Optimize NTFS and remove unused language packs" -ForegroundColor White
+    Write-Host "- Generate detailed log file in TEMP folder" -ForegroundColor White
     Write-Host ""
     Write-Host "Continue? (y/n)" -ForegroundColor Yellow
     $confirm = Read-Host
@@ -821,6 +929,10 @@ function Start-CompleteOptimization {
     Write-Host ""
     Write-Host "STARTING OPTIMIZATIONS..." -ForegroundColor Green
     Write-Host "================================================" -ForegroundColor Green
+    
+    # === NUEVO: Verificación de integridad del sistema ===
+    Write-Host "`n=== SYSTEM INTEGRITY CHECK ===" -ForegroundColor Cyan
+    Repair-SystemFiles
     
     # 1. Hyper-V for VMware
     Write-Host "`n=== VMWARE COMPATIBILITY ===" -ForegroundColor Cyan
@@ -851,6 +963,9 @@ function Start-CompleteOptimization {
     Disable-AdvertisingID
     Disable-WindowsSpotlight
     Disable-BackgroundApps
+    # Nuevas funciones de privacidad (sin afectar notificaciones)
+    Disable-InputPersonalization
+    Disable-StartupSuggestions
     
     # 5. Windows Update
     Write-Host "`n=== WINDOWS UPDATE ===" -ForegroundColor Cyan
@@ -869,24 +984,30 @@ function Start-CompleteOptimization {
     Set-HardeningSecurity
     Remove-TelemetryFiles
     
-    # 8. Performance
+    # 8. Deep Maintenance (limpieza profunda y paquetes de idioma)
+    Write-Host "`n=== DEEP MAINTENANCE ===" -ForegroundColor Cyan
+    Invoke-DeepSystemCleanup
+    Remove-UnusedLanguagePacks
+    
+    # 9. Performance
     Write-Host "`n=== PERFORMANCE ===" -ForegroundColor Cyan
     Optimize-Performance
     Optimize-Network
+    Optimize-NTFS   # Nueva optimización NTFS
     
-    # 9. Security
+    # 10. Security
     Write-Host "`n=== SECURITY ===" -ForegroundColor Cyan
     Optimize-Firewall
     
-    # 10. Explorer
+    # 11. Explorer
     Write-Host "`n=== FILE EXPLORER ===" -ForegroundColor Cyan
     Optimize-Explorer
     
-    # 11. Scheduled tasks
+    # 12. Scheduled tasks
     Write-Host "`n=== SCHEDULED TASKS ===" -ForegroundColor Cyan
     Disable-UnnecessaryTasks
     
-    # 12. Cleanup
+    # 13. Cleanup
     Write-Host "`n=== CLEANUP ===" -ForegroundColor Cyan
     Clean-TemporaryFiles
 
@@ -897,6 +1018,7 @@ function Start-CompleteOptimization {
     Write-Host "================================================" -ForegroundColor Green
     Write-Host ""
     Write-Host "Applied optimizations:" -ForegroundColor Yellow
+    Write-Host "  - System files verified/repaired (SFC/DISM)" -ForegroundColor Green
     Write-Host "  - Hyper-V disabled for VMware" -ForegroundColor Green
     Write-Host "  - SSD optimized and hibernation disabled" -ForegroundColor Green
     Write-Host "  - 65+ unnecessary services disabled" -ForegroundColor Green
@@ -906,8 +1028,15 @@ function Start-CompleteOptimization {
     Write-Host "  - Physical telemetry files removed" -ForegroundColor Green
     Write-Host "  - Windows Update set to manual" -ForegroundColor Green
     Write-Host "  - OneDrive, Xbox and 50+ apps removed" -ForegroundColor Green
+    Write-Host "  - Input data collection disabled" -ForegroundColor Green
+    Write-Host "  - Startup suggestions disabled (notifications untouched)" -ForegroundColor Green
+    Write-Host "  - Deep cleanup (DISM, WinSxS, Update cache)" -ForegroundColor Green
+    Write-Host "  - Unused language packs removed" -ForegroundColor Green
+    Write-Host "  - NTFS optimizations applied" -ForegroundColor Green
     Write-Host "  - File Explorer improved" -ForegroundColor Green
     Write-Host "  - Firewall and security optimized" -ForegroundColor Green
+    Write-Host ""
+    Write-Host "Detailed log saved to: $script:LogFile" -ForegroundColor Cyan
     Write-Host ""
     Write-Host "VMware compatibility improved!" -ForegroundColor Green
     Write-Host "Some changes may require restart." -ForegroundColor Yellow
@@ -923,8 +1052,5 @@ function Start-CompleteOptimization {
     }
 }
 
-# Execute the complete improved version
+# Ejecutar la optimización completa
 Start-CompleteOptimization
-
-
-
