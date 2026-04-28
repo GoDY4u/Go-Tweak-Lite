@@ -52,6 +52,33 @@ Windows Registry Editor Version 5.00
 [HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Power\PowerThrottling]
 "PowerThrottlingOff"=dword:00000001
 
+; Deshabilitar el registro del último acceso a archivos (reduce escrituras)
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\FileSystem]
+"NtfsDisableLastAccessUpdate"=dword:00000001
+
+; Deshabilitar la creación de nombres cortos 8.3 (mejora el rendimiento en carpetas con muchos archivos)
+"NtfsDisable8dot3NameCreation"=dword:00000001
+
+; Evitar que el sistema pagine el kernel a disco (mantiene los drivers en RAM)
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\Session Manager\Memory Management]
+"DisablePagingExecutive"=dword:00000001
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\SysMain]
+"Start"=dword:00000004
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip\Parameters\Interfaces]
+; Busca la subclave de tu adaptador de red y crea:
+"TcpAckFrequency"=dword:00000001
+"TCPNoDelay"=dword:00000001
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Control\CrashControl]
+"CrashDumpEnabled"=dword:00000000
+"LogEvent"=dword:00000000
+"SendAlert"=dword:00000000
+
+[HKEY_LOCAL_MACHINE\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters]
+"DisabledComponents"=dword:00000020
+
 ; ==========================================
 ; >>> TELEMETRÍA, PRIVACIDAD Y RECOPILACIÓN DE DATOS <<<
 ; ==========================================
@@ -1375,7 +1402,8 @@ Windows Registry Editor Version 5.00
 ; Disable_Animations
 
 [HKEY_CURRENT_USER\Control Panel\Desktop]
-"UserPreferencesMask"=hex:90,12,07,80,10,00,00,00
+"UserPreferencesMask"=hex:40,0C,07,80,10,00,00,00
+
 
 
 
