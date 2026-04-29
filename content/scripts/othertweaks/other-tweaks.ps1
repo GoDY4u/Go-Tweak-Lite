@@ -1,10 +1,483 @@
 # =============================================================================
-# SCRIPT: other-tweaks.ps1
-# VERSIÓN: 2.1 (Mejorada con funciones adicionales)
+# SCRIPT: other-tweaks.ps1 (combinado con tweaks.json de WinUtil)
+# VERSIÓN: 3.0 (Integración de tweaks avanzados)
 # DESCRIPCIÓN: Optimización completa de Windows 10/11 para rendimiento,
-#               privacidad extrema y eliminación de telemetría/AI/Copilot.
+#               privacidad extrema y eliminación de telemetría/AI/Copilot,
+#               más los tweaks específicos de WinUtil.
 # EJECUTAR: PowerShell como Administrador
 # =============================================================================
+
+# ========== CONFIGURACIÓN DE TWEAKS (desde JSON) ==========
+$script:TweaksConfig = @{
+    "WPFTweaksActivity" = @{
+        "Content" = "Activity History - Disable"
+        "Description" = "Erases recent docs, clipboard, and run history."
+        "category" = "Essential Tweaks"
+        "panel" = "1"
+        "registry" = @(
+            @{ Path = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System"; Name = "EnableActivityFeed"; Value = 0; Type = "DWord"; OriginalValue = "<RemoveEntry>" },
+            @{ Path = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System"; Name = "PublishUserActivities"; Value = 0; Type = "DWord"; OriginalValue = "<RemoveEntry>" },
+            @{ Path = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System"; Name = "UploadUserActivities"; Value = 0; Type = "DWord"; OriginalValue = "<RemoveEntry>" }
+        )
+    }
+    "WPFTweaksConsumerFeatures" = @{
+        "Content" = "ConsumerFeatures - Disable"
+        "Description" = "Windows will not automatically install any games, third-party apps, or application links from the Windows Store for the signed-in user. Some default Apps will be inaccessible (eg. Phone Link)."
+        "category" = "Essential Tweaks"
+        "panel" = "1"
+        "registry" = @(
+            @{ Path = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\CloudContent"; Name = "DisableWindowsConsumerFeatures"; Value = 1; Type = "DWord"; OriginalValue = "<RemoveEntry>" }
+        )
+    }
+    "WPFTweaksEndTaskOnTaskbar" = @{
+        "Content" = "End Task With Right Click - Enable"
+        "Description" = "Enables option to end task when right clicking a program in the taskbar."
+        "category" = "Essential Tweaks"
+        "panel" = "1"
+        "registry" = @(
+            @{ Path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced\TaskbarDeveloperSettings"; Name = "TaskbarEndTask"; Value = 1; Type = "DWord"; OriginalValue = "<RemoveEntry>" }
+        )
+    }
+    "WPFTweaksDisableExplorerAutoDiscovery" = @{
+        "Content" = "File Explorer Automatic Folder Discovery - Disable"
+        "Description" = "Windows Explorer automatically tries to guess the type of the folder based on its contents, slowing down the browsing experience. WARNING! Will disable File Explorer grouping."
+        "category" = "Essential Tweaks"
+        "panel" = "1"
+        "InvokeScript" = @(
+            @'
+# Previously detected folders
+$bags = "HKCU:\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\Bags"
+# Folder types lookup table
+$bagMRU = "HKCU:\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\BagMRU"
+# Flush Explorer view database
+Remove-Item -Path $bags -Recurse -Force
+Write-Host "Removed $bags"
+Remove-Item -Path $bagMRU -Recurse -Force
+Write-Host "Removed $bagMRU"
+# Every folder
+$allFolders = "HKCU:\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\Bags\AllFolders\Shell"
+if (!(Test-Path $allFolders)) {
+    New-Item -Path $allFolders -Force
+    Write-Host "Created $allFolders"
+}
+# Generic view
+New-ItemProperty -Path $allFolders -Name "FolderType" -Value "NotSpecified" -PropertyType String -Force
+Write-Host "Set FolderType to NotSpecified"
+Write-Host Please sign out and back in, or restart your computer to apply the changes!
+'@
+        )
+        "UndoScript" = @(
+            @'
+# Previously detected folders
+$bags = "HKCU:\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\Bags"
+# Folder types lookup table
+$bagMRU = "HKCU:\Software\Classes\Local Settings\Software\Microsoft\Windows\Shell\BagMRU"
+# Flush Explorer view database
+Remove-Item -Path $bags -Recurse -Force
+Write-Host "Removed $bags"
+Remove-Item -Path $bagMRU -Recurse -Force
+Write-Host "Removed $bagMRU"
+Write-Host Please sign out and back in, or restart your computer to apply the changes!
+'@
+        )
+    }
+    "WPFTweaksHiber" = @{
+        "Content" = "Hibernation - Disable"
+        "Description" = "Hibernation is really meant for laptops as it saves what's in memory before turning the PC off. It really should never be used."
+        "category" = "Essential Tweaks"
+        "panel" = "1"
+        "registry" = @(
+            @{ Path = "HKLM:\System\CurrentControlSet\Control\Session Manager\Power"; Name = "HibernateEnabled"; Value = 0; Type = "DWord"; OriginalValue = 1 },
+            @{ Path = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Explorer\FlyoutMenuSettings"; Name = "ShowHibernateOption"; Value = 0; Type = "DWord"; OriginalValue = 1 }
+        )
+        "InvokeScript" = @("powercfg.exe /hibernate off")
+        "UndoScript" = @("powercfg.exe /hibernate on")
+    }
+    "WPFTweaksLocation" = @{
+        "Content" = "Location Tracking - Disable"
+        "Description" = "Disables Location Tracking."
+        "category" = "Essential Tweaks"
+        "panel" = "1"
+        "service" = @(
+            @{ Name = "lfsvc"; StartupType = "Disable"; OriginalType = "Manual" }
+        )
+        "registry" = @(
+            @{ Path = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\CapabilityAccessManager\ConsentStore\location"; Name = "Value"; Value = "Deny"; Type = "String"; OriginalValue = "Allow" },
+            @{ Path = "HKLM:\SOFTWARE\Microsoft\Windows NT\CurrentVersion\Sensor\Overrides\{BFA794E4-F964-4FDB-90F6-51056BFE4B44}"; Name = "SensorPermissionState"; Value = 0; Type = "DWord"; OriginalValue = 1 },
+            @{ Path = "HKLM:\SYSTEM\Maps"; Name = "AutoUpdateEnabled"; Value = 0; Type = "DWord"; OriginalValue = 1 }
+        )
+    }
+    "WPFTweaksDisableStoreSearch" = @{
+        "Content" = "Microsoft Store Recommended Search Results - Disable"
+        "Description" = "Will not display recommended Microsoft Store apps when searching for apps in the Start menu."
+        "category" = "Essential Tweaks"
+        "panel" = "1"
+        "InvokeScript" = @('icacls "$Env:LocalAppData\Packages\Microsoft.WindowsStore_8wekyb3d8bbwe\LocalState\store.db" /deny Everyone:F')
+        "UndoScript" = @('icacls "$Env:LocalAppData\Packages\Microsoft.WindowsStore_8wekyb3d8bbwe\LocalState\store.db" /grant Everyone:F')
+    }
+    "WPFTweaksPowershell7Tele" = @{
+        "Content" = "PowerShell 7 Telemetry - Disable"
+        "Description" = "Creates an Environment Variable called 'POWERSHELL_TELEMETRY_OPTOUT' with a value of '1' which will tell PowerShell 7 to not send Telemetry Data."
+        "category" = "Essential Tweaks"
+        "panel" = "1"
+        "InvokeScript" = @("[Environment]::SetEnvironmentVariable('POWERSHELL_TELEMETRY_OPTOUT', '1', 'Machine')")
+        "UndoScript" = @("[Environment]::SetEnvironmentVariable('POWERSHELL_TELEMETRY_OPTOUT', '', 'Machine')")
+    }
+    "WPFTweaksServices" = @{
+        "Content" = "Services - Set to Manual"
+        "Description" = "Turns a bunch of system services to manual that don't need to be running all the time. This is pretty harmless as if the service is needed, it will simply start on demand."
+        "category" = "Essential Tweaks"
+        "panel" = "1"
+        "service" = @(
+            @{ Name = "CscService"; StartupType = "Disabled"; OriginalType = "Manual" },
+            @{ Name = "DiagTrack"; StartupType = "Disabled"; OriginalType = "Automatic" },
+            @{ Name = "MapsBroker"; StartupType = "Manual"; OriginalType = "Automatic" },
+            @{ Name = "RemoteAccess"; StartupType = "Disabled"; OriginalType = "Disabled" },
+            @{ Name = "RemoteRegistry"; StartupType = "Disabled"; OriginalType = "Disabled" },
+            @{ Name = "StorSvc"; StartupType = "Manual"; OriginalType = "Automatic" },
+            @{ Name = "SharedAccess"; StartupType = "Disabled"; OriginalType = "Automatic" },
+            @{ Name = "TermService"; StartupType = "Manual"; OriginalType = "Manual" },
+            @{ Name = "TroubleshootingSvc"; StartupType = "Manual"; OriginalType = "Manual" },
+            @{ Name = "seclogon"; StartupType = "Manual"; OriginalType = "Manual" },
+            @{ Name = "ssh-agent"; StartupType = "Disabled"; OriginalType = "Disabled" }
+        )
+        "InvokeScript" = @(
+            @'
+$Memory = (Get-CimInstance Win32_PhysicalMemory | Measure-Object Capacity -Sum).Sum / 1KB
+Set-ItemProperty -Path "HKLM:\SYSTEM\CurrentControlSet\Control" -Name SvcHostSplitThresholdInKB -Value $Memory
+'@
+        )
+    }
+    "WPFTweaksTelemetry" = @{
+        "Content" = "Telemetry - Disable"
+        "Description" = "Disables Microsoft Telemetry."
+        "category" = "Essential Tweaks"
+        "panel" = "1"
+        "registry" = @(
+            @{ Path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\AdvertisingInfo"; Name = "Enabled"; Value = 0; Type = "DWord"; OriginalValue = "<RemoveEntry>" },
+            @{ Path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Privacy"; Name = "TailoredExperiencesWithDiagnosticDataEnabled"; Value = 0; Type = "DWord"; OriginalValue = "<RemoveEntry>" },
+            @{ Path = "HKCU:\Software\Microsoft\Speech_OneCore\Settings\OnlineSpeechPrivacy"; Name = "HasAccepted"; Value = 0; Type = "DWord"; OriginalValue = "<RemoveEntry>" },
+            @{ Path = "HKCU:\Software\Microsoft\Input\TIPC"; Name = "Enabled"; Value = 0; Type = "DWord"; OriginalValue = "<RemoveEntry>" },
+            @{ Path = "HKCU:\Software\Microsoft\InputPersonalization"; Name = "RestrictImplicitInkCollection"; Value = 1; Type = "DWord"; OriginalValue = "<RemoveEntry>" },
+            @{ Path = "HKCU:\Software\Microsoft\InputPersonalization"; Name = "RestrictImplicitTextCollection"; Value = 1; Type = "DWord"; OriginalValue = "<RemoveEntry>" },
+            @{ Path = "HKCU:\Software\Microsoft\InputPersonalization\TrainedDataStore"; Name = "HarvestContacts"; Value = 0; Type = "DWord"; OriginalValue = "<RemoveEntry>" },
+            @{ Path = "HKCU:\Software\Microsoft\Personalization\Settings"; Name = "AcceptedPrivacyPolicy"; Value = 0; Type = "DWord"; OriginalValue = "<RemoveEntry>" },
+            @{ Path = "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Policies\DataCollection"; Name = "AllowTelemetry"; Value = 0; Type = "DWord"; OriginalValue = "<RemoveEntry>" },
+            @{ Path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"; Name = "Start_TrackProgs"; Value = 0; Type = "DWord"; OriginalValue = "<RemoveEntry>" },
+            @{ Path = "HKLM:\SOFTWARE\Policies\Microsoft\Windows\System"; Name = "PublishUserActivities"; Value = 0; Type = "DWord"; OriginalValue = "<RemoveEntry>" },
+            @{ Path = "HKCU:\Software\Microsoft\Siuf\Rules"; Name = "NumberOfSIUFInPeriod"; Value = 0; Type = "DWord"; OriginalValue = "<RemoveEntry>" }
+        )
+        "InvokeScript" = @(
+            @'
+# Disable Defender Auto Sample Submission
+Set-MpPreference -SubmitSamplesConsent 2
+# Disable (Connected User Experiences and Telemetry) Service
+Set-Service -Name diagtrack -StartupType Disabled
+# Disable (Windows Error Reporting Manager) Service
+Set-Service -Name wermgr -StartupType Disabled
+Remove-ItemProperty -Path "HKCU:\Software\Microsoft\Siuf\Rules" -Name PeriodInNanoSeconds
+'@
+        )
+        "UndoScript" = @(
+            @'
+# Enable Defender Auto Sample Submission
+Set-MpPreference -SubmitSamplesConsent 1
+# Enable (Connected User Experiences and Telemetry) Service
+Set-Service -Name diagtrack -StartupType Automatic
+# Enable (Windows Error Reporting Manager) Service
+Set-Service -Name wermgr -StartupType Automatic
+'@
+        )
+    }
+    "WPFTweaksDeleteTempFiles" = @{
+        "Content" = "Temporary Files - Remove"
+        "Description" = "Erases TEMP Folders."
+        "category" = "Essential Tweaks"
+        "panel" = "1"
+        "InvokeScript" = @(
+            @'
+Remove-Item -Path "$Env:Temp\*" -Recurse -Force
+Remove-Item -Path "$Env:SystemRoot\Temp\*" -Recurse -Force
+'@
+        )
+    }
+    "WPFTweaksWidget" = @{
+        "Content" = "Widgets - Remove"
+        "Description" = "Removes the annoying widgets in the bottom left of the Taskbar."
+        "category" = "Essential Tweaks"
+        "panel" = "1"
+        "InvokeScript" = @(
+            @'
+Get-Process *Widget* | Stop-Process
+Get-AppxPackage Microsoft.WidgetsPlatformRuntime -AllUsers | Remove-AppxPackage -AllUsers
+Get-AppxPackage MicrosoftWindows.Client.WebExperience -AllUsers | Remove-AppxPackage -AllUsers
+Invoke-WinUtilExplorerUpdate -action "restart"
+Write-Host "Removed widgets"
+'@
+        )
+        "UndoScript" = @(
+            @'
+Write-Host "Restoring widgets AppxPackages"
+Add-AppxPackage -Register "C:\Program Files\WindowsApps\Microsoft.WidgetsPlatformRuntime*\AppxManifest.xml" -DisableDevelopmentMode
+Add-AppxPackage -Register "C:\Program Files\WindowsApps\MicrosoftWindows.Client.WebExperience*\AppxManifest.xml" -DisableDevelopmentMode
+Invoke-WinUtilExplorerUpdate -action "restart"
+'@
+        )
+    }
+    "WPFTweaksWPBT" = @{
+        "Content" = "Windows Platform Binary Table (WPBT) - Disable"
+        "Description" = "If enabled, WPBT allows your computer vendor to execute programs at boot time, such as anti-theft software, software drivers, as well as force install software without user consent. Poses potential security risk."
+        "category" = "Essential Tweaks"
+        "panel" = "1"
+        "registry" = @(
+            @{ Path = "HKLM:\SYSTEM\CurrentControlSet\Control\Session Manager"; Name = "DisableWpbtExecution"; Value = 1; Type = "DWord"; OriginalValue = "<RemoveEntry>" }
+        )
+    }
+    "WPFTweaksDisableBGapps" = @{
+        "Content" = "Background Apps - Disable"
+        "Description" = "Disables all Microsoft Store apps from running in the background, which has to be done individually since Windows 11."
+        "category" = "z__Advanced Tweaks - CAUTION"
+        "panel" = "1"
+        "registry" = @(
+            @{ Path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\BackgroundAccessApplications"; Name = "GlobalUserDisabled"; Value = 1; Type = "DWord"; OriginalValue = 0 }
+        )
+    }
+    "WPFTweaksBraveDebloat" = @{
+        "Content" = "Brave Browser - Debloat"
+        "Description" = "Disables various annoyances like Brave Rewards, Leo AI, Crypto Wallet and VPN."
+        "category" = "z__Advanced Tweaks - CAUTION"
+        "panel" = "1"
+        "registry" = @(
+            @{ Path = "HKLM:\SOFTWARE\Policies\BraveSoftware\Brave"; Name = "BraveRewardsDisabled"; Value = 1; Type = "DWord"; OriginalValue = "<RemoveEntry>" },
+            @{ Path = "HKLM:\SOFTWARE\Policies\BraveSoftware\Brave"; Name = "BraveWalletDisabled"; Value = 1; Type = "DWord"; OriginalValue = "<RemoveEntry>" },
+            @{ Path = "HKLM:\SOFTWARE\Policies\BraveSoftware\Brave"; Name = "BraveVPNDisabled"; Value = 1; Type = "DWord"; OriginalValue = "<RemoveEntry>" },
+            @{ Path = "HKLM:\SOFTWARE\Policies\BraveSoftware\Brave"; Name = "BraveAIChatEnabled"; Value = 0; Type = "DWord"; OriginalValue = "<RemoveEntry>" },
+            @{ Path = "HKLM:\SOFTWARE\Policies\BraveSoftware\Brave"; Name = "BraveStatsPingEnabled"; Value = 0; Type = "DWord"; OriginalValue = "<RemoveEntry>" }
+        )
+    }
+    "WPFTweaksDisableWarningForUnsignedRdp" = @{
+        "Content" = "Disable warnings for unsigned RDP files"
+        "Description" = "Disables warnings shown when launching unsigned RDP files introduced with the latest Windows 10 and 11 updates."
+        "category" = "z__Advanced Tweaks - CAUTION"
+        "panel" = "1"
+        "registry" = @(
+            @{ Path = "HKLM:\SOFTWARE\Policies\Microsoft\Windows NT\Terminal Services\Client"; Name = "RedirectionWarningDialogVersion"; Value = 1; Type = "DWord"; OriginalValue = "<RemoveEntry>" },
+            @{ Path = "HKCU:\SOFTWARE\Microsoft\Terminal Server Client"; Name = "RdpLaunchConsentAccepted"; Value = 1; Type = "DWord"; OriginalValue = "<RemoveEntry>" }
+        )
+    }
+    "WPFTweaksDisableIPv6" = @{
+        "Content" = "IPv6 - Disable"
+        "Description" = "Disables IPv6."
+        "category" = "z__Advanced Tweaks - CAUTION"
+        "panel" = "1"
+        "registry" = @(
+            @{ Path = "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters"; Name = "DisabledComponents"; Value = 255; Type = "DWord"; OriginalValue = 0 }
+        )
+        "InvokeScript" = @("Disable-NetAdapterBinding -Name * -ComponentID ms_tcpip6")
+        "UndoScript" = @("Enable-NetAdapterBinding -Name * -ComponentID ms_tcpip6")
+    }
+    "WPFTweaksIPv46" = @{
+        "Content" = "IPv6 - Set IPv4 as Preferred"
+        "Description" = "Setting the IPv4 preference can have latency and security benefits on private networks where IPv6 is not configured."
+        "category" = "z__Advanced Tweaks - CAUTION"
+        "panel" = "1"
+        "registry" = @(
+            @{ Path = "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters"; Name = "DisabledComponents"; Value = 32; Type = "DWord"; OriginalValue = 0 }
+        )
+    }
+    "WPFTweaksRemoveCopilot" = @{
+        "Content" = "Microsoft Copilot - Disable"
+        "Description" = "Removes Copilot AppXPackages and related ai packages"
+        "category" = "z__Advanced Tweaks - CAUTION"
+        "panel" = "1"
+        "InvokeScript" = @(
+            @'
+Get-AppxPackage -AllUsers *Copilot* | Remove-AppxPackage -AllUsers
+Get-AppxPackage -AllUsers Microsoft.MicrosoftOfficeHub | Remove-AppxPackage -AllUsers
+$Appx = (Get-AppxPackage MicrosoftWindows.Client.CoreAI).PackageFullName
+$Sid = (Get-LocalUser $Env:UserName).Sid.Value
+New-Item "HKLM:\SOFTWARE\Microsoft\Windows\CurrentVersion\Appx\AppxAllUserStore\EndOfLife\$Sid\$Appx" -Force
+Remove-AppxPackage $Appx
+Write-Host "Copilot Removed"
+'@
+        )
+        "UndoScript" = @(
+            @'
+Write-Host "Installing Copilot..."
+winget install --name Copilot --source msstore --accept-package-agreements --accept-source-agreements --silent
+'@
+        )
+    }
+    "WPFTweaksRemoveEdge" = @{
+        "Content" = "Microsoft Edge - Remove"
+        "Description" = "Unblocks Microsoft Edge uninstaller restrictions then uses that uninstaller to remove Microsoft Edge."
+        "category" = "z__Advanced Tweaks - CAUTION"
+        "panel" = "1"
+        "InvokeScript" = @("Invoke-WinUtilRemoveEdge")
+        "UndoScript" = @(
+            @'
+Write-Host 'Installing Microsoft Edge...'
+winget install Microsoft.Edge --source winget
+'@
+        )
+    }
+    "WPFTweaksRemoveOneDrive" = @{
+        "Content" = "Microsoft OneDrive - Remove"
+        "Description" = "Denies permission to remove OneDrive user files, then uses its own uninstaller to remove it and restores the original permission afterward."
+        "category" = "z__Advanced Tweaks - CAUTION"
+        "panel" = "1"
+        "InvokeScript" = @(
+            @'
+# Deny permission to remove OneDrive folder
+icacls $Env:OneDrive /deny "Administrators:(D,DC)"
+Write-Host "Uninstalling OneDrive..."
+Start-Process 'C:\Windows\System32\OneDriveSetup.exe' -ArgumentList '/uninstall' -Wait
+# Some of OneDrive files use explorer, and OneDrive uses FileCoAuth
+Write-Host "Removing leftover OneDrive Files..."
+Stop-Process -Name FileCoAuth,Explorer
+Remove-Item "$Env:LocalAppData\Microsoft\OneDrive" -Recurse -Force
+Remove-Item "C:\ProgramData\Microsoft OneDrive" -Recurse -Force
+# Grant back permission to access OneDrive folder
+icacls $Env:OneDrive /grant "Administrators:(D,DC)"
+# Disable OneSyncSvc
+Set-Service -Name OneSyncSvc -StartupType Disabled
+'@
+        )
+        "UndoScript" = @(
+            @'
+Write-Host "Installing OneDrive"
+winget install Microsoft.Onedrive --source winget
+# Enabled OneSyncSvc
+Set-Service -Name OneSyncSvc -StartupType Automatic
+'@
+        )
+    }
+    "WPFTweaksXboxRemoval" = @{
+        "Content" = "Xbox & Gaming Components - Remove"
+        "Description" = "Removes Xbox services, the Xbox app, Game Bar, and related authentication components."
+        "category" = "z__Advanced Tweaks - CAUTION"
+        "panel" = "1"
+        "registry" = @(
+            @{ Path = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\GameDVR"; Name = "AppCaptureEnabled"; Value = 0; Type = "DWord"; OriginalValue = 1 }
+        )
+        "appx" = @(
+            "Microsoft.XboxIdentityProvider",
+            "Microsoft.XboxSpeechToTextOverlay",
+            "Microsoft.GamingApp",
+            "Microsoft.Xbox.TCUI",
+            "Microsoft.XboxGamingOverlay"
+        )
+    }
+    "WPFTweaksDisplay" = @{
+        "Content" = "Visual Effects - Set to Best Performance"
+        "Description" = "Sets the system preferences to performance. You can do this manually with sysdm.cpl as well."
+        "category" = "z__Advanced Tweaks - CAUTION"
+        "panel" = "1"
+        "registry" = @(
+            @{ Path = "HKCU:\Control Panel\Desktop"; Name = "DragFullWindows"; Value = "0"; Type = "String"; OriginalValue = "1" },
+            @{ Path = "HKCU:\Control Panel\Desktop"; Name = "MenuShowDelay"; Value = "200"; Type = "String"; OriginalValue = "400" },
+            @{ Path = "HKCU:\Control Panel\Desktop\WindowMetrics"; Name = "MinAnimate"; Value = "0"; Type = "String"; OriginalValue = "1" },
+            @{ Path = "HKCU:\Control Panel\Keyboard"; Name = "KeyboardDelay"; Value = 0; Type = "DWord"; OriginalValue = 1 },
+            @{ Path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"; Name = "ListviewAlphaSelect"; Value = 0; Type = "DWord"; OriginalValue = 1 },
+            @{ Path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"; Name = "ListviewShadow"; Value = 0; Type = "DWord"; OriginalValue = 1 },
+            @{ Path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"; Name = "TaskbarAnimations"; Value = 0; Type = "DWord"; OriginalValue = 1 },
+            @{ Path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\VisualEffects"; Name = "VisualFXSetting"; Value = 3; Type = "DWord"; OriginalValue = 1 },
+            @{ Path = "HKCU:\Software\Microsoft\Windows\DWM"; Name = "EnableAeroPeek"; Value = 0; Type = "DWord"; OriginalValue = 1 },
+            @{ Path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"; Name = "TaskbarMn"; Value = 0; Type = "DWord"; OriginalValue = 1 },
+            @{ Path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Explorer\Advanced"; Name = "ShowTaskViewButton"; Value = 0; Type = "DWord"; OriginalValue = 1 },
+            @{ Path = "HKCU:\Software\Microsoft\Windows\CurrentVersion\Search"; Name = "SearchboxTaskbarMode"; Value = 0; Type = "DWord"; OriginalValue = 1 }
+        )
+        "InvokeScript" = @("Set-ItemProperty -Path 'HKCU:\Control Panel\Desktop' -Name 'UserPreferencesMask' -Type Binary -Value ([byte[]](144,18,3,128,16,0,0,0))")
+        "UndoScript" = @("Remove-ItemProperty -Path 'HKCU:\Control Panel\Desktop' -Name 'UserPreferencesMask'")
+    }
+    "WPFTweaksDeBloat" = @{
+        "Content" = "Unwanted Pre-Installed Apps - Remove"
+        "Description" = "This will remove a bunch of Windows pre-installed applications which most people dont want on there system."
+        "category" = "z__Advanced Tweaks - CAUTION"
+        "panel" = "1"
+        "appx" = @(
+            "Microsoft.WindowsFeedbackHub",
+            "Microsoft.BingNews",
+            "Microsoft.BingSearch",
+            "Microsoft.BingWeather",
+            "Clipchamp.Clipchamp",
+            "Microsoft.Todos",
+            "Microsoft.PowerAutomateDesktop",
+            "Microsoft.MicrosoftSolitaireCollection",
+            "Microsoft.WindowsSoundRecorder",
+            "Microsoft.MicrosoftStickyNotes",
+            "Microsoft.Windows.DevHome",
+            "Microsoft.Paint",
+            "Microsoft.OutlookForWindows",
+            "Microsoft.WindowsAlarms",
+            "Microsoft.StartExperiencesApp",
+            "Microsoft.GetHelp",
+            "Microsoft.ZuneMusic",
+            "MicrosoftCorporationII.QuickAssist",
+            "MSTeams"
+        )
+        "InvokeScript" = @(
+            @'
+$TeamsPath = "$Env:LocalAppData\Microsoft\Teams\Update.exe"
+if (Test-Path $TeamsPath) {
+    Write-Host "Uninstalling Teams"
+    Start-Process $TeamsPath -ArgumentList -uninstall -wait
+    Write-Host "Deleting Teams directory"
+    Remove-Item $TeamsPath -Recurse -Force
+}
+'@
+        )
+    }
+    "WPFTweaksTeredo" = @{
+        "Content" = "Teredo - Disable"
+        "Description" = "Teredo network tunneling is an IPv6 feature that can cause additional latency, but may cause problems with some games."
+        "category" = "z__Advanced Tweaks - CAUTION"
+        "panel" = "1"
+        "registry" = @(
+            @{ Path = "HKLM:\SYSTEM\CurrentControlSet\Services\Tcpip6\Parameters"; Name = "DisabledComponents"; Value = 1; Type = "DWord"; OriginalValue = 0 }
+        )
+        "InvokeScript" = @("netsh interface teredo set state disabled")
+        "UndoScript" = @("netsh interface teredo set state default")
+    }
+    "WPFTweaksStorage" = @{
+        "Content" = "Storage Sense - Disable"
+        "Description" = "Storage Sense deletes temp files automatically."
+        "category" = "z__Advanced Tweaks - CAUTION"
+        "panel" = "1"
+        "registry" = @(
+            @{ Path = "HKCU:\SOFTWARE\Microsoft\Windows\CurrentVersion\StorageSense\Parameters\StoragePolicy"; Name = "01"; Value = 0; Type = "DWord"; OriginalValue = 1 }
+        )
+    }
+    "WPFTweaksRightClickMenu" = @{
+        "Content" = "Right-Click Menu Previous Layout - Enable"
+        "Description" = "Restores the classic context menu when right-clicking in File Explorer, replacing the simplified Windows 11 version."
+        "category" = "z__Advanced Tweaks - CAUTION"
+        "panel" = "1"
+        "InvokeScript" = @(
+            @'
+New-Item -Path "HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}" -Name "InprocServer32" -force -value ""
+Write-Host Restarting explorer.exe ...
+Stop-Process -Name "explorer" -Force
+'@
+        )
+        "UndoScript" = @(
+            @'
+Remove-Item -Path "HKCU:\Software\Classes\CLSID\{86ca1aa0-34aa-4e8b-a509-50c905bae2a2}" -Recurse -Confirm:$false -Force
+Write-Host Restarting explorer.exe ...
+Stop-Process -Name "explorer" -Force
+'@
+        )
+    }
+    "WPFTweaksDisableFSO" = @{
+        "Content" = "Fullscreen Optimizations - Disable"
+        "Description" = "Disables FSO in all applications. NOTE: This will disable Color Management in Exclusive Fullscreen."
+        "category" = "z__Advanced Tweaks - CAUTION"
+        "panel" = "1"
+        "registry" = @(
+            @{ Path = "HKCU:\System\GameConfigStore"; Name = "GameDVR_DXGIHonorFSEWindowsCompatible"; Value = 1; Type = "DWord"; OriginalValue = 0 }
+        )
+    }
+}
 
 # ========== FUNCIONES AUXILIARES BÁSICAS ==========
 function Get-HardwareInfo {
@@ -132,6 +605,66 @@ function Set-ScheduledTaskState {
             # Ignore errors
         }
     }
+}
+
+# ========== FUNCIÓN PARA APLICAR TWEAKS DEL JSON ==========
+function Apply-WinUtilTweaks {
+    <#
+    .SYNOPSIS
+      Applies all tweaks defined in the WinUtil JSON configuration.
+    #>
+    Write-Status -Types "@" -Status "Applying WinUtil tweaks from configuration..."
+    $tweaks = $script:TweaksConfig
+    foreach ($tweakKey in $tweaks.Keys) {
+        $tweak = $tweaks[$tweakKey]
+        $name = if ($tweak.Content) { $tweak.Content } else { $tweakKey }
+        Write-Status -Types "-" -Status "Processing: $name"
+        
+        # Registry tweaks
+        if ($tweak.registry) {
+            foreach ($reg in $tweak.registry) {
+                $path = $reg.Path
+                $regName = $reg.Name
+                $value = $reg.Value
+                $type = $reg.Type
+                if ($reg.OriginalValue -eq '<RemoveEntry>') {
+                    # We are to create the entry (if it doesn't exist) and set value
+                    Set-ItemPropertyVerified -Path $path -Name $regName -Value $value -Type $type
+                } else {
+                    # Original value exists, we just set
+                    Set-ItemPropertyVerified -Path $path -Name $regName -Value $value -Type $type
+                }
+            }
+        }
+        
+        # Service tweaks
+        if ($tweak.service) {
+            foreach ($svc in $tweak.service) {
+                try {
+                    $svcName = $svc.Name
+                    $desiredType = $svc.StartupType
+                    Set-Service -Name $svcName -StartupType $desiredType -ErrorAction SilentlyContinue
+                } catch {}
+            }
+        }
+        
+        # AppX removal
+        if ($tweak.appx) {
+            Remove-UWPApp -PackageNames $tweak.appx
+        }
+        
+        # InvokeScript (apply actions)
+        if ($tweak.InvokeScript) {
+            foreach ($scriptBlock in $tweak.InvokeScript) {
+                try {
+                    Invoke-Expression $scriptBlock
+                } catch {
+                    Write-Status -Types "?" -Status "Error executing script for $name : $_"
+                }
+            }
+        }
+    }
+    Write-Status -Types "+" -Status "WinUtil tweaks applied successfully"
 }
 
 # ========== NUEVAS FUNCIONES (2,5,6,7,9,10,11) ==========
@@ -915,6 +1448,7 @@ function Start-CompleteOptimization {
     Write-Host "- Deep system cleanup (DISM, WinSxS, Update cache)" -ForegroundColor White
     Write-Host "- Disable input data collection & startup suggestions" -ForegroundColor White
     Write-Host "- Optimize NTFS and remove unused language packs" -ForegroundColor White
+    Write-Host "- Apply WinUtil tweaks (activity history, telemetry, widgets, etc.)" -ForegroundColor White
     Write-Host "- Generate detailed log file in TEMP folder" -ForegroundColor White
     Write-Host ""
     Write-Host "Continue? (y/n)" -ForegroundColor Yellow
@@ -1007,7 +1541,11 @@ function Start-CompleteOptimization {
     Write-Host "`n=== SCHEDULED TASKS ===" -ForegroundColor Cyan
     Disable-UnnecessaryTasks
     
-    # 13. Cleanup
+    # 13. Aplicar tweaks de WinUtil (JSON)
+    Write-Host "`n=== WINUTIL TWEAKS ===" -ForegroundColor Cyan
+    Apply-WinUtilTweaks
+    
+    # 14. Cleanup
     Write-Host "`n=== CLEANUP ===" -ForegroundColor Cyan
     Clean-TemporaryFiles
 
@@ -1030,6 +1568,7 @@ function Start-CompleteOptimization {
     Write-Host "  - OneDrive, Xbox and 50+ apps removed" -ForegroundColor Green
     Write-Host "  - Input data collection disabled" -ForegroundColor Green
     Write-Host "  - Startup suggestions disabled (notifications untouched)" -ForegroundColor Green
+    Write-Host "  - WinUtil tweaks applied (activity, telemetry, widgets, etc.)" -ForegroundColor Green
     Write-Host "  - Deep cleanup (DISM, WinSxS, Update cache)" -ForegroundColor Green
     Write-Host "  - Unused language packs removed" -ForegroundColor Green
     Write-Host "  - NTFS optimizations applied" -ForegroundColor Green
