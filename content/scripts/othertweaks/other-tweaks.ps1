@@ -1,6 +1,6 @@
 # =============================================================================
 # SCRIPT: other-tweaks.ps1 (combinado con tweaks.json de WinUtil)
-# VERSIÓN: 3.1 (Sin reparación de archivos de sistema que causaba bloqueo)
+# VERSIÓN: 3.2 (Corregido bloqueo en características opcionales y limpieza final)
 # DESCRIPCIÓN: Optimización completa de Windows 10/11 para rendimiento,
 #               privacidad extrema y eliminación de telemetría/AI/Copilot,
 #               más los tweaks específicos de WinUtil.
@@ -1071,14 +1071,17 @@ function Optimize-WindowsFeaturesList {
         try {
             $featureExists = Get-WindowsOptionalFeature -Online -FeatureName $feature -ErrorAction SilentlyContinue
             if ($featureExists -and $featureExists.State -ne "Disabled") {
-                Disable-WindowsOptionalFeature -Online -FeatureName $feature -NoRestart | Out-Null
+                # Evitar bloqueos: se añade -Confirm:$false y -NoRestart
+                Disable-WindowsOptionalFeature -Online -FeatureName $feature -NoRestart -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
+                Write-Status -Types "+" -Status "Disabled feature: $feature"
             }
         } catch {
-            # Ignore errors for features that don't exist
+            # Si falla, seguimos con la siguiente
+            Write-Status -Types "?" -Status "Could not disable feature: $feature"
         }
     }
     
-    Write-Status -Types "+" -Status "Optional features disabled"
+    Write-Status -Types "+" -Status "Optional features processing finished"
 }
 
 function Disable-AllDiagnostics {
@@ -1408,18 +1411,6 @@ function Start-CompleteOptimization {
         exit 1
     }
     
-    # Show system info
-    $systemInfo = Get-HardwareInfo
-    if ($systemInfo) {
-        Write-Host "System detected:" -ForegroundColor Yellow
-        Write-Host "  Computer: $($systemInfo.ComputerName)" -ForegroundColor White
-        Write-Host "  OS: $($systemInfo.OS)" -ForegroundColor White
-        Write-Host "  CPU: $($systemInfo.CPU)" -ForegroundColor White
-        Write-Host "  RAM: $($systemInfo.MemoryMB) MB" -ForegroundColor White
-        Write-Host "  Disk: $($systemInfo.DiskGB) GB" -ForegroundColor White
-        Write-Host ""
-    }
-    
     # Final confirmation
     Write-Host "This IMPROVED version will:" -ForegroundColor Yellow
     Write-Host "- Disable Hyper-V for VMware" -ForegroundColor White
@@ -1555,18 +1546,9 @@ function Start-CompleteOptimization {
     Write-Host ""
     Write-Host "Detailed log saved to: $script:LogFile" -ForegroundColor Cyan
     Write-Host ""
-    Write-Host "VMware compatibility improved!" -ForegroundColor Green
-    Write-Host "Some changes may require restart." -ForegroundColor Yellow
-    
-    $reboot = Read-Host "`nRestart now? (y/n)"
-    if ($reboot -eq 'y' -or $reboot -eq 'Y') {
-        Write-Host "Restarting in 5 seconds..." -ForegroundColor Yellow
-        Start-Sleep 5
-        Restart-Computer -Force
-    } else {
-        Write-Host "Optimization completed. Restart when convenient." -ForegroundColor Green
-        pause
-    }
+    Write-Host "Optimization completed. Some changes may require a restart." -ForegroundColor Yellow
+    Write-Host "Press any key to exit..." -ForegroundColor Yellow
+    $null = $Host.UI.RawUI.ReadKey("NoEcho,IncludeKeyDown")
 }
 
 # Ejecutar la optimización completa
