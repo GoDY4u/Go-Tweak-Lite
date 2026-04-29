@@ -1402,7 +1402,7 @@ Windows Registry Editor Version 5.00
 ; Disable_Animations
 
 [HKEY_CURRENT_USER\Control Panel\Desktop]
-"UserPreferencesMask"=hex:40,0C,07,80,10,00,00,00
+"UserPreferencesMask"=hex:90,12,03,80,10,00,00,00
 
 
 
