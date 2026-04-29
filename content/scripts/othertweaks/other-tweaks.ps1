@@ -1,6 +1,6 @@
 # =============================================================================
 # SCRIPT: other-tweaks.ps1 (combinado con tweaks.json de WinUtil)
-# VERSIÓN: 3.0 (Integración de tweaks avanzados)
+# VERSIÓN: 3.1 (Sin reparación de archivos de sistema que causaba bloqueo)
 # DESCRIPCIÓN: Optimización completa de Windows 10/11 para rendimiento,
 #               privacidad extrema y eliminación de telemetría/AI/Copilot,
 #               más los tweaks específicos de WinUtil.
@@ -667,7 +667,7 @@ function Apply-WinUtilTweaks {
     Write-Status -Types "+" -Status "WinUtil tweaks applied successfully"
 }
 
-# ========== NUEVAS FUNCIONES (2,5,6,7,9,10,11) ==========
+# ========== OTRAS FUNCIONES ==========
 
 # 2. Limpieza profunda del sistema (DISM y caché de Windows Update)
 function Invoke-DeepSystemCleanup {
@@ -728,21 +728,6 @@ function Disable-StartupSuggestions {
     Set-ItemPropertyVerified -Path "HKCU:\Software\Microsoft\Windows\CurrentVersion\ContentDeliveryManager" -Name "SubscribedContent-353698Enabled" -Value 0
     Write-Status -Types "+" -Status "Startup suggestions disabled"
     Write-Log -Message "Startup suggestions and welcome experience disabled (notifications NOT affected)" -Level "SUCCESS"
-}
-
-# 9. Verificación y reparación de archivos de sistema (SFC / DISM)
-function Repair-SystemFiles {
-    Write-Status -Types "@" -Status "Checking and repairing system files..."
-    try {
-        sfc /scannow
-        Write-Log -Message "SFC /scannow executed" -Level "INFO"
-        Dism /Online /Cleanup-Image /RestoreHealth
-        Write-Log -Message "DISM /RestoreHealth executed" -Level "INFO"
-        Write-Status -Types "+" -Status "System file check and repair completed"
-    } catch {
-        Write-Status -Types "?" -Status "Error during system file repair"
-        Write-Log -Message "System file repair failed: $_" -Level "ERROR"
-    }
 }
 
 # 10. Eliminación de paquetes de idioma no usados
@@ -1437,7 +1422,6 @@ function Start-CompleteOptimization {
     
     # Final confirmation
     Write-Host "This IMPROVED version will:" -ForegroundColor Yellow
-    Write-Host "- Verify and repair system files (SFC/DISM)" -ForegroundColor White
     Write-Host "- Disable Hyper-V for VMware" -ForegroundColor White
     Write-Host "- Remove bloatware and unnecessary services" -ForegroundColor White
     Write-Host "- Optimize performance and privacy" -ForegroundColor White
@@ -1463,10 +1447,6 @@ function Start-CompleteOptimization {
     Write-Host ""
     Write-Host "STARTING OPTIMIZATIONS..." -ForegroundColor Green
     Write-Host "================================================" -ForegroundColor Green
-    
-    # === NUEVO: Verificación de integridad del sistema ===
-    Write-Host "`n=== SYSTEM INTEGRITY CHECK ===" -ForegroundColor Cyan
-    Repair-SystemFiles
     
     # 1. Hyper-V for VMware
     Write-Host "`n=== VMWARE COMPATIBILITY ===" -ForegroundColor Cyan
@@ -1497,7 +1477,6 @@ function Start-CompleteOptimization {
     Disable-AdvertisingID
     Disable-WindowsSpotlight
     Disable-BackgroundApps
-    # Nuevas funciones de privacidad (sin afectar notificaciones)
     Disable-InputPersonalization
     Disable-StartupSuggestions
     
@@ -1511,14 +1490,14 @@ function Start-CompleteOptimization {
     Remove-Xbox
     Remove-Bloatware
     
-    # 7. PROTECCIONES AVANZADAS
+    # 7. ADVANCED PROTECTIONS
     Write-Host "`n=== ADVANCED PROTECTIONS ===" -ForegroundColor Cyan
     Remove-CopilotAndAI
     Set-AdvancedTelemetryBlock
     Set-HardeningSecurity
     Remove-TelemetryFiles
     
-    # 8. Deep Maintenance (limpieza profunda y paquetes de idioma)
+    # 8. Deep Maintenance
     Write-Host "`n=== DEEP MAINTENANCE ===" -ForegroundColor Cyan
     Invoke-DeepSystemCleanup
     Remove-UnusedLanguagePacks
@@ -1527,7 +1506,7 @@ function Start-CompleteOptimization {
     Write-Host "`n=== PERFORMANCE ===" -ForegroundColor Cyan
     Optimize-Performance
     Optimize-Network
-    Optimize-NTFS   # Nueva optimización NTFS
+    Optimize-NTFS
     
     # 10. Security
     Write-Host "`n=== SECURITY ===" -ForegroundColor Cyan
@@ -1541,7 +1520,7 @@ function Start-CompleteOptimization {
     Write-Host "`n=== SCHEDULED TASKS ===" -ForegroundColor Cyan
     Disable-UnnecessaryTasks
     
-    # 13. Aplicar tweaks de WinUtil (JSON)
+    # 13. WinUtil tweaks
     Write-Host "`n=== WINUTIL TWEAKS ===" -ForegroundColor Cyan
     Apply-WinUtilTweaks
     
@@ -1556,7 +1535,6 @@ function Start-CompleteOptimization {
     Write-Host "================================================" -ForegroundColor Green
     Write-Host ""
     Write-Host "Applied optimizations:" -ForegroundColor Yellow
-    Write-Host "  - System files verified/repaired (SFC/DISM)" -ForegroundColor Green
     Write-Host "  - Hyper-V disabled for VMware" -ForegroundColor Green
     Write-Host "  - SSD optimized and hibernation disabled" -ForegroundColor Green
     Write-Host "  - 65+ unnecessary services disabled" -ForegroundColor Green
