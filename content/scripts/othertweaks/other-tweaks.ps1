@@ -1,6 +1,6 @@
 # =============================================================================
 # SCRIPT: other-tweaks.ps1 (combinado con tweaks.json de WinUtil)
-# VERSIÓN: 3.2 (Corregido bloqueo en características opcionales y limpieza final)
+# VERSIÓN: 3.3 (Eliminada característica que bloqueaba el script)
 # DESCRIPCIÓN: Optimización completa de Windows 10/11 para rendimiento,
 #               privacidad extrema y eliminación de telemetría/AI/Copilot,
 #               más los tweaks específicos de WinUtil.
@@ -1042,47 +1042,8 @@ function Optimize-ServicesRunning {
     Write-Status -Types "+" -Status "Services optimized (65+ services configured)"
 }
 
-function Optimize-WindowsFeaturesList {
-    Write-Status -Types "@" -Status "Disabling optional Windows features..."
-    
-    $FeaturesToTry = @(
-        "FaxServicesClientPackage",
-        "IIS-WebServerRole",
-        "IIS-WebServer",
-        "IIS-CommonHttpFeatures",
-        "IIS-HostableWebCore",
-        "IIS-HealthAndDiagnostics",
-        "IIS-Performance",
-        "IIS-Security",
-        "IIS-FTPServer",
-        "IIS-WebServerManagementTools",
-        "Internet-Explorer-Optional-amd64",
-        "LegacyComponents",
-        "MediaPlayback",
-        "MicrosoftWindowsPowerShellV2",
-        "MicrosoftWindowsPowershellV2Root",
-        "Printing-PrintToPDFServices-Features",
-        "Printing-XPSServices-Features",
-        "WorkFolders-Client",
-        "XPS-Foundation-XPS-Viewer"
-    )
-    
-    foreach ($feature in $FeaturesToTry) {
-        try {
-            $featureExists = Get-WindowsOptionalFeature -Online -FeatureName $feature -ErrorAction SilentlyContinue
-            if ($featureExists -and $featureExists.State -ne "Disabled") {
-                # Evitar bloqueos: se añade -Confirm:$false y -NoRestart
-                Disable-WindowsOptionalFeature -Online -FeatureName $feature -NoRestart -Confirm:$false -ErrorAction SilentlyContinue -WarningAction SilentlyContinue | Out-Null
-                Write-Status -Types "+" -Status "Disabled feature: $feature"
-            }
-        } catch {
-            # Si falla, seguimos con la siguiente
-            Write-Status -Types "?" -Status "Could not disable feature: $feature"
-        }
-    }
-    
-    Write-Status -Types "+" -Status "Optional features processing finished"
-}
+# ========== ESTA FUNCIÓN HA SIDO ELIMINADA POR COMPLETO ==========
+# function Optimize-WindowsFeaturesList { ... }
 
 function Disable-AllDiagnostics {
     Write-Status -Types "-" -Status "COMPLETELY disabling diagnostics and telemetry..."
@@ -1448,13 +1409,12 @@ function Start-CompleteOptimization {
     Optimize-SSD
     Disable-Hibernate
     
-    # 3. Services and processes
+    # 3. Services and processes (sin Optimize-WindowsFeaturesList)
     Write-Host "`n=== SERVICES AND PROCESSES ===" -ForegroundColor Cyan
     Disable-IntelLMS
     Disable-AdobeServices
     Disable-TeredoIPv6
     Optimize-ServicesRunning
-    Optimize-WindowsFeaturesList
     
     # 4. Privacy
     Write-Host "`n=== PRIVACY ===" -ForegroundColor Cyan
