@@ -131,14 +131,14 @@ Write-Host Please sign out and back in, or restart your computer to apply the ch
         "service" = @(
             @{ Name = "CscService"; StartupType = "Disabled"; OriginalType = "Manual" },
             @{ Name = "DiagTrack"; StartupType = "Disabled"; OriginalType = "Automatic" },
-            @{ Name = "MapsBroker"; StartupType = "Manual"; OriginalType = "Automatic" },
+            @{ Name = "MapsBroker"; StartupType = "Disabled"; OriginalType = "Automatic" },   # cambiado Manual -> Disabled
             @{ Name = "RemoteAccess"; StartupType = "Disabled"; OriginalType = "Disabled" },
             @{ Name = "RemoteRegistry"; StartupType = "Disabled"; OriginalType = "Disabled" },
-            @{ Name = "StorSvc"; StartupType = "Manual"; OriginalType = "Automatic" },
-            @{ Name = "SharedAccess"; StartupType = "Disabled"; OriginalType = "Automatic" },
-            @{ Name = "TermService"; StartupType = "Manual"; OriginalType = "Manual" },
-            @{ Name = "TroubleshootingSvc"; StartupType = "Manual"; OriginalType = "Manual" },
-            @{ Name = "seclogon"; StartupType = "Manual"; OriginalType = "Manual" },
+            @{ Name = "StorSvc"; StartupType = "Disabled"; OriginalType = "Automatic" },      # cambiado Manual -> Disabled
+            @{ Name = "SharedAccess"; StartupType = "Disabled"; OriginalType = "Automatic" }, # cambiado Manual -> Disabled
+            @{ Name = "TermService"; StartupType = "Disabled"; OriginalType = "Manual" },     # cambiado Manual -> Disabled
+            @{ Name = "TroubleshootingSvc"; StartupType = "Disabled"; OriginalType = "Manual" }, # cambiado Manual -> Disabled
+            @{ Name = "seclogon"; StartupType = "Disabled"; OriginalType = "Manual" },        # cambiado Manual -> Disabled
             @{ Name = "ssh-agent"; StartupType = "Disabled"; OriginalType = "Disabled" }
         )
         "InvokeScript" = @(
@@ -1032,14 +1032,15 @@ function Optimize-ServicesRunning {
         "BthAvctpSvc", "bthserv", "RtkBtManServ", "DPS", "WdiServiceHost", "WdiSystemHost"
     )
     
-    $ServicesToManual = @(
+    # Servicios que antes estaban en Manual ahora se deshabilitan
+    $ServicesToAlsoDisable = @(
         "BITS", "FontCache", "PhoneSvc", "SCardSvr", "stisvc", "WMPNetworkSvc",
         "iphlpsvc", "lmhosts", "SharedAccess", "Wecsvc", "WerSvc", "BTAGService"
     )
     
     Set-ServiceStartup -ServiceNames $ServicesToDisabled -StartupType "Disabled"
-    Set-ServiceStartup -ServiceNames $ServicesToManual -StartupType "Manual"
-    Write-Status -Types "+" -Status "Services optimized (65+ services configured)"
+    Set-ServiceStartup -ServiceNames $ServicesToAlsoDisable -StartupType "Disabled"   # antes eran Manual, ahora Disabled
+    Write-Status -Types "+" -Status "Services optimized (65+ services configured to Disabled)"
 }
 
 # ========== ESTA FUNCIÓN HA SIDO ELIMINADA POR COMPLETO ==========
@@ -1274,18 +1275,6 @@ function Optimize-Explorer {
     Write-Status -Types "+" -Status "File Explorer optimized"
 }
 
-function Disable-HyperVForVMware {
-    Write-Host "Disabling Hyper-V for VMware..." -ForegroundColor Yellow
-    
-    try {
-        bcdedit /set hypervisorlaunchtype off | Out-Null
-        Disable-WindowsOptionalFeature -Online -FeatureName Microsoft-Hyper-V-All -NoRestart -ErrorAction SilentlyContinue
-        Write-Host "[+] Hyper-V disabled successfully" -ForegroundColor Green
-    } catch {
-        Write-Host "[-] Error disabling Hyper-V: $_" -ForegroundColor Red
-    }
-}
-
 function Optimize-Firewall {
     Write-Status -Types "@" -Status "Optimizing firewall configuration..."
     
@@ -1372,44 +1361,23 @@ function Start-CompleteOptimization {
         exit 1
     }
     
-    # Final confirmation
-    Write-Host "This IMPROVED version will:" -ForegroundColor Yellow
-    Write-Host "- Disable Hyper-V for VMware" -ForegroundColor White
-    Write-Host "- Remove bloatware and unnecessary services" -ForegroundColor White
-    Write-Host "- Optimize performance and privacy" -ForegroundColor White
-    Write-Host "- ELIMINATE Copilot, AI components and Recall" -ForegroundColor White
-    Write-Host "- Advanced network blocking (100+ domains)" -ForegroundColor White
-    Write-Host "- Remove physical telemetry files" -ForegroundColor White
-    Write-Host "- Hardening security without performance impact" -ForegroundColor White
-    Write-Host "- Deep system cleanup (DISM, WinSxS, Update cache)" -ForegroundColor White
-    Write-Host "- Disable input data collection & startup suggestions" -ForegroundColor White
-    Write-Host "- Optimize NTFS and remove unused language packs" -ForegroundColor White
-    Write-Host "- Apply WinUtil tweaks (activity history, telemetry, widgets, etc.)" -ForegroundColor White
-    Write-Host "- Generate detailed log file in TEMP folder" -ForegroundColor White
-    Write-Host ""
-    Write-Host "Continue? (y/n)" -ForegroundColor Yellow
-    $confirm = Read-Host
-    
-    if ($confirm -ne 'y' -and $confirm -ne 'Y') {
-        Write-Host "Execution cancelled" -ForegroundColor Red
-        exit 0
-    }
+    # Se ha eliminado la confirmación y/n
     
     # EXECUTE OPTIMIZATIONS
     Write-Host ""
     Write-Host "STARTING OPTIMIZATIONS..." -ForegroundColor Green
     Write-Host "================================================" -ForegroundColor Green
     
-    # 1. Hyper-V for VMware
-    Write-Host "`n=== VMWARE COMPATIBILITY ===" -ForegroundColor Cyan
-    Disable-HyperVForVMware
+    # 1. Hyper-V (ya no se llama a VMware)
+    Write-Host "`n=== HYPER-V DISABLE ===" -ForegroundColor Cyan
+    Disable-HyperV
     
     # 2. System optimizations
     Write-Host "`n=== SYSTEM OPTIMIZATIONS ===" -ForegroundColor Cyan
     Optimize-SSD
     Disable-Hibernate
     
-    # 3. Services and processes (sin Optimize-WindowsFeaturesList)
+    # 3. Services and processes
     Write-Host "`n=== SERVICES AND PROCESSES ===" -ForegroundColor Cyan
     Disable-IntelLMS
     Disable-AdobeServices
@@ -1486,7 +1454,7 @@ function Start-CompleteOptimization {
     Write-Host "================================================" -ForegroundColor Green
     Write-Host ""
     Write-Host "Applied optimizations:" -ForegroundColor Yellow
-    Write-Host "  - Hyper-V disabled for VMware" -ForegroundColor Green
+    Write-Host "  - Hyper-V disabled" -ForegroundColor Green
     Write-Host "  - SSD optimized and hibernation disabled" -ForegroundColor Green
     Write-Host "  - 65+ unnecessary services disabled" -ForegroundColor Green
     Write-Host "  - Telemetry and diagnostics COMPLETELY disabled" -ForegroundColor Green
