@@ -124,21 +124,21 @@ Write-Host Please sign out and back in, or restart your computer to apply the ch
         "UndoScript" = @("[Environment]::SetEnvironmentVariable('POWERSHELL_TELEMETRY_OPTOUT', '', 'Machine')")
     }
     "WPFTweaksServices" = @{
-        "Content" = "Services - Set to Manual"
-        "Description" = "Turns a bunch of system services to manual that don't need to be running all the time. This is pretty harmless as if the service is needed, it will simply start on demand."
+        "Content" = "Services - Set to Disabled (was Manual)"
+        "Description" = "Turns a bunch of system services to disabled. If needed, they won't start."
         "category" = "Essential Tweaks"
         "panel" = "1"
         "service" = @(
             @{ Name = "CscService"; StartupType = "Disabled"; OriginalType = "Manual" },
             @{ Name = "DiagTrack"; StartupType = "Disabled"; OriginalType = "Automatic" },
-            @{ Name = "MapsBroker"; StartupType = "Disabled"; OriginalType = "Automatic" },   # cambiado Manual -> Disabled
+            @{ Name = "MapsBroker"; StartupType = "Disabled"; OriginalType = "Automatic" },
             @{ Name = "RemoteAccess"; StartupType = "Disabled"; OriginalType = "Disabled" },
             @{ Name = "RemoteRegistry"; StartupType = "Disabled"; OriginalType = "Disabled" },
-            @{ Name = "StorSvc"; StartupType = "Disabled"; OriginalType = "Automatic" },      # cambiado Manual -> Disabled
-            @{ Name = "SharedAccess"; StartupType = "Disabled"; OriginalType = "Automatic" }, # cambiado Manual -> Disabled
-            @{ Name = "TermService"; StartupType = "Disabled"; OriginalType = "Manual" },     # cambiado Manual -> Disabled
-            @{ Name = "TroubleshootingSvc"; StartupType = "Disabled"; OriginalType = "Manual" }, # cambiado Manual -> Disabled
-            @{ Name = "seclogon"; StartupType = "Disabled"; OriginalType = "Manual" },        # cambiado Manual -> Disabled
+            @{ Name = "StorSvc"; StartupType = "Disabled"; OriginalType = "Automatic" },
+            @{ Name = "SharedAccess"; StartupType = "Disabled"; OriginalType = "Automatic" },
+            @{ Name = "TermService"; StartupType = "Disabled"; OriginalType = "Manual" },
+            @{ Name = "TroubleshootingSvc"; StartupType = "Disabled"; OriginalType = "Manual" },
+            @{ Name = "seclogon"; StartupType = "Disabled"; OriginalType = "Manual" },
             @{ Name = "ssh-agent"; StartupType = "Disabled"; OriginalType = "Disabled" }
         )
         "InvokeScript" = @(
@@ -962,7 +962,7 @@ function Disable-HyperV {
         Write-Status -Types "?" -Status "Could not modify boot configuration"
     }
     
-    Write-Status -Types "+" -Status "Hyper-V completely disabled - VMware will work at maximum performance"
+    Write-Status -Types "+" -Status "Hyper-V completely disabled"
 }
 
 function Optimize-SSD {
@@ -1029,18 +1029,24 @@ function Optimize-ServicesRunning {
         "WalletService", "Payments", "NgcSvc", "NgcCtnrSvc", "DiagSvc", "AVCTPService",
         "edgeupdate", "edgeupdatem", "MicrosoftEdgeElevationService", "XblAuthManager",
         "XblGameSave", "XboxGipSvc", "XboxNetApiSvc", "WbioSrvc", "wisvc", "WpnService",
-        "BthAvctpSvc", "bthserv", "RtkBtManServ", "DPS", "WdiServiceHost", "WdiSystemHost"
+        "BthAvctpSvc", "bthserv", "RtkBtManServ", "DPS", "WdiServiceHost", "WdiSystemHost",
+        # Nuevos servicios añadidos:
+        "SysMain",           # Superfetch (optimización de rendimiento)
+        "Spooler",           # Cola de impresión (Print Spooler)
+        "LanmanWorkstation"  # Estación de trabajo (Workstation)
+        # Nota: NgcSvc (Microsoft Passport) ya estaba incluido arriba
+        # WSearch ya estaba incluido
     )
     
-    # Servicios que antes estaban en Manual ahora se deshabilitan
+    # Servicios que antes estaban en Manual y ahora se deshabilitan
     $ServicesToAlsoDisable = @(
         "BITS", "FontCache", "PhoneSvc", "SCardSvr", "stisvc", "WMPNetworkSvc",
         "iphlpsvc", "lmhosts", "SharedAccess", "Wecsvc", "WerSvc", "BTAGService"
     )
     
     Set-ServiceStartup -ServiceNames $ServicesToDisabled -StartupType "Disabled"
-    Set-ServiceStartup -ServiceNames $ServicesToAlsoDisable -StartupType "Disabled"   # antes eran Manual, ahora Disabled
-    Write-Status -Types "+" -Status "Services optimized (65+ services configured to Disabled)"
+    Set-ServiceStartup -ServiceNames $ServicesToAlsoDisable -StartupType "Disabled"
+    Write-Status -Types "+" -Status "Services optimized (70+ services configured to Disabled)"
 }
 
 # ========== ESTA FUNCIÓN HA SIDO ELIMINADA POR COMPLETO ==========
@@ -1361,14 +1367,14 @@ function Start-CompleteOptimization {
         exit 1
     }
     
-    # Se ha eliminado la confirmación y/n
+    # Se ha eliminado la confirmación y/n - ejecución directa
     
     # EXECUTE OPTIMIZATIONS
     Write-Host ""
     Write-Host "STARTING OPTIMIZATIONS..." -ForegroundColor Green
     Write-Host "================================================" -ForegroundColor Green
     
-    # 1. Hyper-V (ya no se llama a VMware)
+    # 1. Hyper-V (sin VMware)
     Write-Host "`n=== HYPER-V DISABLE ===" -ForegroundColor Cyan
     Disable-HyperV
     
@@ -1456,7 +1462,7 @@ function Start-CompleteOptimization {
     Write-Host "Applied optimizations:" -ForegroundColor Yellow
     Write-Host "  - Hyper-V disabled" -ForegroundColor Green
     Write-Host "  - SSD optimized and hibernation disabled" -ForegroundColor Green
-    Write-Host "  - 65+ unnecessary services disabled" -ForegroundColor Green
+    Write-Host "  - 70+ unnecessary services disabled (including SysMain, Passport, Spooler, Workstation, WSearch)" -ForegroundColor Green
     Write-Host "  - Telemetry and diagnostics COMPLETELY disabled" -ForegroundColor Green
     Write-Host "  - Copilot, AI components and Recall ELIMINATED" -ForegroundColor Green
     Write-Host "  - Advanced network blocking (100+ domains)" -ForegroundColor Green
